@@ -1,0 +1,12 @@
+[submodule "custom/pulsar"]
+	path = custom/pulsar
+	url = https://github.com/protesilaos/pulsar
+[submodule "custom/treesit-auto"]
+	path = custom/treesit-auto
+	url = https://github.com/renzmann/treesit-auto
+[submodule "custom/org-cliplink"]
+	path = custom/org-cliplink
+	url = https://github.com/rexim/org-cliplink
+[submodule "custom/dired-preview"]
+	path = custom/dired-preview
+	url = https://github.com/protesilaos/dired-preview
