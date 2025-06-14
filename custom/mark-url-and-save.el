@@ -4,6 +4,7 @@
 ;;    Tries to embedded inline images as base64 image data. For offline reading.
 
 ;;; Code:
+
 (require 'url)
 (require 'url-parse)
 (require 'base64)
@@ -17,6 +18,10 @@
 
 (defun cf/resolve-url (relative base)
   (url-expand-file-name relative base))
+
+(defun cf/escape-replacement (string)
+  "Escape \\ and & in STRING for safe use in `replace-regexp-in-string' replacement."
+  (replace-regexp-in-string "[\\&]" (lambda (m) (concat "\\" m)) string t t))
 
 (defun cf/base64-encode-url (url callback)
   (url-retrieve
@@ -44,31 +49,13 @@
       (setq i (1+ i)))
     full-path))
 
-;; (defun cf/cleanup-html-tags (html)
-;;   "Remove residual or invalid HTML constructs in HTML string."
-;;   (let ((clean html))
-;;     (setq clean (replace-regexp-in-string "srcset=[\"'][^\"']*[\"']" "" clean))
-;;     (setq clean (replace-regexp-in-string
-;;                  "<img\\([^>]*\\)?>"  ; match <img ...>
-;;                  (lambda (img)
-;;                    (if (string-match "src=[\"']data:[^\"']+[\"']" img)
-;;                        img
-;;                      "")) clean))
-;;     (setq clean (replace-regexp-in-string "<\\([^>]+\\)>"
-;;                                           (lambda (tag)
-;;                                             (replace-regexp-in-string "[ \t]+" " " tag))
-;;                                           clean))
-;;     (setq clean (replace-regexp-in-string "<!--.*?-->" "" clean))
-;;     clean))
-
 (defun cf/cleanup-html-tags (html)
   "Remove residual or invalid HTML constructs in HTML string."
   (let ((clean html))
     (setq clean (replace-regexp-in-string
                  "srcset=[\"'][^\"']*[\"']"
                  ""
-                 clean
-                 t t)) ;; literal replace
+                 clean t t))
     (setq clean (replace-regexp-in-string
                  "<img\\([^>]*\\)?>"
                  (lambda (img)
@@ -83,10 +70,10 @@
                  clean))
     (setq clean (replace-regexp-in-string "<!--.*?-->" "" clean t))
     clean))
+
 (defun cf/inline-images-in-html (html base-url callback)
   "Inline all image src and srcset URLs as base64 data URIs in HTML."
-  (let ((img-urls '())
-        (replacements '())
+  (let ((replacements '())
         (pending 0))
     (with-temp-buffer
       (insert html)
@@ -108,13 +95,14 @@
               (cf/base64-encode-url
                resolved
                (lambda (data-uri)
-                 (let* ((new-tag (replace-regexp-in-string
-                                  "srcset=[\"'][^\"']+[\"']" "" ; remove srcset
+                 (let* ((escaped-src (cf/escape-replacement (format "src=\"%s\"" data-uri)))
+                        (new-tag (replace-regexp-in-string
+                                  "srcset=[\"'][^\"']+[\"']" ""
                                   (replace-regexp-in-string
                                    "src=[\"'][^\"']+[\"']"
-                                   (format "src=\"%s\"" data-uri)
-                                   img-tag t)
-                                  t)))
+                                   escaped-src
+                                   img-tag t t)
+                                  t t)))
                    (push (list start end new-tag) replacements))
                  (cl-decf pending)
                  (when (zerop pending)
@@ -271,14 +259,5 @@ BOOKMARK non-nil triggers bookmarking."
 (keymap-global-set "C-M-~" #'cf/alternate-mark-url-and-save)
 (keymap-global-set "C-M-#" #'cf/save-eww-page)
 
-
-
-;;; _
 (provide 'mark-url-and-save)
-;; Local Variables:
-;; coding: utf-8
-;; fill-column: 90
-;; require-final-newline: t
-;; indent-tabs-mode: nil
-;; End:
 ;;; mark-url-and-save.el ends here
