@@ -486,8 +486,10 @@
 (#("Tabac Journalier" 0 16
    (face minibuffer-prompt rear-nonsticky t front-sticky t))
  (filename
-  . "/home/cf/Documents/dc/fisc/2025/ledger-2025/tabac-journalier.ldg")
- (position . 28180))
+  . "~/Documents/dc/fisc/2025/ledger-2025/tabac-journalier.ldg")
+ (front-context-string . "    Tabac:Fumage")
+ (rear-context-string . "16h07    1 tope\n") (position . 28420)
+ (last-modified 26746 50396 356668 558000))
 ("Ledger config. (init.el)" (filename . "~/.emacs.d/init.el")
  (front-context-string . "  :custom\n  (led")
  (rear-context-string . "ode \"\\\\.ldg\\\\'\"\n") (position . 57437)

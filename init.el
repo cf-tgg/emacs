@@ -2,7 +2,7 @@
 
 ;;; Commentary:
 ;;     Emacs from scratch.
-;;     Time-stamp: <2025-07-18 17:05:50 cf>
+;;     Time-stamp: <2025-07-18 18:15:04 cf>
 ;;     [Linux 6.14.6-zen1-1-zen x86_64 GNU/Linux]
 
 ;;; Code:
@@ -249,9 +249,9 @@ or from the command line with:
          (display-buffer-reuse-window display-buffer-below-selected display-buffer-in-direction)
          (body-function . select-window)
          (direction . right)
-         (slot . 1)
-         (window-height . 0.3)
          (window-width . 0.5)
+         (direction . bottom)
+         (window-height . 0.3)
          (window-parameters . ((mode-line-format . none))))
 
         ("\\*eww\\*"
@@ -259,10 +259,8 @@ or from the command line with:
          (body-function . select-window)
          (window-width . 0.5)
          (direction . right)
-         (slot . 0)
          (window-height . 0.5)
          (direction . bottom)
-         (slot . -1)
          (window-parameters . ((header-line-format . none)
                                (mode-line-format . none))))
 
@@ -277,34 +275,30 @@ or from the command line with:
                                (mode-line-format . none))))
 
         ("\\*\\(Ibuffer\\|Colors\\|Messages\\)*"
-         (display-buffer-reuse-mode-window display-buffer-below-selected display-buffer-in-direction display-buffer-in-side-window)
+         (display-buffer-reuse-mode-window display-buffer-below-selected display-buffer-in-direction)
          (body-function . select-window)
          (direction . bottom)
-         (side . bottom)
-         (slot . 1)
          (window-height . 0.3)
          (direction . right)
-         (side . right)
-         (slot . 1)
          (window-width . 0.5)
          (window-parameters . ((mode-line-format .  none))))
 
         ("\\*Occur\\*"
-         (display-buffer-reuse-mode-window display-buffer-in-side-window)
-         (side . bottom)
-         (slot . 1)
+         (display-buffer-reuse-mode-window display-buffer-at-bottom display-buffer-in-direction)
+         (direction . bottom)
          (window-height . 0.3)
+         (direction . right)
+         (window-width . 0.5)
          (window-parameters . ((mode-line-format . none))))
 
-        ("\\*Completions\\*"
+        ("\\*\\(Completions\\| transient\\)\\*"
          (display-buffer-reuse-window display-buffer-at-bottom)
          (window-height . fit-window-to-buffer)
          (window-parameters . ((mode-line-format . none))))
 
         ("\\*compilation\\*"
-         (display-buffer-reuse-mode-window display-buffer-below-selected display-buffer-in-side-window)
-         (side . bottom)
-         (slot . -1)
+         (display-buffer-reuse-mode-window display-buffer-below-selected display-buffer-in-direction)
+         (direction . bottom)
          (dedicated . t)
          (reusable-frames . visible)
          (window-height . 12)
@@ -2253,6 +2247,7 @@ named 'eqtabac'.  Otherwise, displays the inserted transaction in the echo area.
                      (ledger-report  "tabac-journalier" nil)))
           (message "%s" (string-trim tabac-ya))))))
 
+  :bind
   ("C-c C-0" . cf/ledger-insert-tabac))
 
 
