@@ -2,7 +2,7 @@
 
 ;;; Commentary:
 ;;     Emacs from scratch.
-;;     Time-stamp: <2025-07-18 14:34:13 cf>
+;;     Time-stamp: <2025-07-18 17:05:50 cf>
 ;;     [Linux 6.14.6-zen1-1-zen x86_64 GNU/Linux]
 
 ;;; Code:
@@ -117,12 +117,27 @@ DEFINITIONS is a sequence of string and command pairs."
      (3 font-lock-variable-name-face nil t))))
 (font-lock-add-keywords 'emacs-lisp-mode cf-font-lock-keywords)
 
-(require 'buffer-move)
-(require 'app-launchers)
-(require 'cf-modeline)
-(require 'hls-playlist-mode)
 (require 'bookmark)
-(require 'spmacs)
+(require 'buffer-move)
+(require 'cf-app-launchers)
+(require 'cf-common-abbrev-table)
+(require 'cf-common)
+(require 'cf-custom-functions)
+(require 'cf-gemtext-mode)
+(require 'cf-gnus)
+(require 'cf-hls-playlist-mode)
+(require 'cf-linux-installer)
+(require 'cf-mark-url-and-save)
+(require 'cf-modeline)
+(require 'cf-mu4e)
+(require 'cf-pjumper)
+(require 'cf-popup-frame)
+(require 'cf-scratch)
+(require 'cf-sdcv-definition)
+(require 'cf-spmacs)
+(require 'cf-visit-gh-raw)
+(require 'cf-yt-dired)
+;;  (require 'cf-minibuffer-frame.el)
 
 (use-package taxy
   :ensure nil
@@ -527,7 +542,7 @@ or from the command line with:
   :diminish " "
   :hook (woman-mode Man-mode help-mode shortdoc-mode)
   :init
-  (require 'sdcv-definition)
+  (require 'cf-sdcv-definition)
   (require 'multiple-cursors)
   (require 'expreg)
   (require 'crux)
@@ -2033,13 +2048,13 @@ Return cons (ICON . POSITION) or nil."
   :mode "skhkdrc\\'")
 
 ;;  HLS Playlist :hls:
-(use-package hls-playlist-mode
+(use-package cf-hls-playlist-mode
   :ensure nil
   :load-path "~/.emacs.d/custom/"
   :defer t
   :mode "\\.m3u8\\'"
   :config
-  (require 'hls-playlist-mode))
+  (require 'cf-hls-playlist-mode))
 
 (use-package cider
   :ensure t
@@ -2794,7 +2809,7 @@ If NO-FOLLOW is non-nil, don't select the moved buffer."
 ;;; Documentation
 
 ;; SDCV Local Dictionary Definitions
-(use-package sdcv-definition
+(use-package cf-sdcv-definition
   :ensure nil
   :commands (cf/lookup-word)
   :custom
@@ -2809,7 +2824,7 @@ If NO-FOLLOW is non-nil, don't select the moved buffer."
    ("d" . cf/scroll-up-and-recenter)
    ("u" . cf/scroll-down-and-recenter))
   :config
-  (require 'sdcv-definition))
+  (require 'cf-sdcv-definition))
 
 ;; Dictionary
 (use-package dictionary
@@ -4269,11 +4284,11 @@ Example:
   (add-hook 'eww-after-render-hook #'eww-readable))
 
 ;; Local, org-formatted, webpages minus the bloat, with embedded base64 images.
-(use-package mark-url-and-save
+(use-package cf-mark-url-and-save
   :ensure nil
   :after eww
   :load-path "~/.emacs.d/custom/"
-  :init (require 'mark-url-and-save)
+  :init (require 'cf-mark-url-and-save)
   :config
   ;; EwwSurfraw
   (defvar cf-sr-default-elvi
@@ -4322,7 +4337,7 @@ If missing, prompts for ELVI and/or QUERY."
   :load-path "~/.emacs.d/custom/"
   :hook (elpher-mode . hl-line-mode)
   :init
-  (require 'sdcv-definition)
+  (require 'cf-sdcv-definition)
   (require 'multiple-cursors)
   (require 'expreg)
   (require 'crux)
@@ -4461,7 +4476,7 @@ If missing, prompts for ELVI and/or QUERY."
   :init
   (require 'key-chord)
   (require 'iy-go-to-char)
-  (require 'sdcv-definition)
+  (require 'cf-sdcv-definition)
   (require 'cf-common-abbrev-table)
   (require 'crux)
   :config
