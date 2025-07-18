@@ -2,7 +2,7 @@
 
 ;;; Commentary:
 ;;     Emacs from scratch.
-;;     Time-stamp: <2025-07-18 18:15:04 cf>
+;;     Time-stamp: <2025-07-18 19:21:21 cf>
 ;;     [Linux 6.14.6-zen1-1-zen x86_64 GNU/Linux]
 
 ;;; Code:
@@ -208,8 +208,8 @@ or from the command line with:
     (signal-process (emacs-pid) 'sigusr1))
 
   :bind
-  (("C-c B"   . cf/mode-line-toggle)
-   ("C-c E"   . cf/print-env)
+  (("C-c M-b"   . cf/mode-line-toggle)
+   ("C-c M-e"   . cf/print-env)
    ("C-c C-c" . compile-command)
    ("C-c M-k" . cf/restart-server)))
 

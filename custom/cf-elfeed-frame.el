@@ -85,7 +85,6 @@ If no prefix argument is given, prompt for elvi choice with completion."
       (message "Failed to retrieve URL."))))
 (keymap-global-set "C-c s" #'cf/sr-elvi-search)
 
-
 ;; Shr html renderer
 (use-package shr
   :ensure nil
@@ -338,5 +337,8 @@ If no prefix argument is given, prompt for elvi choice with completion."
     (elfeed)
     (delete-other-windows)))
 
+
+
+;;; _
 (provide 'cf-elfeed-frame)
-;;; cf-elfeed-frame.el ends here.
+;;; cf-elfeed-frame.el ends here

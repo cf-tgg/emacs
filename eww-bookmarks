@@ -1,5 +1,8 @@
 ;; Auto-generated file; don't edit -*- mode: lisp-data -*-
-((:url "https://tronche.com/gui/x/xlib/" :title "" :time
+((:url "https://cabal.readthedocs.io/en/stable/" :title
+       "Welcome to the Cabal User Guide — Cabal 3.16.0.0 User's Guide"
+       :time "Fri Jul 18 18:23:01 2025")
+ (:url "https://tronche.com/gui/x/xlib/" :title "" :time
        "Fri Jul 18 06:58:25 2025")
  (:url "https://indieweb.org/principles" :title
        "principles - IndieWeb" :time "Fri Jul 18 01:31:12 2025")
