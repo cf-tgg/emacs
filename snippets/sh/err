@@ -1,7 +1,0 @@
-# -*- mode: snippet -*-
-# name: err
-# key: err
-# --
- || { echo "${1:errmsg}" >&2 ; exit 1 ; }
-
-$0

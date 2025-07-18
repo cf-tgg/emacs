@@ -1,8 +1,0 @@
-# -*- mode: snippet -*-
-# name: shm
-# key: shm
-# --
-#!/bin/sh
-# -*- mode: sh; -*- vim: ft=sh:ts=2:sw=2:et:
-
-$1
