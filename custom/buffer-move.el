@@ -1,4 +1,4 @@
-;;; buffer-move.el --- Buffer move allows for better window controls. -*- lexical-binding:nil ;-*-
+;;; buffer-move.el --- Buffer move allows for better window controls. -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2004-2014  Lucas Bonnet <lucas@rincevent.net.fr>
 
@@ -96,6 +96,8 @@ one, an error is signaled."
       (set-window-buffer other-win buf-this-buf)
       (select-window other-win))))
 
-(provide 'buffer-move)
 
+
+;;; _
+(provide 'buffer-move)
 ;;; buffer-move.el ends here
