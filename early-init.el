@@ -1,15 +1,16 @@
 ;;; early-init.el --- Emacs early-init-file -*- lexical-binding: t; -*-
 
 ;;; Commentary:
-;;    Disable loading packages at startup for Elpaca setup.
+;;    See: (info "(emacs) Init File")
 
 ;;; Code:
 
-(setq package-enable-at-startup nil)
+(setq package-enable-at-startup t)
 
 (defun cf-add-to-list (list element)
   "Add to symbol of LIST the given ELEMENT.
-Simplified version of `add-to-list'."
+Simplified version of `add-to-list'.
+From Protesilaos Stravou \"dotemacs\": <https://protesilaos.com/emacs/dotemacs/>."
   (set list (cons element (symbol-value list))))
 
 (mapc
@@ -20,9 +21,9 @@ Simplified version of `add-to-list'."
 
 (setq frame-resize-pixelwise t
       frame-inhibit-implied-resize t
-      frame-title-format '("%b")
+      frame-title-format '("%F")
       ring-bell-function 'ignore
-      use-dialog-box t
+      use-dialog-box nil
       use-file-dialog nil
       use-short-answers t
       inhibit-splash-screen t
@@ -30,20 +31,27 @@ Simplified version of `add-to-list'."
       inhibit-startup-echo-area-message user-login-name
       inhibit-startup-buffer-menu t)
 
-(set-face-attribute 'default nil :family "Iosevka Nerd Font" :height 120)
-(set-face-attribute 'variable-pitch nil :family "Iosevka Nerd Font Propo")
-(set-face-attribute 'fixed-pitch nil :family "Iosevka Nerd Font Mono")
+;; From Protesilaos' backlog <https://protesilaos.com/emacs/dotemacs/>
+(defun cf-emacs-avoid-initial-flash-of-light ()
+  "Sets dark background and fonts for initial frame."
+  (setq-default mode-line-format nil)
+  (set-face-attribute 'default nil :family "Iosevka Nerd Font" :height 100 :background "#181818" :foreground "#f0f3f0")
+  (set-face-attribute 'mode-line nil :family "Iosevka Nerd Font Mono" :background "#282828" :foreground "#484848")
+  (set-face-attribute 'variable-pitch nil :family "Iosevka Nerd Font Propo" :background "#181818")
+  (set-face-attribute 'fixed-pitch nil :family "Iosevka Nerd Font Mono" :background "#181818"))
+(cf-emacs-avoid-initial-flash-of-light)
 
 (modify-all-frames-parameters
- '((right-divider-width . 2)
-   (internal-border-width . 5)
+ '((right-divider-width . 4)
+   (internal-border-width . 4)
    (alpha 99 96)))
 
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 (column-number-mode 1)
-(setq-default initial-scratch-message ";; -*- lexical-binding:t -*-\n\n")
+
+(setq-default initial-scratch-message ";; -*- lexical-binding: t; -*-\n\n")
 
 (setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 0.5)
@@ -61,16 +69,17 @@ Simplified version of `add-to-list'."
                       (time-subtract after-init-time before-init-time))
                      gcs-done)
             (setq read-process-output-max (* 1024 1024))
-            (set-frame-name
-             (concat "Emacs "
-                     (car (split-string emacs-version " ("))))))
+            (let ((version (car (split-string emacs-version " ("))))
+              (set-frame-name (concat "Emacs " version)))))
 
+;; Speed up package initialization.
+(setopt package-quickstart nil)
 
 
 ;; -
 (provide 'early-init)
 ;; Local Variables:
-;; coding: utf-8
+;; coding: utf-8-emacs
 ;; fill-column: 80
 ;; no-byte-compile: t
 ;; indent-tabs-mode: nil
