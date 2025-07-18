@@ -97,6 +97,27 @@
 ;;         ("<return>"   . minibuffer-choose-completion-or-exit)
 ;;         ("M-RET"      . minibuffer-force-complete-and-exit)
 ;;         ("C-g"        . minibuffer-hide-completions)))
+;;
+;;  Dedicated Minibuffer Frame
+;;  (require 'cf-minibuffer-frame)
+;;  (setq default-minibuffer-frame (cf/minibuffer-frame))
+;;   (setq default-frame-alist
+;;        (append
+;;         '((minibuffer . nil))
+;;         default-frame-alist))
+;;   (setq minibuffer-frame-alist
+;;        '((name . "minibuffer")
+;;          (minibuffer . only)
+;;          (undecorated . t)
+;;          (visibility . nil)
+;;          (skip-taskbar . t)
+;;          (tool-bar-lines . 0)
+;;          (menu-bar-lines . 0)
+;;          (internal-border-width . 10)
+;;          (width . 140)
+;;          (height . 1)
+;;          (left . 600)
+;;          (top . 100)))
 
 ;;; Code:
 
@@ -131,7 +152,6 @@
   "Initialize a reusable hidden minibuffer-only frame at startup."
   (setq cf-minibuffer-frame (cf/minibuffer-frame))
   (setq default-minibuffer-frame cf-minibuffer-frame))
-
 (add-hook 'after-init-hook #'cf--init-minibuffer-frame)
 
 ;;; _

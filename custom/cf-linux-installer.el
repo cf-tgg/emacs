@@ -5,8 +5,9 @@
 
 ;;; Code:
 
-(require 'subr-x)
-(require 'cl-lib)
+(eval-when-compile
+  (require 'subr-x)
+  (require 'cl-lib))
 
 (defgroup cf/linux-installer nil
   "Minimal Linux installer with LUKS support."
@@ -65,7 +66,6 @@
     (cf/linux--run "genfstab -U /mnt > /mnt/etc/fstab")
     (message "Base system installed. Continue setup with chroot.")
     (cf/linux--run "arch-chroot /mnt"))
-
   (message "Linux installation complete."))
 
 

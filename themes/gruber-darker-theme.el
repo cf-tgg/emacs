@@ -299,7 +299,7 @@
 
    ;; Mode Line
    `(mode-line ((t ,(list :background gruber-darker-bg+1
-                          :foreground "#7e8e7f"))))
+                          :foreground "#424242"))))
    `(mode-line-buffer-id ((t ,(list :background gruber-darker-bg+1
                                     :foreground gruber-darker-fg))))
    `(mode-line-inactive ((t ,(list :background gruber-darker-bg+1

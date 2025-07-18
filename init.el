@@ -1,48 +1,42 @@
-;;; init.el --- Emacs init. file -*- lexical-binding:t -*-
+;;; init.el --- Emacs init. file -*- lexical-binding:t; -*-
 
 ;;; Commentary:
-;;     Emacs from scratch. [ art ]
-;;     LastEdited:   [ 2025-05-08 05:19 ]
-;;     LastCompiled: [ 2025-05-08 05:33 ]
+;;     Emacs from scratch.
+;;     Time-stamp: <2025-07-18 14:34:13 cf>
+;;     [Linux 6.14.6-zen1-1-zen x86_64 GNU/Linux]
 
 ;;; Code:
 
 ;; Local Custom Package Directory
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/custom/"))
+(add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
+(setq custom-theme-directory "~/.emacs.d/themes/")
+(load-theme 'gruber-darker t)
 
-;; Dedicated Minibuffer Frame
-(require 'cf-minibuffer-frame)
-(setq default-minibuffer-frame (cf/minibuffer-frame))
-
-(setq default-frame-alist
-      (append
-       '((minibuffer . nil))
-       default-frame-alist))
-
-(setq minibuffer-frame-alist
-      '((name . "minibuffer")
-        (minibuffer . only)
-        (undecorated . t)
-        (visibility . nil)
-        (skip-taskbar . t)
-        (tool-bar-lines . 0)
-        (menu-bar-lines . 0)
-        (internal-border-width . 10)
-        (width . 140)
-        (height . 1)
-        (left . 600)
-        (top . 100)))
+(when (native-comp-available-p)
+  (setq native-comp-async-report-warnings-errors 'silent) ; Emacs 28 with native compilation
+  (setq native-compile-prune-cache t)) ; Emacs 29
+(setq package-vc-register-as-project nil) ; Emacs 30
 
 ;; Package Setup
-;; (require 'elpaca-setup)
 (require 'package)
 (package-initialize)
 
+;; Sources
 (setq package-archives
-      '(("melpa" . "https://melpa.org/packages/")
-        ("gnu-devel" . "https://elpa.gnu.org/devel/")
-        ("ORG ELPA" . "https://orgmode.org/elpa/")
-        ("nongnu-devel" . "https://elpa.nongnu.org/nongnu-devel/")))
+      '(("melpa"          . "https://melpa.org/packages/")
+        ("gnu-elpa"       . "https://elpa.gnu.org/packages/")
+        ("gnu-elpa-devel" . "https://elpa.gnu.org/devel/")
+        ("nongnu"         . "https://elpa.nongnu.org/nongnu/")))
+
+;; Highest number gets priority (what is not mentioned has priority 0)
+(setq package-archive-priorities
+      '(("gnu-elpa-devel" . 4)
+        ("gnu-elpa" . 3)
+        ("melpa"    . 2)
+        ("nongnu"   . 1)))
+
+(setq package-install-upgrade-built-in t)
 
 (unless package-archive-contents
   (package-refresh-contents))
@@ -50,18 +44,134 @@
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 (require 'use-package)
+
 (setq use-package-verbose t
       use-package-compute-statistics t
       use-package-always-ensure nil)
 
+(use-package slime
+  :ensure t
+  :config
+  (setq inferior-lisp-program "/usr/local/bin/sbcl")
+  (add-hook 'slime-load-hook
+            (lambda ()
+              (define-key slime-prefix-map (kbd "M-h") 'slime-documentation-lookup))))
+
+(defmacro cf-keybind (keymap &rest definitions)
+  "Expand key binding DEFINITIONS for the given KEYMAP.
+DEFINITIONS is a sequence of string and command pairs."
+  (declare (indent 1))
+  (unless (zerop (% (length definitions) 2))
+    (error "Uneven number of key+command pairs"))
+  (let ((keys (seq-filter #'stringp definitions))
+        ;; We do accept nil as a definition: it unsets the given key.
+        (commands (seq-remove #'stringp definitions)))
+    `(when-let* (((keymapp ,keymap))
+                 (map ,keymap))
+       ,@(mapcar
+          (lambda (pair)
+            (let* ((key (car pair))
+                   (command (cdr pair)))
+              (unless (and (null key) (null command))
+                `(define-key map (kbd ,key) ,command))))
+          (cl-mapcar #'cons keys commands)))))
+
+(defun cf/insert-use-package-bindings-for-map (map-symbol)
+  "Generate and insert a `:bind (:map MAP ...)` block from MAP-SYMBOL."
+  (interactive
+   (let ((sym (intern (completing-read "Map symbol: " obarray
+                (lambda (s)
+                  (and (boundp s)
+                       (keymapp (symbol-value s))))
+                t))))
+     (list sym)))
+  (let* ((map (symbol-value map-symbol))
+         (bindings '()))
+    (map-keymap
+     (lambda (key fn)
+       (when (and (not (keymapp fn))
+                  (not (memq fn '(undefined ignore))))
+         (let ((desc (key-description (vector key))))
+           (push (format "(\"%s\" . %s)" desc fn) bindings))))
+     map)
+    (let ((bind-decl
+           (format
+            "\n:bind\n(:map %s\n      %s)"
+            map-symbol
+            (mapconcat #'identity
+                       (nreverse bindings)
+                       "\n      "))))
+      (insert bind-decl)
+      (message "Inserted :bind (:map ...) declaration for %s" map-symbol))))
+
+(defvar cf-package-form-regexp
+  "^(\\(cf-keybind\\|cf-abbrev\\) +'?\\([0-9a-zA-Z-]+\\)"
+  "Regexp to add packages to `lisp-imenu-generic-expression'.")
+
+(eval-after-load 'lisp-mode
+  `(add-to-list 'lisp-imenu-generic-expression
+                (list "Packages" ,cf-package-form-regexp 2)))
+
+(defconst cf-font-lock-keywords
+  '(("(\\(cf-\\(keybind\\|abbrev\\)\\)\\_>[ \t']*\\(\\(\\sw\\|\\s_\\)+\\)?"
+     (3 font-lock-variable-name-face nil t))))
+(font-lock-add-keywords 'emacs-lisp-mode cf-font-lock-keywords)
+
 (require 'buffer-move)
 (require 'app-launchers)
+(require 'cf-modeline)
+(require 'hls-playlist-mode)
+(require 'bookmark)
+(require 'spmacs)
+
+(use-package taxy
+  :ensure nil
+  :load-path "~/.emacs.d/custom/taxy/"
+  :config
+  (require 'taxy)
+  (add-to-list 'load-path (expand-file-name "~/.emacs.d/custom/taxy/examples/"))
+  (require 'musicy))
 
 (use-package server
   :ensure nil
+  :hook (after-init . server-mode)
+  :custom
+  (sentence-end-double-space nil)
+  (help-window-select t)
+  (truncate-lines t)
   :config
   (unless (server-running-p)
     (server-start))
+  (setq custom-file "~/.emacs.d/custom.el")
+  (load custom-file t)
+  (global-font-lock-mode 1)
+
+  (defun cf/print-env (&optional insert)
+    "Display currently set environment variables.
+With INSERT prefix argument, insert pretty format in the buffer."
+    (interactive "P")
+    (let ((env-vars (format
+                     "HOME: %s\nXDG_CONFIG_HOME: %s\nXDG_DATA_HOME: %s\nXDG_RUNTIME_DIR: %s\n\
+server-socket-dir: %s\nserver-name: %s\nserver-auth-dir: %s\n\
+EDITOR: %s\nVISUAL: %s\nALTERNATE_EDITOR: %s\nEMACS_SERVER_FILE: %s\n\
+user-emacs-directory: %s\npackage-user-dir: %s\ndata-directory: %s\n"
+                     (getenv "HOME")
+                     (getenv "XDG_CONFIG_HOME")
+                     (getenv "XDG_DATA_HOME")
+                     (getenv "XDG_RUNTIME_DIR")
+                     (bound-and-true-p server-socket-dir)
+                     (bound-and-true-p server-name)
+                     (bound-and-true-p server-auth-dir)
+                     (getenv "EDITOR")
+                     (getenv "VISUAL")
+                     (getenv "ALTERNATE_EDITOR")
+                     (getenv "EMACS_SERVER_FILE")
+                     user-emacs-directory
+                     package-user-dir
+                     data-directory)))
+      (if insert
+          (insert env-vars)
+        (message "%s" env-vars))))
 
   (defun signal-restart-server ()
     "Handler for SIGUSR1 signal, to (re)start an Emacs server.
@@ -80,16 +190,22 @@ or from the command line with:
     "Interactively restart the server with \\[signal-restart-server]"
     (interactive)
     (signal-process (emacs-pid) 'sigusr1))
-  :bind ("C-c M-k" . cf/restart-server))
+
+  :bind
+  (("C-c B"   . cf/mode-line-toggle)
+   ("C-c E"   . cf/print-env)
+   ("C-c C-c" . compile-command)
+   ("C-c M-k" . cf/restart-server)))
 
 ;; Garbage C. Magick
 (use-package gcmh
   :ensure nil
   :diminish
+  :custom
+  (gcmh-verbose nil)
   :hook after-init
-  :init (require 'gcmh)
-  :custom (gcmh-verbose nil)
-  :config (gcmh-mode 1))
+  :config
+  (require 'gcmh))
 
 ;; gc-buffers
 (use-package gc-buffers
@@ -97,26 +213,24 @@ or from the command line with:
   :diminish
   :hook gcmh-mode)
 
-(setq initial-scratch-message ";; -*- lexical-binding:t -*-\n\n")
-
 
 ;;; Global Options
 
-;; Display Buffer
+(setq-default display-buffer-base-action
+        '(display-buffer-at-bottom display-buffer-below-selected))
+
+;; Display Buffer :dpb:
 (setq display-buffer-alist
-      `(("\\*\\(Compile-Log\\|[Hh]elp\\|tldr\\|Messages\\)\\*"
-         (display-buffer-reuse-mode-window
-          display-buffer-in-side-window)
+      `(("\\*\\([Hh]elp\\|tldr\\)\\*"
+         (display-buffer-reuse-mode-window display-buffer-in-side-window)
          (body-function . fit-window-to-buffer)
          (side . right)
          (slot . 1)
          (window-width . 0.5)
          (window-parameters . ((mode-line-format . none))))
 
-        ("\\*\\(scratch\\|.* scratch\\|vterm\\)\\*"
-         (display-buffer-reuse-window
-          display-buffer-below-selected
-          display-buffer-in-direction)
+        ("\\*\\(scratch\\|.* scratch\\)\\*"
+         (display-buffer-reuse-window display-buffer-below-selected display-buffer-in-direction)
          (body-function . select-window)
          (direction . right)
          (slot . 1)
@@ -125,8 +239,7 @@ or from the command line with:
          (window-parameters . ((mode-line-format . none))))
 
         ("\\*eww\\*"
-         (display-buffer-reuse-window
-          display-buffer-in-direction)
+         (display-buffer-reuse-window display-buffer-in-direction display-buffer--maybe-pop-up-frame)
          (body-function . select-window)
          (window-width . 0.5)
          (direction . right)
@@ -137,167 +250,67 @@ or from the command line with:
          (window-parameters . ((header-line-format . none)
                                (mode-line-format . none))))
 
-        ("\\*\\(Ibuffer\\|Colors\\)*"
-         (display-buffer-reuse-mode-window
-          display-buffer-in-direction
-          display-buffer-in-side-window)
+        ("\\*Ledger Report\\*"
+         (display-buffer-reuse-window display-buffer-in-direction)
          (body-function . select-window)
+         (window-width . 0.5)
          (direction . right)
+         (window-height . 0.3)
+         (direction . bottom)
+         (window-parameters . ((header-line-format . none)
+                               (mode-line-format . none))))
+
+        ("\\*\\(Ibuffer\\|Colors\\|Messages\\)*"
+         (display-buffer-reuse-mode-window display-buffer-below-selected display-buffer-in-direction display-buffer-in-side-window)
+         (body-function . select-window)
+         (direction . bottom)
+         (side . bottom)
          (slot . 1)
          (window-height . 0.3)
+         (direction . right)
+         (side . right)
+         (slot . 1)
          (window-width . 0.5)
          (window-parameters . ((mode-line-format .  none))))
 
         ("\\*Occur\\*"
-         (display-buffer-reuse-mode-window
-          display-buffer-in-side-window)
+         (display-buffer-reuse-mode-window display-buffer-in-side-window)
          (side . bottom)
          (slot . 1)
          (window-height . 0.3)
-         (window-parameters . ((mode-line-format . (" " "%b")))))
+         (window-parameters . ((mode-line-format . none))))
 
         ("\\*Completions\\*"
-         (display-buffer-reuse-window
-          display-buffer-in-side-window)
-         (side . bottom)
-         (slot . 1)
+         (display-buffer-reuse-window display-buffer-at-bottom)
          (window-height . fit-window-to-buffer)
          (window-parameters . ((mode-line-format . none))))
 
-        ("\\*ielm\\*"
-         (display-buffer-reuse-mode-window display-buffer-below-selected)
+        ("\\*compilation\\*"
+         (display-buffer-reuse-mode-window display-buffer-below-selected display-buffer-in-side-window)
+         (side . bottom)
+         (slot . -1)
          (dedicated . t)
          (reusable-frames . visible)
-         (window-height . 10)
+         (window-height . 12)
          (window-parameters . ((mode-line-format . none))))
 
-       ("\\*\\(Backtrace\\|Warnings\\|Disabled Command\\|mu4e-last-update\\|Async-native-compile-log\\)\\*"
-        (display-buffer-no-window)
-        (inhibit-same-window . t)
-        (allow-no-window . t))))
+        ("\\*\\(ielm\\|vterm\\)\\*"
+         (display-buffer-reuse-mode-window display-buffer-at-bottom display-buffer-below-selected)
+         (window-height . 10)
+         (dedicated . t)
+         (reusable-frames . visible)
+         (window-parameters . ((mode-line-format . none)
+                               (header-line-format . none))))
 
-;; (gnus-group-mode
-;;   (display-buffer-reuse-window display-buffer-in-previous-window))
-;; (gnus-summary-mode
-;;   (display-buffer-reuse-mode-window display-buffer-in-previous-window))
-;; (gnus-article-mode
-;;   (display-buffer-reuse-mode-window display-buffer-below-selected |display-buffer-in-previous-window))
+        ("\\*\\([Ii]nfo\\|Ibuffer\\)\\*"
+         (display-buffer-reuse-window display-buffer-full-frame)
+         (reusable-frames . visible)
+         (window-parameters . ((mode-line-format . none))))
 
-(setq custom-file "~/.emacs.d/custom.el")
-(load custom-file t)
-
-(global-font-lock-mode 1)
-
-(add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
-(setq custom-theme-directory "~/.emacs.d/themes/")
-(load-theme 'gruber-darker t)
-
-(set-face-attribute 'mode-line nil :family "Iosevka Nerd Font Mono" :foreground "#696969" :background "#282828")
-(set-face-attribute 'mode-line-inactive nil :family "Iosevka Nerd Font Mono" :foreground "#484848" :background "#282828")
-
-(setq-default blink-cursor-blinks 2
-              window-divider-default-places 'bottom-only
-              window-divider-default-bottom-width 1)
-
-(defun cf-theme-settings ()
-  "(re-)Sets default theming settings."
-  (interactive)
-  (setq blink-cursor-blinks 2
-        window-divider-default-places 'bottom-only
-        window-divider-default-bottom-width 1)
-  (window-divider-mode 1)
-  (let* ((sep1 (propertize "" 'face '(:foreground "#282828" :background "#282828" :box (:line-width (0 . -1) :color "#181818" :style none))))
-         (sep2 (propertize "" 'face '(:foreground "#282828" :background "#181818" :box (:line-width (0 . -1) :color "#181818" :style none))))
-         (sep3 (propertize "" 'face '(:foreground "#181818" :background "#181818" :box (:line-width (0 . -1) :color "#181818" :style none))))
-         (sep4 (propertize "" 'face '(:foreground "#282828" :background "#181818" :box (:line-width (0 . -1) :color "#181818"))))
-         (inner (propertize "   %b  "
-                            'face '(:background "#181818" :box (:line-width (0 . -1) :color "#181818" :style none))
-                            'local-map mode-line-buffer-identification-keymap)))
-    (setq-default mode-line-buffer-identification (list sep1 sep2 inner sep3 sep4)))
-
-  (setq-default mode-line-format
-                `("%e"
-                  mode-line-front-space
-                  mode-line-mule-info
-                  mode-line-client
-                  mode-line-remote
-                  mode-line-frame-identification
-                  mode-line-buffer-identification
-                  mode-line-modes
-                  mode-line-input-method-map
-                  mode-line-format-right-align 'window
-                  mode-line-bury-buffer
-                  mode-line-misc-info
-                  (:eval (let ((map (make-sparse-keymap)))
-                           (define-key map [mode-line mouse-1]
-                                       (lambda ()
-                                         (interactive)
-                                         (when (use-region-p)
-                                           (copy-region-as-kill (region-beginning) (region-end))
-                                           (message "Region copied to the kill ring."))))
-                           (propertize (format " [%d:%d] " (line-number-at-pos) (current-column))
-                                       'face '(:foreground "#594949")
-                                       'mouse-face 'mode-line-highlight
-                                       'help-echo "mouse-1: Copy region"
-                                       'local-map map)))
-                  (:eval (let ((map (make-sparse-keymap)))
-                           (define-key map [mode-line mouse-1]
-                                       (lambda () (interactive)
-                                         (view-mode 'toggle)))
-                           (define-key map [mode-line mouse-2]
-                                       (lambda () (interactive)
-                                         (eval-buffer)))
-                           (define-key map [mode-line mouse-3]
-                                       (lambda () (interactive)
-                                         (save-buffer)))
-                           (propertize
-                            (cond
-                             (buffer-read-only
-                              " [RO] ")
-                             ((buffer-modified-p)
-                              " [+] ")
-                             (t
-                              " [-] "))
-                            'face (cond
-                                   (buffer-read-only '(:foreground "#ac2c1d"))
-                                   ((buffer-modified-p) '(:foreground "#cb9c3c"))
-                                   (t '(:foreground "#484848")))
-                            'mouse-face 'mode-line-highlight
-                            'help-echo "mouse-1: Toggle view-mode\nmouse-2: Eval buffer\nmouse-3: Save buffer"
-                            'local-map map)))
-                  (:eval (propertize (format-time-string "[%H:%M] ")
-                                     'face '(:foreground "#696969")
-                                     'help-echo (format-time-string "%c")))
-                  mode-line-end-spaces)))
-(add-hook 'after-init-hook #'cf-theme-settings)
-
-(defvar-local cf--saved-header-line-format nil)
-(defvar-local cf--saved-mode-line-format nil)
-
-(define-minor-mode cf/mode-line-hide-mode
-  "Minor mode to toggle visibility of mode-line and header-line in the current buffer."
-  :init-value nil
-  :lighter ""
-  :global nil
-  (if cf/mode-line-hide-mode
-      (progn
-        (unless cf--saved-header-line-format
-          (setq cf--saved-header-line-format header-line-format))
-        (unless cf--saved-mode-line-format
-          (setq cf--saved-mode-line-format mode-line-format))
-        (setq mode-line-format nil
-              header-line-format nil))
-    (setq mode-line-format cf--saved-mode-line-format
-          header-line-format cf--saved-header-line-format))
-  (force-mode-line-update)
-  (redraw-display))
-
-(defun cf/toggle-mode-line ()
-  "Toggle `cf/mode-line-hide-mode' minor mode."
-  (interactive)
-  (if cf/mode-line-hide-mode
-      (cf/mode-line-hide-mode -1)
-    (cf/mode-line-hide-mode 1)))
+        ("\\*\\(Backtrace\\|Warnings\\|Disabled Command\\|mu4e-last-update\\|Async-native-compile-log\\)\\*"
+         (display-buffer-no-window)
+         (inhibit-same-window . t)
+         (allow-no-window . t))))
 
 (add-to-list 'save-some-buffers-action-alist
              (list "d" (lambda (buffer)
@@ -310,15 +323,13 @@ or from the command line with:
       '((".*" . "~/.emacs.d/backups/")))
 (global-auto-revert-mode 1)
 
-
 
 ;;; Theme
-
-(setq-default truncate-lines t)
 
 ;; Nerd Icons
 (use-package nerd-icons
   :ensure t
+  :if (display-graphic-p)
   :config
   (unless (file-exists-p "~/.local/share/fonts/NFM.ttf")
     (nerd-icons-install-fonts t)))
@@ -326,23 +337,28 @@ or from the command line with:
 (use-package nerd-icons-dired
   :ensure t
   :diminish
+  :if (display-graphic-p)
   :hook (dired-mode . nerd-icons-dired-mode))
 
 (use-package nerd-icons-completion
   :ensure t
   :after marginalia
+  :if (display-graphic-p)
   :config
   (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
 
 (use-package nerd-icons-ibuffer
-  :ensure t)
+   :if (display-graphic-p)
+   :ensure t)
 
 (use-package nerd-icons-ivy-rich
   :ensure t
+  :if (display-graphic-p)
   :after ivy)
 
 (use-package all-the-icons-ivy-rich
   :ensure t
+  :if (display-graphic-p)
   :after ivy-rich
   :diminish
   :init (all-the-icons-ivy-rich-mode 1))
@@ -389,40 +405,41 @@ or from the command line with:
   (minibuffer-scroll-window t)
   (enable-recursive-minibuffers nil)
   (completion-eager-display t)
+  (minibuffer-completion-confirm 'confirm-after-completion)
   :bind
-  (:map minibuffer-mode-map
+  (:map minibuffer-local-map
+        ("C-g"        . minibuffer-keyboard-quit)
         ("C-p"        . minibuffer-previous-line-completion)
         ("C-n"        . minibuffer-next-line-completion)
-        ("C-y"        . minibuffer-complete-and-exit)
-        ("M-<return>" . minibuffer-force-complete-and-exit)
-        :map minibuffer-local-map
         ("<up>"       . previous-history-elememt)
         ("<down>"     . next-history-element)
         ("<right>"    . minibuffer-complete-word)
         ("ESC"        . abort-recursive-edit)
         ("<escape>"   . abort-recursive-edit)
-        ("<tab>"      . minibuffer-complete-defaults)
         ("TAB"        . minibuffer-complete-defaults)
+        ("<tab>"      . minibuffer-complete-defaults)
+        ("RET"        . minibuffer-complete-and-exit)
         ("<return>"   . minibuffer-complete-and-exit)
-        ("C-<tab>"    . minibuffer-complete-word)
+        ("C-S-w"      . minibuffer-complete-word)
         ("C-i"        . minibuffer-complete-word)
-        ("C-y"        . minibuffer-complete-and-exit)
         ("M-<return>" . minibuffer-force-complete-and-exit)
         :map minibuffer-visible-completions-map
         ("<down>"     . minibuffer-next-history-element)
         ("<up>"       . minibuffer-previous-history-element)
+        ("M-n"        . minibuffer-next-history-element)
+        ("M-p"        . minibuffer-previous-history-element)
         ("<backtab>"  . minibuffer-previous-completion)
         ("S-TAB"      . minibuffer-previous-completion)
         ("<tab>"      . minibuffer-next-completion)
         ("TAB"        . minibuffer-next-completion)
         ("C-p"        . minibuffer-previous-line-completion)
         ("C-n"        . minibuffer-next-line-completion)
-        ("C-y"        . minibuffer-complete-and-exit)
-        ("<return>"   . minibuffer-choose-completion-or-exit)
+        ("C-j"        . minibuffer-complete-and-exit)
         ("RET"        . minibuffer-choose-completion-or-exit)
+        ("<return>"   . minibuffer-choose-completion-or-exit)
         ("M-<return>" . minibuffer-force-complete-and-exit)
-        ("C-<escape>" . minibuffer-hide-completions)
-        ))
+        ("C-x C-g"    . minibuffer-hide-completions)
+        ("C-<escape>" . minibuffer-hide-completions)))
 
 ;; simple
 (use-package simple
@@ -436,20 +453,24 @@ or from the command line with:
   (indent-tabs-mode nil)
   (column-number-mode t)
   :bind
-  (:map global-map
-        ("M-o"        . split-line)
-        ("M-O"        . delete-blank-lines)
-        ("M-_"        . delete-indentation)
-        ("M-+"        . open-line)
-        ("C-o"        . open-line)
-        ("M-SPC"      . cycle-spacing)
-        ("C-v"        . cf/scroll-up-and-recenter)
-        ("M-v"        . cf/scroll-down-and-recenter))
+  (("M-o"        . split-line)
+   ("M-O"        . delete-blank-lines)
+   ("M-_"        . delete-indentation)
+   ("M-+"        . open-line)
+   ("C-o"        . open-line)
+   ("C-c C-c"    . compile)
+   ("C-c C-a"    . append-to-buffer)
+   ("C-c C-k"    . copy-to-buffer)
+   ("C-c C-p"    . prepend-to-buffer)
+   ("M-SPC"      . cycle-spacing)
+   ("C-v"        . cf/scroll-up-and-recenter)
+   ("M-v"        . cf/scroll-down-and-recenter))
   :config
   (defun cf/message-killed-text (&rest _args)
     "Display the latest killed text in the echo area."
-    (when (stringp (current-kill 0 t))
-      (message (format "%s" (current-kill 0 t)))))
+    (let ((text (current-kill 0 t)))
+      (when (stringp text)
+        (message "%s" text))))
 
   (dolist (fn '(kill-region
                 kill-line
@@ -460,27 +481,45 @@ or from the command line with:
                 backward-kill-word
                 backward-kill-sexp))
     (advice-add fn :after #'cf/message-killed-text))
-
-  ;; (advice-remove 'bookmark-set "bookmark-set-and-save")
-  (advice-add 'bookmark-set
-              :after (lambda (&rest _) (bookmark-save))
-              '((name . "bookmark-set-and-save")))
+  ;; (advice-remove fn #'cf/message-killed-text)
 
   ;; (advice-remove 'indent-region "indent-region-delete-trailing-ws")
   (advice-add 'indent-region
               :after (lambda (&rest _) (delete-trailing-whitespace))
               '((name . "indent-region-delete-trailing-ws"))))
 
+(use-package comint
+  :ensure nil
+  :config
+  (setq comint-buffer-maximum-size 10000)
+  (dolist (fn '(comint-strip-ctrl-m comint-osc-process-output comint-truncate-buffer))
+    (unless (memq fn comint-output-filter-functions)
+      (add-hook 'comint-output-filter-functions fn))))
+
 ;; find-at-point
 (use-package ffap
   :ensure nil
   :init
-  (require 'thingatpt)
   (require 'ffap)
+  (require 'rfc-mode)
   :custom
   (ffap-rfc-path "~/Documents/rfc/")
-  :config
-  (ffap-bindings))
+  :bind
+  (("C-x d"   . dired-at-point)
+   ("C-h r"   . rfc-mode-read)
+   ("C-x C-f" . find-file-at-point)
+   ("C-x C-r" . ffap-read-only)
+   ("C-x C-v" . ffap-alternate-file)
+   ("C-x C-d" . ffap-list-directory)
+   ("C-x 4 f" . ffap-other-window)
+   ("C-x 4 r" . ffap-read-only-other-window)
+   ("C-x 4 d" . ffap-dired-other-window)
+   ("C-x 5 f" . ffap-other-frame)
+   ("C-x 5 r" . ffap-read-only-other-frame)
+   ("C-x 5 d" . ffap-dired-other-frame)
+   ("C-x t f" . ffap-other-tab)
+   ("S-<mouse-3>" . ffap-at-mouse)
+   ("C-S-<mouse-3>" . ffap-menu)))
 
 ;; View Mode :viewmode:
 (use-package view
@@ -490,6 +529,8 @@ or from the command line with:
   :init
   (require 'sdcv-definition)
   (require 'multiple-cursors)
+  (require 'expreg)
+  (require 'crux)
   :bind
   (:map view-mode-map
         ("d" . cf/scroll-up-and-recenter)
@@ -516,7 +557,7 @@ or from the command line with:
         ("a" . backward-sentence)
         ("]" . forward-paragraph)
         ("[" . backward-paragraph)
-        (";" . er/expand-region)
+        (";" . cf/expreg-expand-dwim)
         ("m" . cf/mark-construct-dwim))
   :config
   (add-hook 'xref-after-jump-hook #'view-mode))
@@ -534,27 +575,6 @@ or from the command line with:
   (setq search-whitespace-regexp ".*")
   (setq isearch-lax-whitespace t)
   (setq isearch-regexp-lax-whitespace nil)
-  (defun cf/query-replace-regexp-at-point ()
-    "Use region or word at point as default regexp in `query-replace-regexp`."
-    (interactive)
-    (let* ((text (if (use-region-p)
-                     (buffer-substring-no-properties (region-beginning) (region-end))
-                   (thing-at-point 'word t))))
-      (unless (and text (not (string-blank-p text)))
-        (user-error "No valid region or word at point"))
-      (let ((from (regexp-quote text)))
-        (call-interactively
-         (lambda (from-regexp to-string &optional delimited start end)
-           (interactive
-            (let ((from from))
-              (list
-               (read-regexp "Query replace regexp" from)
-               (read-string (format "Replace %s with: " from))
-               current-prefix-arg
-               (when (use-region-p) (region-beginning))
-               (when (use-region-p) (region-end)))))
-           (perform-replace from-regexp to-string t t delimited start end))))))
-
   (defun cf/isearch-mark-and-exit ()
     "Marks the current search-string.  Can be used as a building
 block for a more complex chain, such as to kill a region, or
@@ -647,12 +667,16 @@ Trailing periods are removed before deduplication to normalize sentence-final pu
               (delete-region start (point)))))
         (goto-char (point-min))
         (read-only-mode 1))
-      (pop-to-buffer buf)))
+      (pop-to-buffer buf)
+(keymap-local-set "RET" #'goto-address-at-point)))
 
   (defun cf/occur-browse-url ()
     "Point browser at a URL in the buffer using completion.
 Which web browser to use depends on the value of the variable
 `browse-url-browser-function'.
+
+NOTE: DEPRECATED: Having ‘browse-url-browser-function’ set to
+an alist is deprecated. Use ‘browse-url-handlers’ instead.'
 
 Also see `cf/occur-urls'."
     (interactive)
@@ -661,25 +685,46 @@ Also see `cf/occur-urls'."
         (goto-char (point-min))
         (while (search-forward-regexp cf-common-url-regexp nil t)
           (push (match-string-no-properties 0) matches)))
-      (funcall browse-url-browser-function
+      (funcall browse-url-function
                (completing-read "Browse URL: " matches nil t))))
   :bind
   (("C-s"    . isearch-forward)
    ("M-r"    . isearch-backward)
-   ("M-["    . isearch-backward)
    ("M-^"    . isearch-backward-regexp)
    ("M-#"    . isearch-forward-regexp)
    ("M-&"    . cf/query-replace-regexp-at-point)
    ("M-*"    . isearch-forward-symbol-at-point)
-   ("M-]"    . isearch-forward-thing-at-point)
    ("M-\\"   . cf/occur-browse-url)
    ("C-M-\\" . cf/occur-urls)
    :map isearch-mode-map
    ("C-s"        . cf/isearch-repeat-forward)
    ("C-r"        . cf/isearch-repeat-backward)
    ("C-<return>" . cf/isearch-other-end)
-   ("C-<escape>" . cf/isearch-abort-dwim))
-)
+   ("C-<escape>" . cf/isearch-abort-dwim)))
+
+(use-package cf-pjumper
+  :ensure nil
+  :hook (prog-mode text-mode)
+  :load-path "~/.emacs.d/custom/"
+  :config (require 'cf-pjumper))
+
+;; Registers (register.el)
+(use-package register
+  :ensure nil
+  :defer t ; its commands are autoloaded, so this will be loaded then
+  :config
+  (setq register-preview-delay 0.8
+        register-preview-function #'register-preview-default)
+
+  (with-eval-after-load 'savehist
+    (add-to-list 'savehist-additional-variables 'register-alist)))
+
+;; Goto last change
+(use-package goto-chg
+  :ensure t
+  :bind
+  (("C-(" . goto-last-change)
+   ("C-)" . goto-last-change-reverse)))
 
 ;; replace
 (use-package replace
@@ -709,6 +754,7 @@ Also see `cf/occur-urls'."
 ;; Mouse & Drag and Drop
 (use-package mouse
   :ensure nil
+  :hook (after-init . mouse-wheel-mode)
   :custom
   (mouse-drag-copy-region t)
   (mouse-yank-at-point t)
@@ -719,7 +765,7 @@ Also see `cf/occur-urls'."
   :bind
   (:map global-map
         ("<down-mouse-2>"     . mouse-drag-drag)
-        ("<mouse-3>"          . er/expand-region)
+        ("<mouse-3>"          . cf/expreg-expand-dwim)
         ("<mouse-2>"          . mouse-yank-primary)
         ("S-<mouse-2>"        . eww-search-words)
         ("C-<mouse-2>"        . eww-search-words)
@@ -733,8 +779,55 @@ Also see `cf/occur-urls'."
         ("C-<down-mouse-1>"   . mouse-drag-and-drop-region)
         ("M-S-<down-mouse-1>" . mouse-drag-region-rectangle))
   :config
-  (require 'eww)
+  ;; Some of these variables are defined in places other than mouse.el, but this is fine.
+  (setq mouse-autoselect-window t) ; complements the auto-selection of my tiling window manager
+
+  ;; In Emacs 27+, use Control + mouse wheel to scale text.
+  (setq mouse-wheel-scroll-amount
+        '(1
+          ((shift) . 5)
+          ((meta) . 0.5)
+          ((control) . text-scale))
+        mouse-drag-copy-region nil
+        make-pointer-invisible t
+        mouse-wheel-progressive-speed t
+        mouse-wheel-follow-mouse t)
+
+  ;; Scrolling behaviour
+  (setq-default scroll-preserve-screen-position t
+                scroll-conservatively 1 ; affects `scroll-step'
+                scroll-margin 0
+                next-screen-context-lines 0)
   (setq track-mouse nil))
+
+;; Repeat Keychords
+(use-package repeat
+  :ensure nil
+  :hook (after-init . repeat-mode)
+  :config
+  (setq repeat-on-final-keystroke t
+        repeat-exit-timeout 5
+        repeat-exit-key "<escape>"
+        repeat-keep-prefix nil
+        repeat-check-key t
+        repeat-echo-function 'ignore
+        ;; Technically, this is not in repeat.el, though it is the
+        ;; same idea.
+        set-mark-command-repeat-pop t))
+
+(use-package bookmark
+  :ensure nil
+  :commands (bookmark-set bookmark-jump bookmark-bmenu-list)
+  :hook (bookmark-bmenu-mode . hl-line-mode)
+  :config
+  (setq bookmark-use-annotations nil)
+  (setq bookmark-automatically-show-annotations nil)
+  (setq bookmark-fringe-mark nil) ; Emacs 29 to hide bookmark fringe icon
+  ;; Write changes to the bookmark file as soon as 1 modification is
+  ;; made (addition or deletion).  Otherwise Emacs will only save the
+  ;; bookmarks when it closes, which may never happen properly
+  ;; (e.g. power failure).
+  (setq bookmark-save-flag 1))
 
 ;; ibuffer
 (use-package ibuffer
@@ -746,7 +839,7 @@ Also see `cf/occur-urls'."
    :ensure nil
    :custom
    (savehist-additional-variables
-    '(command-history))
+    '(command-history compile-history))
    :config
    (savehist-mode))
 
@@ -808,6 +901,9 @@ Leaves point after the sexp and region active."
 (use-package eldoc
   :ensure nil
   :diminish
+  :hook
+  ((text-mode . global-eldoc-mode)
+   (prog-mode . global-eldoc-mode))
   :config
   (global-eldoc-mode 1))
 
@@ -850,21 +946,36 @@ Leaves point after the sexp and region active."
   :ensure nil
   :custom
   (ido-enable-flex-matching t)
-  (ido-everywhere t)
+  :bind
+  (:map ido-completion-map
+        ("RET" . ido-select-text))
   :config
+  (setq ido-use-filename-at-point 'guess)
+  (ido-everywhere 1)
   (ido-mode 1))
 
-
 
-;;; Functions
+;;; Custom Features
+;; git clone https://gitlab.com/ajgrf/edwina ~/.emacs.d/edwina
+(use-package edwina
+  :ensure nil
+  :load-path "~/.emacs.d/custom/edwina"
+  :hook after-init
+  :config
+  (edwina-setup-dwm-keys)
+  (edwina-mode 1)
+(setq display-buffer-base-action
+        '(display-buffer-at-bottom display-buffer-below-selected)))
 
-(use-package prot-scratch
+
+;; Pops scratch-buffer for current major-mode with active marked region content.
+(use-package cf-scratch
   :ensure nil
   :load-path "~/.emacs.d/custom/"
   :init
-  (require 'prot-common)
-  (require 'prot-scratch)
-  :bind ("C-c s" . prot-scratch-buffer))
+  (require 'cf-common)
+  (require 'cf-scratch)
+  :bind ("C-c C-s" . cf-scratch-buffer))
 
 ;;; Maximise window + kill buffer (and close window)
 ;; `cf/window-single-toggle' is based on `windower' by Pierre
@@ -897,10 +1008,10 @@ managers such as DWM, BSPWM refer to this state as \\='monocle\\='."
     (when (and arg
                (not (one-window-p)))
       (delete-window)))
-  :bind (("C-c w" . cf/window-single-toggle)
-         ("C-c k" . cf/kill-buffer-current)))
+  :bind (("C-c W" . cf/window-single-toggle)
+         ("C-x C-k" . cf/kill-buffer-current)))
 
-;; Marking constructs :: From protesilaos' backlog
+;; From Protesilaos' backlog: "Marking constructs" <https://protesilaos.com/emacs/dotemacs/>
 (use-package emacs
   :ensure nil
   :commands (cf/mark-symbol
@@ -1179,7 +1290,7 @@ If prefix ARG, insert `#+date:` before the timestamp."
     (insert (format-time-string "%Y-%m-%d %H:%M" (current-time)))))
 (keymap-global-set "M-<f1>" #'cf/insert-locale-timestamp-at-point)
 
-;; Kill Ring Yanka
+;; Kill Ring Yank
 (defun insert-kill-ring-item ()
   "Insert item from `kill-ring', selected with completion."
   (interactive)
@@ -1193,7 +1304,7 @@ If prefix ARG, insert `#+date:` before the timestamp."
 like \\[yank-pop] does, but in the opposite direction."
   (interactive "p")
   (yank-pop (- arg)))
-(keymap-global-set "C-M-y" 'undo-yank)
+(keymap-global-set "C-M-y" #'undo-yank)
 
 ;; Insert palette color at point
 (defun cf/insert-palette-color (&optional show)
@@ -1261,7 +1372,7 @@ Displays color names with their hex color in the completion menu."
 (defun cf/config-reload ()
   "Reload `init.el' configuration."
   (interactive)
-  (load-file  "~/.emacs.d/init.el")
+  (load-file "~/.emacs.d/init.el")
   (message "c'fait."))
 (keymap-global-set "C-c R" #'cf/config-reload)
 
@@ -1334,17 +1445,6 @@ Killed text is shown in the echo area."
   (message "%s" (current-kill 0)))
 (keymap-global-set "C-w" #'cf/kill-word-or-region)
 
-;; Prepend kill-word
-(defun cf/prepend-kill-word ()
-  "Kill word prepending it to the last-kill."
-  (interactive)
-  (backward-word)
-  (forward-word)
-  (append-next-kill)
-  (backward-kill-word 1)
-  (message "%s" (current-kill 0)))
-(keymap-global-set "C-c C-u" #'cf/prepend-kill-word)
-
 ;; Copy line or region
 (defun cf/copy-line-or-region (&optional count)
   "Copy region if active, otherwise copy the whole current line.
@@ -1381,6 +1481,10 @@ With optional COUNT prefix argument (C-u N), insert the copied text COUNT times 
   (setq kill-ring nil)
   (message "Kill ring cleared."))
 (keymap-global-set "C-c z" #'cf/clear-kill-ring)
+
+(use-package google-maps
+  :ensure nil
+  :load-path "~/.emacs.d/custom/google-maps/")
 
 
 
@@ -1610,6 +1714,7 @@ Return cons (ICON . POSITION) or nil."
 ;; Mct
 (use-package mct
   :ensure t
+  :hook (after-init . mct-mode)
   :custom
   (mct-live-completion t)
   (mct-completion-window-size 12)
@@ -1625,10 +1730,10 @@ Return cons (ICON . POSITION) or nil."
   :after ivy
   :bind
   (:map minibuffer-mode-map
-        ("C-," . embark-collect)
-        ("C->"   . embark-act)
-        ("C-<"   . embark-dwim)
-        ("C-h b" . embark-bindings)))
+        ("C-,"      . embark-collect)
+        ("C-."      . embark-act)
+        ([meta .]   . embark-dwim)
+        ("C-h b"    . embark-bindings)))
 
 (use-package keycast
   :ensure t
@@ -1686,20 +1791,36 @@ Return cons (ICON . POSITION) or nil."
   (vertico-cycle t)
   :bind
   (:map vertico-map
+        ("RET"        . exit-minibuffer)
         ("?"          . minibuffer-completion-help)
         ("C-M-n"      . minibuffer-next-history-element)
-        ("C-M-p"      . miibuffer-previous-history-element)
+        ("C-M-p"      . minibuffer-previous-history-element)
         ("C-n"        . minibuffer-next-line-completion)
         ("C-p"        . minibuffer-previous-line-completion)
         ("C-y"        . minibuffer-complete-and-exit)
         ("M-RET"      . minibuffer-force-complete-and-exit)
         ("M-<return>" . minibuffer-force-complete-and-exit))
-  :init (vertico-mode))
+  :config
+  (vertico-mode)
+  (setq read-file-name-completion-ignore-case t
+        read-buffer-completion-ignore-case t
+        completion-ignore-case t)
+  (setq completion-in-region-function #'consult-completion-in-region)
 
+  ;; Prompt indicator for `completing-read-multiple'.
+  (when (< emacs-major-version 31)
+    (advice-add #'completing-read-multiple :filter-args
+                (lambda (args)
+                  (cons (format "[CRM%s] %s"
+                                (string-replace "[ \t]*" "" crm-separator)
+                                (car args))
+                        (cdr args))))))
+
+;; Orderless
 (use-package orderless
   :ensure t
   :custom
-  (completion-styles '(orderless basic))
+  (completion-styles '(orderless basic partial-completion emacs22))
   (completion-category-defaults nil)
   (completion-category-overrides nil))
 
@@ -1718,7 +1839,7 @@ Return cons (ICON . POSITION) or nil."
   :bind
   (("C-."   . company-complete-common-or-cycle)
    ("<tab>" . company-indent-or-complete-common)
-   ("C-c y" . company-yasnippet)
+   ("C-c Y" . company-yasnippet)
    :map company-active-map
    ("TAB"   . company-complete-common-or-cycle)
    ("RET"   . company-complete-selection)
@@ -1754,6 +1875,7 @@ Return cons (ICON . POSITION) or nil."
          :map ivy-minibuffer-map
          ("<return>" . ivy-done)
          ("C-y"      . ivy-alt-done)
+         ("RET"      . ivy-alt-done)
          ("C-n"      . ivy-next-line-and-call)
          ("C-p"      . ivy-previous-line-and-call)
          :map ivy-switch-buffer-map
@@ -1786,7 +1908,7 @@ Return cons (ICON . POSITION) or nil."
         (display-buffer
          buffer
          `((display-buffer-reuse-window
-            display-buffer-below-selected)
+            display-buffer-at-bottom)
            (window-height . ,(1+ (ivy--height (ivy-state-caller ivy-last)))))))))
   (setq ivy-re-builders-alist '((t . orderless-ivy-re-builder)))
   (add-to-list 'ivy-highlight-functions-alist '(orderless-ivy-re-builder . orderless-ivy-highlight))
@@ -1824,8 +1946,10 @@ Return cons (ICON . POSITION) or nil."
   :hook ((prog-mode text-mode conf-mode) . yas-minor-mode)
   :custom
   (yas-snippet-dirs
-   `("~/.emacs.d/snippets"                      ;; personal snippets
-     ,(concat (file-name-directory (locate-library "yasnippet-snippets")) "snippets"))) ;; default snippets
+   `("~/.emacs.d/snippets"
+     ,(concat (file-name-directory
+               (locate-library "yasnippet-snippets"))
+              "snippets")))
   (yas-wrap-around-region t)
   (yas-triggers-in-field t)
   :bind
@@ -1841,6 +1965,8 @@ Return cons (ICON . POSITION) or nil."
 (use-package yasnippet-snippets
   :ensure t
   :after yasnippet)
+
+
 
 
 ;;; Language Support
@@ -1884,10 +2010,14 @@ Return cons (ICON . POSITION) or nil."
   :config
   (defun cf-simpc-mode-comment-setup ()
     "Set up multi-line comment behavior for simpc-mode."
-    (setq comment-start "/* "
-          comment-end   " */"
-          comment-style 'multi-line))
+    (setq-local c-block-comment-starter "/* "
+                c-block-comment-prefix " *"
+                c-block-comment-ender "\\n */"))
   (add-hook 'simpc-mode-hook 'cf-simpc-mode-comment-setup))
+
+(use-package awk-ts-mode
+  :ensure t
+  :defer t)
 
 ;; Go
 (use-package go-mode
@@ -1895,39 +2025,105 @@ Return cons (ICON . POSITION) or nil."
   :defer t
   :mode "\\.go\\'")
 
-;; Markdown
-(use-package markdown-mode
+;; Simple XKeyBinding Daemon :sxhkdrc:
+(use-package sxhkdrc-mode
+  :load-path "~/.emacs.d/custom/"
+  :ensure nil
+  :defer t
+  :mode "skhkdrc\\'")
+
+;;  HLS Playlist :hls:
+(use-package hls-playlist-mode
+  :ensure nil
+  :load-path "~/.emacs.d/custom/"
+  :defer t
+  :mode "\\.m3u8\\'"
+  :config
+  (require 'hls-playlist-mode))
+
+(use-package cider
   :ensure t
   :defer t
-  :mode "\\.md\\'")
+  :config
+  (setq cider-repl-display-help-banner nil
+        cider-repl-use-clojure-font-lock t
+        cider-repl-result-prefix ";; => ")
+  :hook ((clojure-mode . cider-mode)
+         (cider-repl-mode . paredit-mode)))
 
-;; html
+(use-package clojure-mode
+  :ensure t
+  :mode ("\\.clj\\'" "\\.cljs\\'" "\\.cljc\\'" "\\.edn\\'")
+  :hook (clojure-mode . paredit-mode))
+
+
+;; Markdown :md:
+(use-package markdown-mode
+  :ensure t
+  :init
+  (require 'goto-addr)
+  :mode "\\.md\\'"
+  :hook ((markdown-mode . markdown-live-preview-mode)
+         (markdown-mode . read-only-mode)
+         (markdown-mode . visual-line-mode)
+         (markdown-mode . goto-address-mode)
+         (markdown-mode . markdown-display-inline-images)
+         (markdown-mode . markdown-preview))
+  :custom
+  (markdown-enable-math t)
+  (markdown-fontify-code-blocks-natively t)
+  (markdown-hide-markup nil)
+  (markdown-display-inline-images t)
+  (markdown-display-remote-images t)
+  :config
+  (goto-address-mode 1)
+  (setq markdown-toggle-wiki-links t)
+  :bind
+  (:map markdown-mode-map
+        ("C-c p"     . markdown-preview)
+        ("C-c C-l"   . markdown-toggle-wiki-links)
+        ("<tab>"     . forward-button)
+        ("<backtab>" . backward-button)
+        ("RET"       . goto-address-at-point)
+        ("<return>"  . goto-address-at-point)))
+
+;; html :htm:
 (use-package htmlize
   :ensure t
   :defer t
   :mode "\\.htm?\\'")
 
-;; lua
+;; lua :lua:
 (use-package lua-mode
   :ensure t
   :mode "\\.lua\\'"
   :defer t)
 
-;; php
+;; php :php:
 (use-package php-mode
   :ensure t
   :defer t
   :mode "\\.php\\'")
 
+;; :sed:
 (use-package sed-mode
   :ensure t
   :defer t
   :mode "\\.sed\\'")
 
+;; QML Mode :qml:
+(use-package qml-mode
+  :ensure nil
+  :load-path "~/.emacs.d/custom/qml-mode/"
+  :defer t
+  :mode "\\.qml\\'")
+
 ;; Ledger :ldg:
 (use-package ledger-mode
   :ensure t
   :defer t
+  :init
+  (require 'bookmark)
   :mode "\\.ldg\\'"
   :custom
   (ledger-reconcile-toggle-to-pending t)
@@ -2002,21 +2198,23 @@ Return cons (ICON . POSITION) or nil."
     :type 'string
     :group 'cf-ledger)
 
-  (defun cf/ledger-insert-tabac (&optional report)
+  (defun cf/ledger-insert-tabac (&optional noreport)
     "Insert recurrent tabac-ya entry after `cf-tabac-bookmark' bookmark position.
 Updates the bookmark after insertion.  With REPORT prefix argument, runs the ledger report
 named 'eqtabac'.  Otherwise, displays the inserted transaction in the echo area."
     (interactive "P")
-    (require 'bookmark)
     (require 'ledger-mode)
+    (require 'bookmark)
     (let* ((bookmark cf-tabac-bookmark)
            (pos (bookmark-get-position bookmark))
            (buf (bookmark-get-filename bookmark))
-           (month (capitalize (format-time-string "%B")))
+           (month (format-time-string "%m"))
+           (month-name (capitalize (format-time-string "%B")))
            (weekday (capitalize (format-time-string "%A")))
-           (timestamp (format "%s %s %s:%s"
-                              (format-time-string "%d")
+           (timestamp (format "%s - %s %s %s:%s"
                               month
+                              (format-time-string "%d")
+                              month-name
                               weekday
                               (format-time-string "%Hh%M")))
            (tabac-ya (format "    Tabac:Fumage:%s            1 tope\n" timestamp)))
@@ -2032,13 +2230,13 @@ named 'eqtabac'.  Otherwise, displays the inserted transaction in the echo area.
                             nil)
             (bookmark-save)))
         (when (derived-mode-p 'ledger-mode)
-          (if report
+          (unless noreport
               (progn (bookmark-jump bookmark)
                      (ledger-indent-line)
                      (save-buffer)
                      (ledger-report  "tabac-journalier" nil)))
           (message "%s" (string-trim tabac-ya))))))
-  :bind
+
   ("C-c C-0" . cf/ledger-insert-tabac))
 
 
@@ -2046,7 +2244,16 @@ named 'eqtabac'.  Otherwise, displays the inserted transaction in the echo area.
 
 ;; Magit
 (use-package magit
-  :ensure t)
+  :ensure t
+  :config
+  (defun magit-dotfiles ()
+    "Open Magit for the bare ~/.dotfiles repository."
+  (interactive)
+  (let ((default-directory (getenv "HOME"))
+        (process-environment (copy-sequence process-environment)))
+    (setenv "GIT_DIR" (expand-file-name "~/.dotfiles"))
+    (setenv "GIT_WORK_TREE" (expand-file-name "~"))
+    (magit-status default-directory))))
 
 (use-package browse-at-remote
   :ensure t
@@ -2115,6 +2322,13 @@ named 'eqtabac'.  Otherwise, displays the inserted transaction in the echo area.
   (with-eval-after-load 'iy-go-to-char
     (add-to-list 'mc/cursor-specific-vars 'iy-go-to-char-start-pos)))
 
+(use-package ace-mc
+  :ensure t
+  :after multiple-cursors
+  :bind (:map mc/keymap
+              ("M-S-n"            . ace-mc-add-multiple-cursors)
+              ("M-S-c"            . ace-mc-add-single-cursor)))
+
 ;; Drag Stuff
 (use-package drag-stuff
   :ensure nil
@@ -2124,7 +2338,7 @@ named 'eqtabac'.  Otherwise, displays the inserted transaction in the echo area.
   (:map global-map
         ("M-p" . drag-stuff-up)
         ("M-n" . drag-stuff-down)
-   :map drag-stuff-mode-map
+        :map drag-stuff-mode-map
         ("C-M-S-p" . drag-stuff-up)
         ("C-M-S-n" . drag-stuff-down)
         ("C-M-S-h" . drag-stuff-left)
@@ -2132,10 +2346,30 @@ named 'eqtabac'.  Otherwise, displays the inserted transaction in the echo area.
   :config
   (drag-stuff-global-mode 1))
 
-;; Expand Region
-(use-package expand-region
+(use-package expreg
   :ensure t
-  :bind ("C-;" . er/expand-region))
+  :functions (cf/expreg-expand cf/expreg-expand-dwim)
+  :bind
+  (("C-;"     . cf/expreg-expand-dwim)
+   ("C-M-SPC" . cf/expreg-expand-dwim))
+  :config
+  (defun cf/expreg-expand (n)
+    "Expand to N syntactic units, defaulting to 1 if none is provided interactively."
+    (interactive "p")
+    (dotimes (_ n)
+      (expreg-expand)))
+
+  (defun cf/expreg-expand-dwim ()
+    "Do-What-I-Mean `expreg-expand' to start with symbol or word.
+If over a real symbol, mark that directly, else start with a
+word.  Fall back to regular `expreg-expand'."
+    (interactive)
+    (let ((symbol (bounds-of-thing-at-point 'symbol)))
+      (cond
+       ((equal (bounds-of-thing-at-point 'word) symbol)
+        (cf/expreg-expand 1))
+       (symbol (cf/expreg-expand 2))
+       (t (expreg-expand))))))
 
 ;; Pulsar
 (use-package pulsar
@@ -2235,6 +2469,7 @@ named 'eqtabac'.  Otherwise, displays the inserted transaction in the echo area.
 ;; Tramp
 (use-package tramp
   :ensure nil
+  :mode "\\sshx:\\'"
   :custom
   (tramp-default-method "sshx")
   (tramp-use-connection-share t))
@@ -2242,14 +2477,15 @@ named 'eqtabac'.  Otherwise, displays the inserted transaction in the echo area.
 ;; SudoEdit
 (use-package sudo-edit
   :ensure t
+  :init
+  (require 'sudo-edit)
   :custom
   (sudo-edit-remote-method "sudo")
   (sudo-edit-local-method "sudo")
   :commands (sudo-edit sudo-edit-find-file)
   :bind
   (("C-c C-M-s" . sudo-edit)
-   ("C-c C-M-f" . sudo-edit-find-file))
-  :init (require 'sudo-edit))
+   ("C-c C-M-f" . sudo-edit-find-file)))
 
 ;; Ediff
 (use-package ediff
@@ -2273,16 +2509,17 @@ named 'eqtabac'.  Otherwise, displays the inserted transaction in the echo area.
         which-key-min-display-lines 3
         which-key-side-window-slot -1
         which-key-side-window-max-height 0.3
-        which-key-idle-delay .2
-        which-key-max-description-length 30
+        which-key-idle-delay .3
+        which-key-max-description-length 35
         which-key-separator " → " ))
 
 ;; Projectile
 (use-package projectile
   :ensure t
   :diminish
+  :bind ("s-p" . projectile-command-map)
   :config
-  (projectile-mode 1))
+  (projectile-mode +1))
 
 ;; Eshell
 (use-package eshell-toggle
@@ -2325,6 +2562,7 @@ named 'eqtabac'.  Otherwise, displays the inserted transaction in the echo area.
     :bind ("C-\\" . vterm-toggle)
     :config
     (define-key vterm-mode-map (kbd "<escape>") #'vterm--self-insert)
+    (define-key vterm-mode-map (kbd "C-x") #'vterm--self-insert)
     (define-key vterm-mode-map (kbd "C-\\") #'vterm-toggle)
     (setq vterm-toggle-fullscreen-p nil)
     (setq vterm-toggle-scope 'frame)
@@ -2334,32 +2572,53 @@ named 'eqtabac'.  Otherwise, displays the inserted transaction in the echo area.
                        (with-current-buffer buffer
                          (or (equal major-mode 'vterm-mode)
                              (string-prefix-p vterm-buffer-name (buffer-name buffer))))))
-                   (display-buffer-reuse-window display-buffer-at-bottom)
-                   (dedicated . t)
-                   (reusable-frames . visible)
+                   (display-buffer-reuse-mode-window display-buffer-at-bottom display-buffer-below-selected)
                    (window-height . 10)
-                   (window-parameters . ((mode-line-format . none)))))
-    (add-hook 'vterm-toggle-show-hook #'(lambda ()
-                                          (let* ((sep1 (propertize "" 'face '(:foreground "#181818" :background "#282828")))
-                                                 (sep2 (propertize "" 'face '(:foreground "#181818" :background "#282828")))
-                                                 (inner (propertize "   %b   "
-                                                                    'face '(:background "#181818" :box (:line-width (0 . -1) :color "#181818"))
-                                                                    'local-map mode-line-buffer-identification-keymap)))
-                                            (setq-default mode-line-buffer-identification (list sep1 inner sep2)))
-                                          (window-divider-mode -1)
-(force-mode-line-update)))
+                   (dedicated . t)
+                   (window-parameters . ((mode-line-format . none)
+                                         (header-line-format . nil)))))))
 
-    (add-hook 'vterm-toggle-hide-hook #'(lambda ()
-                                          (let* ((sep1 (propertize "" 'face '(:foreground "#282828" :background "#282828" :box (:line-width (0 . -1) :color "#181818" :style none))))
-                                                 (sep2 (propertize "" 'face '(:foreground "#282828" :background "#181818" :box (:line-width (0 . -1) :color "#181818" :style none))))
-                                                 (sep3 (propertize "" 'face '(:foreground "#181818" :background "#181818" :box (:line-width (0 . -1) :color "#181818" :style none))))
-                                                 (sep4 (propertize "" 'face '(:foreground "#282828" :background "#181818" :box (:line-width (0 . -1) :color "#181818" :style none))))
-                                                 (inner (propertize "   %b  "
-                                                                    'face '(:background "#181818" :box (:line-width (0 . -1) :color "#181818" :style none))
-                                                                    'local-map mode-line-buffer-identification-keymap)))
-                                            (setq-default mode-line-buffer-identification (list sep1 sep2 inner sep3 sep4)))
-                                          (window-divider-mode 1)
-                                          (force-mode-line-update)))))
+(use-package window
+  :ensure nil
+  :after repeat
+  :hook after-init
+  :config
+  (defun cf/enlarge-window-dwim (&optional n)
+    "Enlarge focused window, just do it."
+    (interactive "p")
+    (let ((count (or n 5)))
+      (if (enlarge-window count)
+          (enlarge-window-horizontally count))))
+
+    (defun cf/shrink-window-dwim (&optional n)
+      "Shrink focused window, just do it."
+      (interactive "p")
+      (let ((count (or n 5)))
+        (if (shrink-window count)
+            (shrink-window-horizontally count))))
+
+  (defun cf/enlarge-window-horizontally-dwim (&optional n)
+    "Enlarge focused window horizontally, just do it."
+    (interactive "p")
+    (let ((count (or n 5)))
+      (if (enlarge-window-horizontally count)
+          (enlarge-window count))))
+
+    (defun cf/shrink-window-horizontally-dwim (&optional n)
+    "Shrink focused window horizontally, just do it."
+      (interactive "p")
+      (let ((count (or n 5)))
+        (if (shrink-window-horizontally count)
+            (shrink-window count))))
+
+  (defvar-keymap cf-window-prefix-map
+    :doc "Custom window functions prefix map."
+    :repeat t
+    "-" #'cf/shrink-window-dwim
+    "," #'cf/shrink-window-horizontally-dwim
+    "." #'cf/enlarge-window-horizontally-dwim
+    "=" #'cf/enlarge-window-dwim)
+  (keymap-set global-map "C-c w" cf-window-prefix-map))
 
 ;; WindMove
 (use-package windmove
@@ -2448,7 +2707,7 @@ If NO-FOLLOW is non-nil, don't select the moved buffer."
 
   (defun cf/windmove-right (&optional arg)
     (interactive "P")
-  (cf/dwim-windmove-buffer-in-direction 'right arg))
+    (cf/dwim-windmove-buffer-in-direction 'right arg))
 
   (defvar-keymap cf-windmove-buffer-map
     :doc "Prefix keymap for buffer windmove commands."
@@ -2471,7 +2730,7 @@ If NO-FOLLOW is non-nil, don't select the moved buffer."
    ("C-c C-w k"   . cf/windmove-up)
    ("C-c C-w l"   . cf/windmove-right)))
 
-;; PDF Tools
+;; PDF Tools :pdf:
 (use-package pdf-tools
   :ensure t
   :defer t
@@ -2482,6 +2741,8 @@ If NO-FOLLOW is non-nil, don't select the moved buffer."
   (:map pdf-view-mode-map
         ("n"       . pdf-view-next-line-or-next-page)
         ("p"       . pdf-view-previous-line-or-previous-page)
+        ("j"       . pdf-view-next-line-or-next-page)
+        ("k"       . pdf-view-previous-line-or-previous-page)
         ("d"       . pdf-view-scroll-up-or-next-page)
         ("u"       . pdf-view-scroll-down-or-previous-page)
         ("C-="     . pdf-view-enlarge)
@@ -2491,7 +2752,12 @@ If NO-FOLLOW is non-nil, don't select the moved buffer."
   (pdf-loader-install)
   :config
   (add-to-list 'revert-without-query ".pdf")
-  (display-line-numbers-mode -1)
+  (defun pdf-view-init-hooks ()
+    "Init hooks for pdf-view-mode."
+    (display-line-numbers-mode -1)
+    (pdf-view-themed-minor-mode 1)
+    (setq-local cursor-type nil))
+  (add-hook 'pdf-view-mode-hook #'pdf-view-init-hooks)
   (add-to-list 'display-buffer-alist
                '((major-mode . pdf-view-mode)
                  (display-buffer-reuse-window display-buffer-in-direction)
@@ -2502,20 +2768,27 @@ If NO-FOLLOW is non-nil, don't select the moved buffer."
 (use-package highlight-numbers
   :ensure t
   :diminish
+  :hook prog-mode
   :config
   (highlight-numbers-mode 1))
 
+;; Olivetti :olv:
 (use-package olivetti
   :ensure nil
   :diminish " õ"
-  :hook (sdcv-definition-mode eww-mode Info-mode markdown-mode pdf-view-mode org-mode view-mode rfc-mode)
+  :hook
+  (sdcv-definition-mode eww-mode markdown-mode view-mode rfc-mode)
   :bind
   (:map olivetti-mode-map
         ("C-}" . olivetti-expand)
         ("C-{" . olivetti-shrink))
   :config
-  (setq olivetti-margin-width 2)
-  (add-hook 'xref-after-jump-hook #'olivetti-mode))
+  (setq olivetti-margin-width 1)
+  (add-hook 'olivetti-mode-hook
+            (lambda ()
+              (setq-local olivetti-body-width
+                          (max (or (bound-and-true-p olivetti-min-body-width) 80)
+                               (window-width))))))
 
 
 ;;; Documentation
@@ -2523,6 +2796,7 @@ If NO-FOLLOW is non-nil, don't select the moved buffer."
 ;; SDCV Local Dictionary Definitions
 (use-package sdcv-definition
   :ensure nil
+  :commands (cf/lookup-word)
   :custom
   (sdcv-default-face 'variable-pitch)
   (sdcv-default-dictionary "Concise Oxford Thesaurus 2nd Ed. (Eng-Eng)")
@@ -2581,7 +2855,7 @@ If NO-FOLLOW is non-nil, don't select the moved buffer."
   (require 'info)
   (setq Info-default-directory-list
         '("/home/cf/.local/share/info/" "/usr/local/share/info/" "/home/cf/.local/src/emacs/info/"
-          "/usr/share/info/" "/usr/local/share/info/" "/home/cf/.emacs.d/elpaca/texis/" "/home/cf/.emacs.d/elpa/"
+          "/usr/share/info/" "/home/cf/.emacs.d/info/" "/home/cf/.emacs.d/elpaca/texis/" "/home/cf/.emacs.d/elpa/"
           "/home/cf/.emacs.d/elpa/archives/gnu/" "/home/cf/.emacs.d/elpa/archives/melpa/" "/home/cf/.emacs.d/elpa/archives/org/"
           "/home/cf/.emacs.d/elpa/archives/elpa/" "/home/cf/.emacs.d/elpa/archives/nongnu/" "/home/cf/.emacs.d/elpaca/builds/"
           "/home/cf/.emacs.d/melpa/" "/usr/share/emacs/site-lisp/" "/usr/share/emacs/30.1/lisp/"))
@@ -2589,6 +2863,8 @@ If NO-FOLLOW is non-nil, don't select the moved buffer."
   (defun update-info-directories ()
     "Ensure `Info-directory-list` is updated with all available paths."
     (interactive)
+    (setq Info-additional-directory-list
+          '("~/.emacs.d/info/"))
     (setq Info-directory-list (delete-dups (flatten-list Info-default-directory-list))))
 
   (update-info-directories)
@@ -2665,11 +2941,10 @@ If NO-FOLLOW is non-nil, don't select the moved buffer."
             (lambda ()
               (visual-line-mode -1)
               (setq-local truncate-lines t)
-              (setq-local olivetti-body-width 80)
               (setq-local left-margin-width 2)
               (setq-local right-margin-width 2))))
 
-;; WoMan
+;; WoMan :man:
 (use-package woman
   :ensure nil
   :defer t
@@ -2691,7 +2966,7 @@ If NO-FOLLOW is non-nil, don't select the moved buffer."
         ("E" . end-of-line)
         ("m" . set-mark-command)
         ("c" . kill-ring-save)
-        (";" . er/expand-region)
+        (";" . cf/expreg-expand-dwim)
         ("d" . cf/scroll-up-and-recenter)
         ("u" . cf/scroll-down-and-recenter))
   :custom
@@ -2699,62 +2974,42 @@ If NO-FOLLOW is non-nil, don't select the moved buffer."
   (woman-font-lock t)
   (woman-use-topic-at-point t)
   (woman-use-extended-font t)
-  (woman-use-symbol-font t)
+  (woman-use-symbol-font nil)
   (font-lock-maximum-decoration t)
   (woman-manpath '("/usr/man/" "/usr/share/man/" "/usr/share/man/man1/"
                    "/var/lib/snapd/snap/man/" "/opt/man/" "/usr/local/man/"
-                   "/usr/X11R6/man/" "/home/cf/.local/share/.nvm/versions/node/v22.6.0/share/man/"
-                   "/home/cf/.local/share/man/" "/home/cf/.local/share/perl5/man/"
+                   "/usr/X11R6/man/" "/home/cf/.local/share/man/"
+                   "/home/cf/.local/share/perl5/man/"
                    "/usr/lib/jvm/default/man/" "/usr/local/share/man/"
                    "/usr/local/share/man/man1/" "/usr/local/share/man/man3/"
                    "/usr/local/share/man/man5/" "/usr/local/share/man/man7/"
-                   "/usr/local/share/man/man8/" "/usr/local/texlive/2024/bin/x86_64-linux/man/"
-                   "/usr/local/texlive/2024/texmf-dist/doc/man/"
-                   "/usr/local/texlive/2024/texmf-dist/doc/man/man1/"
-                   "/usr/local/texlive/2024/texmf-dist/doc/man/man5/"))
+                   "/usr/local/share/man/man8/"))
   :config
-  (defun woman-detect-language ()
-    "Detect the programming language in the current `woman-mode' buffer.
-      Uses common macro sections and syntax patterns found in manual pages."
-    (save-excursion
-      (goto-char (point-min))
-      (cond
-       ((re-search-forward "^\\.\\(SH\\|SS\\|TH\\)" nil t) 'man)
-       ((re-search-forward "^[ \t]*\\(#include\\|typedef\\|struct\\|enum\\|void\\)" nil t) 'c)
-       ((re-search-forward "^[ \t]*\\(def \\|class \\|import \\|from \\|#!.*python\\)" nil t) 'python)
-       ((re-search-forward "^#!.*sh\\|^[ \t]*\\(echo\\|if \\|then\\|fi\\|case \\|esac\\|while \\|done\\|for \\|in \\)" nil t) 'shell)
-       ((re-search-forward "^[ \t]*(\\(defun\\|defmacro\\|lambda\\)" nil t) 'lisp)
-       ((re-search-forward "^[ \t]*\\(public \\|private \\|class \\|static \\|void \\)" nil t) 'java)
-       ((re-search-forward "^#!.*perl\\|^[ \t]*sub " nil t) 'perl)
-       ((re-search-forward "^#!.*ruby\\|^[ \t]*\\(def \\|class \\|module \\)" nil t) 'ruby)
-       ((re-search-forward "^[ \t]*\\(package \\|func \\|import \\)" nil t) 'go)
-       (t 'text))))
-
-  (defun woman-setup-highlighting ()
-    "Enable syntax highlighting in `woman-mode' buffers.
-Uses `treesit' for parsing if available and enables relevant highlight modes."
-    (when (fboundp 'treesit-available-p)
-      (let ((lang (woman-detect-language)))
-        (when (and (treesit-available-p) (treesit-language-available-p lang))
-          (treesit-parser-create lang)
-          (treesit-major-mode-setup))))
-    (when (derived-mode-p 'woman-mode)
-      (when (fboundp 'font-lock-mode) (font-lock-mode 1))
-      (when (fboundp 'highlight-numbers-mode) (highlight-numbers-mode 1))
-      (when (fboundp 'highlight-quoted-mode) (highlight-quoted-mode 1))
-      (when (fboundp 'hl-todo-mode) (hl-todo-mode 1))
-      (when (fboundp 'olivetti-mode) (olivetti-mode 1))
-      (when (fboundp 'treesit-auto-mode) (treesit-auto-mode 1))
-      ))
-  (add-hook 'woman-mode-hook #'woman-setup-highlighting)
   (add-hook 'woman-mode-hook
             (lambda ()
               (visual-line-mode -1)
               (setq-local truncate-lines t)
-              (setq-local olivetti-body-width 90)
               (setq-local left-margin-width 2)
               (setq-local right-margin-width 2)
               (setq-local text-justify 'full))))
+
+;; `man' (manpages)
+(use-package man
+  :ensure nil
+  :commands (man)
+  :config
+  (setq Man-notify-method 'pushy)) ; does not obey `display-buffer-alist'
+
+;; `proced' (process monitor, similar to `top')
+(use-package proced
+  :ensure nil
+  :commands (proced)
+  :config
+  (setq proced-auto-update-flag 'visible) ; Emacs 30 supports more the `visible' value
+  (setq proced-enable-color-flag t) ; Emacs 29
+  (setq proced-auto-update-interval 5)
+  (setq proced-descend t)
+  (setq proced-filter 'user))
 
 ;; rfc-mode
 (use-package rfc-mode
@@ -2788,7 +3043,7 @@ Uses `treesit' for parsing if available and enables relevant highlight modes."
         ("a" . backward-sentence)
         ("]" . forward-paragraph)
         ("[" . backward-paragraph)
-        (";" . er/expand-region)
+        (";" . cf/expreg-expand-dwim)
         ("m" . set-mark-command))
   :config
   (defun cf/update-local-rfc-mirror ()
@@ -2864,29 +3119,31 @@ Uses `treesit' for parsing if available and enables relevant highlight modes."
 (use-package org
   :ensure nil
   :defer t
+  :custom
+  (org-edit-src-auto-save-idle-delay 30)
+  (org-confirm-babel-tangle nil)
+  (org-export-with-toc nil)
+  (org-support-shift-select t)
+  (org-image-actual-width nil)
+  (org-list-allow-alphabetical t)
+  (org-hide-emphasis-markers t)
+  (org-auto-align-tags nil)
+  (org-tags-column 0)
+  (org-fold-catch-invisible-edits 'show-and-error)
+  (org-special-ctrl-a/e t)
+  (org-insert-heading-respect-content t)
+  (org-pretty-entities t)
+  (org-startup-with-inline-images t)
+  (org-image-max-width 'window)
+  (org-agenda-tags-column 0)
+  (org-ellipsis "…")
+  (org-export-backends '(md html))
+  (org-html-htmlize-output-type 'inline-css)
+  (org-return-follows-link t)
+  (org-auto-align-tags t)
+  (org-directory "~/Documents/org/")
+  (org-agenda-files '("~/Documents/Agenda/"))
   :config
-  (setq org-edit-src-auto-save-idle-delay 30)
-  (setq org-confirm-babel-tangle nil)
-  (setq org-export-with-toc nil)
-  (setq org-support-shift-select t)
-  (setq org-image-actual-width nil)
-  (setq org-list-allow-alphabetical t)
-  (setq org-hide-emphasis-markers t)
-  (setq org-auto-align-tags nil)
-  (setq org-tags-column 0)
-  (setq org-fold-catch-invisible-edits 'show-and-error)
-  (setq org-special-ctrl-a/e t)
-  (setq org-insert-heading-respect-content t)
-  (setq org-pretty-entities t)
-  (setq org-startup-with-inline-images t)
-  (setq org-image-max-width 'window)
-  (setq org-agenda-tags-column 0)
-  (setq org-ellipsis "…")
-  (setq org-export-backends '(md html))
-  (setq org-html-htmlize-output-type 'inline-css)
-  (setq org-return-follows-link t)
-  (setq org-directory "~/Documents/org/")
-  (setq org-agenda-files (list "~/Documents/Agenda/"))
   (add-hook 'org-mode-hook
             #'(lambda ()
                 (setq-local electric-pair-inhibit-predicate
@@ -2912,6 +3169,12 @@ Uses `treesit' for parsing if available and enables relevant highlight modes."
      (python . t)
      (awk . t)
      (sed . t)))
+
+  (setq org-link-abbrev-alist
+        '(("ddg"      . "https://duckduckgo.com/?q=%s")
+          ("archwiki" . "https://duckduckgo.com/?q=!archwiki%20%s")
+          ("ytd"      . "file:~/Videos/yt/%s")
+          ("wwd"      . "file:~/.local/eww/%s")))
 
   (org-link-set-parameters
    "info"
@@ -2977,6 +3240,7 @@ Uses `treesit' for parsing if available and enables relevant highlight modes."
         (org-entry-put point move-counter-name
                        (number-to-string move-counter-value)))
       nil)
+
     (defun cf/org-get-heading-name ()
       (nth 4 (org-heading-components)))
 
@@ -3009,7 +3273,7 @@ The function can be called interactively with \\[cf/cliplink-task] or as an
            :empty-lines 1)
           ("k" "Cliplink capture task" entry
            (file "~/Documents/Agenda/tasks.org")
-           "* TODO %(org-cliplink-task) \n  SCHEDULED: %t\n"
+           "* TODO %(cf/cliplink-task) \n  SCHEDULED: %t\n"
            :empty-lines 1)
           ("s" "Symbol Reference" entry
            (file+headline "~/Documents/org/references.org" "References")
@@ -3028,803 +3292,159 @@ The function can be called interactively with \\[cf/cliplink-task] or as an
            "** %? \n\n -- %T\n"
            :empty-lines 1)))
 
- (setq org-feed-alist
-           '(("Slashdot"
-              "https://rss.slashdot.org/Slashdot/slashdot"
-              "~/News/feeds/feeds.org" "Slashdot Entries")
-
-             ("QC - Fil de Presse"
-              "https://www.quebec.ca/fil-de-presse.rss"
-              "~/News/feeds/quebec_fil_de_presse.org" "Fil de Presse du Québec")
-
-             ("ArchLinux - Pkgs"
-              "https://archlinux.org/feeds/packages/x86_64/"
-              "~/News/feeds/ArchLinux-Pkgs.org" "ArchLinux - Pkgs")
-
-             ("ArchLinux - Pkgs Added"
-              "https://archlinux.org/feeds/packages/added/x86_64/"
-              "~/News/feeds/ArchLinux-PkgsAdded.org" "ArchLinux - Pkgs Added")
-
-             ("ArchLinux - Pkgs Removed"
-              "https://archlinux.org/feeds/packages/removed/x86_64/"
-              "~/News/feeds/ArchLinux-PkgsRemoved.org" "ArchLinux - Pkgs Removed")
-
-             ("ArchLinux - Pkgs Issues"
-              "https://gitlab.archlinux.org/groups/archlinux/packaging/packages/-/issues?format=atom"
-              "~/News/feeds/ArchLinux-PkgsIssues.org" "ArchLinux - Pkgs Issues")
-
-             ("ArchLinux - Pacman Issues"
-              "https://gitlab.archlinux.org/pacman/pacman/-/issues?format=atom"
-              "~/News/feeds/ArchLinux-PacmanIssues.org" "ArchLinux - Pacman Issues")
-
-             ("ArchLinux - AUR Issues"
-              "https://gitlab.archlinux.org/archlinux/aurweb/-/issues?format=atom"
-              "~/News/feeds/ArchLinux-AURIssues.org" "ArchLinux - AUR Issues")
-
-             ("Neovim"
-              "https://neovim.io/news.xml"
-              "~/News/feeds/Neovim.org" "Neovim")
-
-             ("ArchLinux"
-              "https://archlinux.org/feeds/news"
-              "~/News/feeds/ArchLinux.org" "ArchLinux")
-
-             ("ArtixLinux"
-              "https://artixlinux.org/feed.php"
-              "~/News/feeds/ArtixLinux.org" "ArtixLinux")
-
-             ("Its FoSS"
-              "https://itsfoss.com/rss"
-              "~/News/feeds/ItsFoSS.org" "It's FoSS")
-
-             ("Suckless"
-              "https://suckless.org/atom.xml"
-              "~/News/feeds/Suckless.org" "Suckless")
-
-             ("FFmpeg"
-              "https://ffmpeg.org/main.rss"
-              "~/News/feeds/FFmpeg.org" "FFmpeg")
-
-             ("Chris Titus Tech - Linux"
-              "https://christitus.com/categories/linux/index.xml"
-              "~/News/feeds/ChrisTitusTech-Linux.org" "Chris Titus Tech - Linux")
-
-             ("Qutebrowser"
-              "https://blog.qutebrowser.org/feeds/all.rss.xml"
-              "~/News/feeds/Qutebrowser.org" "Qutebrowser")
-
-             ("Framework"
-              "https://frame.work/ca/en/blog.rss"
-              "~/News/feeds/Framework.org" "Framework")
-
-             ("chamook lol"
-              "https://chamook.lol/rss.xml"
-              "~/News/feeds/chamooklol.org" "chamook lol")
-
-             ("books"
-              "https://protesilaos.com/books.xml"
-              "~/News/feeds/books.org" "books")
-
-             ("codelog"
-              "https://protesilaos.com/codelog.xml"
-              "~/News/feeds/codelog.org" "codelog")
-
-             ("commentary"
-              "https://protesilaos.com/commentary.xml"
-              "~/News/feeds/commentary.org" "commentary")
-
-             ("interpretations"
-              "https://protesilaos.com/interpretations.xml"
-              "~/News/feeds/interpretations.org" "interpretations")
-
-             ("keeb"
-              "https://protesilaos.com/keeb.xml"
-              "~/News/feeds/keeb.org" "keeb")
-
-             ("poems"
-              "https://protesilaos.com/poems.xml"
-              "~/News/feeds/poems.org" "poems")
-
-             ("news"
-              "https://protesilaos.com/news.xml"
-              "~/News/feeds/news.org" "news")
-
-             ("politics"
-              "https://protesilaos.com/politics.xml"
-              "~/News/feeds/politics.org" "politics")
-
-             ("master"
-              "https://protesilaos.com/master.xml"
-              "~/News/feeds/master.org" "master")
-
-             ("La Relève"
-              "https://www.lareleve.qc.ca/feed/rss"
-              "~/News/feeds/LaRelève.org" "La Relève")
-
-             ("Le Devoir - Manchettes"
-              "https://www.ledevoir.com/rss/manchettes.xml"
-              "~/News/feeds/LeDevoir-Manchettes.org" "Le Devoir - Manchettes")
-
-             ("La Presse - Actualités"
-              "https://www.lapresse.ca/actualites/rss"
-              "~/News/feeds/LaPresse-Actualités.org" "La Presse - Actualités")
-
-             ("La Presse - Techno"
-              "https://www.lapresse.ca/affaires/techno/rss"
-              "~/News/feeds/LaPresse-Techno.org" "La Presse - Techno")
-
-             ("Le Journal de Montréal - Actualités"
-              "https://www.journaldemontreal.com/actualite/rss.xml"
-              "~/News/feeds/LeJournaldeMontréal-Actualités.org" "Le Journal de Montréal - Actualités")
-
-             ("QC - Fil de Presse"
-              "https://www.quebec.ca/fil-de-presse.rss"
-              "~/News/feeds/QC-FildePresse.org" "QC - Fil de Presse")
-
-             ("AssNatQC - Actualités"
-              "https://www.assnat.qc.ca/fr/rss/SyndicationRSS-214.html"
-              "~/News/feeds/AssNatQC-Actualités.org" "AssNatQC - Actualités")
-
-             ("CTV"
-              "https://montreal.ctvnews.ca/rss/ctv-news-montreal-1.822366"
-              "~/News/feeds/CTV.org" "CTV")
-
-             ("RadioCanadaInfo"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UClxaaAzHu1B5EoTtBYea7ig"
-              "~/News/feeds/RadioCanadaInfo.org" "RadioCanadaInfo")
-
-             ("Radio Canada"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCi8BnqbhQripV0V-gqx7oEg"
-              "~/News/feeds/RadioCanada.org" "Radio Canada")
-
-             ("TVA Nouvelles"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCgKzdfWnTie2OD4bfaZKaQw"
-              "~/News/feeds/TVANouvelles.org" "TVA Nouvelles")
-
-             ("RAD"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCVBA7-PfzHIkfPfZ3UiqWdg"
-              "~/News/feeds/RAD.org" "RAD")
-
-             ("PortQc"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCZdjU2sWPeLjmh75zOxekUg"
-              "~/News/feeds/PortQc.org" "PortQc")
-
-             ("NASA"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCLA_DiR1FfKNvjuUpBHmylQ"
-              "~/News/feeds/NASA.org" "NASA")
-
-             ("Bloomberg Markets"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCIALMKvObZNtJ6AmdCLP7Lg"
-              "~/News/feeds/BloombergMarkets.org" "Bloomberg Markets")
-
-             ("CBC News"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCuFFtHWoLl5fauMMD5Ww2jA"
-              "~/News/feeds/CBCNews.org" "CBC News")
-
-             ("Linus Tech Tips"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCXuqSBlHAE6Xw-yeJA0Tunw"
-              "~/News/feeds/LinusTechTips.org" "Linus Tech Tips")
-
-             ("Level1Techs"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC4w1YQAJMWOz4qtxinq55LQ"
-              "~/News/feeds/Level1Techs.org" "Level1Techs")
-
-             ("Rting.com"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCAi6GKtTPoYxUheIbVhnwqw"
-              "~/News/feeds/Rting.com.org" "Rting.com")
-
-             ("Framework Computer"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCDiKw3GnFIwyNJBzhCoRI-Q"
-              "~/News/feeds/FrameworkComputer.org" "Framework Computer")
-
-             ("Lex Fridman"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCSHZKyawb77ixDdsGog4iWA"
-              "~/News/feeds/LexFridman.org" "Lex Fridman")
-
-             ("Network Chuck"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC9x0AN7BWHpCDHSm9NiJFJQ"
-              "~/News/feeds/NetworkChuck.org" "Network Chuck")
-
-             ("David Bombal"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCP7WmQ_U4GB3K51Od9QvM0w"
-              "~/News/feeds/DavidBombal.org" "David Bombal")
-
-             ("Daves Garage"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCNzszbnvQeFzObW0ghk0Ckw"
-              "~/News/feeds/DavesGarage.org" "Dave's Garage")
-
-             ("TallPaulTech"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCcmw3P6BDUFA4h3Y_FpsB_w"
-              "~/News/feeds/TallPaulTech.org" "TallPaulTech")
-
-             ("Techno Tim"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCOk-gHyjcWZNj3Br4oxwh0A"
-              "~/News/feeds/TechnoTim.org" "Techno Tim")
-
-             ("Novaspirit Tech"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCrjKdwxaQMSV_NDywgKXVmw"
-              "~/News/feeds/NovaspiritTech.org" "Novaspirit Tech")
-
-             ("Thoughtbot"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCUR1pFG_3XoZn3JNKjulqZg"
-              "~/News/feeds/Thoughtbot.org" "Thoughtbot")
-
-             ("LiveOverflow"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UClcE-kVhqyiHCcjYwcpfj9w"
-              "~/News/feeds/LiveOverflow.org" "LiveOverflow")
-
-             ("Nerdslesson"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCyFWoLmPTgZ3BkHIKMRSV1g"
-              "~/News/feeds/Nerdslesson.org" "Nerdslesson")
-
-             ("CBT Nuggets"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UClIFqsmxnwVNNlsvjH1D1Aw"
-              "~/News/feeds/CBTNuggets.org" "CBT Nuggets")
-
-             ("Learn Linux TV"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCxQKHvKbmSzGMvUrVtJYnUA"
-              "~/News/feeds/LearnLinuxTV.org" "Learn Linux TV")
-
-             ("CSIUL"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCqHR0icKT20KwFDjaZuFt7w"
-              "~/News/feeds/CSIUL.org" "CSIUL")
-
-             ("Hackfest CA"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCSckp-N4zP4V8GnZGxVqjTg"
-              "~/News/feeds/HackfestCA.org" "Hackfest CA")
-
-             ("The Hacksmith"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCjgpFI5dU-D1-kh9H1muoxQ"
-              "~/News/feeds/TheHacksmith.org" "The Hacksmith")
-
-             ("Off By One Security"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCc8gr33-DyCZ6gAmqdcyzgA"
-              "~/News/feeds/OffByOneSecurity.org" "Off By One Security")
-
-             ("Research Touch"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCe9V4O9aDSe3_XhcpTSWAWg"
-              "~/News/feeds/ResearchTouch.org" "Research Touch")
-
-             ("Jeff Geerling"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCR-DXc1voovS8nhAvccRZhg"
-              "~/News/feeds/JeffGeerling.org" "Jeff Geerling")
-
-             ("Steve Seguin"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCMc1GFSONeLSKvXuHx_N51A"
-              "~/News/feeds/SteveSeguin.org" "Steve Seguin")
-
-             ("Tj DeVries"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCd3dNckv1Za2coSaHGHl5aA"
-              "~/News/feeds/TjDeVries.org" "Tj DeVries")
-
-             ("Bugswriter"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCngn7SVujlvskHRvRKc1cTw"
-              "~/News/feeds/Bugswriter.org" "Bugswriter")
-
-             ("gotbletu"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCkf4VIqu3Acnfzuk3kRIFwA"
-              "~/News/feeds/gotbletu.org" "gotbletu")
-
-             ("Chris Titus Tech"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCg6gPGh8HU2U01vaFCAsvmQ"
-              "~/News/feeds/ChrisTitusTech.org" "Chris Titus Tech")
-
-             ("Engineer Man"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCrUL8K81R4VBzm-KOYwrcxQ"
-              "~/News/feeds/EngineerMan.org" "Engineer Man")
-
-             ("Tsoding Daily"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCrqM0Ym_NbK1fqeQG2VIohg"
-              "~/News/feeds/TsodingDaily.org" "Tsoding Daily")
-
-             ("DevOps Toolbox"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCYeiozh-4QwuC1sjgCmB92w"
-              "~/News/feeds/DevOpsToolbox.org" "DevOps Toolbox")
-
-             ("Chris@Machine"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCS97tchJDq17Qms3cux8wcA"
-              "~/News/feeds/Chris@Machine.org" "Chris@Machine")
-
-             ("TonyTeachesTech"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCWPJwoVXJhv0-ucr3pUs1dA"
-              "~/News/feeds/TonyTeachesTech.org" "TonyTeachesTech")
-
-             ("The Primeagen"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC8ENHE5xdFSwx71u3fDH5Xw"
-              "~/News/feeds/ThePrimeagen.org" "The Primeagen")
-
-             ("The Prime Time"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCUyeluBRhGPCW4rPe_UvBZQ"
-              "~/News/feeds/ThePrimeTime.org" "The Prime Time")
-
-             ("The Vimeagen"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCVk4b-svNJoeytrrlOixebQ"
-              "~/News/feeds/TheVimeagen.org" "The Vimeagen")
-
-             ("Typecraft Talks"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCppiOhLD5jQgs6m0j9-PYOA"
-              "~/News/feeds/TypecraftTalks.org" "Typecraft Talks")
-
-             ("Typecraft Dev"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCo71RUe6DX4w-Vd47rFLXPg"
-              "~/News/feeds/TypecraftDev.org" "Typecraft Dev")
-
-             ("Melkey"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC1Zfv1Zrp1q5lKgBomzOyCA"
-              "~/News/feeds/Melkey.org" "Melkey")
-
-             ("Theo - t3.gg"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCbRP3c757lWg9M-U7TyEkXA"
-              "~/News/feeds/Theo-t3.gg.org" "Theo - t3.gg")
-
-             ("Bro Codez"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC4SVo0Ue36XCfOyb5Lh1viQ"
-              "~/News/feeds/BroCodez.org" "Bro Codez")
-
-             ("devaslife"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC7yZ6keOGsvERMp2HaEbbXQ"
-              "~/News/feeds/devaslife.org" "devaslife")
-
-             ("Mindful Technology"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCi0KOqT1BBKcfWMV_s9-F5w"
-              "~/News/feeds/MindfulTechnology.org" "Mindful Technology")
-
-             ("Linguistic Mind"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCZ_2W3ilvrS-20rk1reNIZA"
-              "~/News/feeds/LinguisticMind.org" "Linguistic Mind")
-
-             ("Luke Smith"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC2eYFnH61tmytImy1mTYvhA"
-              "~/News/feeds/LukeSmith.org" "Luke Smith")
-
-             ("DistroTube"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCVls1GmFKf6WlTraIb_IaJg"
-              "~/News/feeds/DistroTube.org" "DistroTube")
-
-             ("Brodie Robertson"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCld68syR8Wi-GY_n4CaoJGA"
-              "~/News/feeds/BrodieRobertson.org" "Brodie Robertson")
-
-             ("DJ Ware"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC05XpvbHZUQOfA6xk4dlmcw"
-              "~/News/feeds/DJWare.org" "DJ Ware")
-
-             ("Mental Outlaw"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC7YOGHUfC1Tb6E4pudI9STA"
-              "~/News/feeds/MentalOutlaw.org" "Mental Outlaw")
-
-             ("The Linux Cast"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCylGUf9BvQooEFjgdNudoQg"
-              "~/News/feeds/TheLinuxCast.org" "The Linux Cast")
-
-             ("Mashed Linux"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC-V8FVQCUpRRUPNClviki3w"
-              "~/News/feeds/MashedLinux.org" "Mashed Linux")
-
-             ("Jake@Linux"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC1yGcBvdPGxRIMT1yo_bKIQ"
-              "~/News/feeds/Jake@Linux.org" "Jake@Linux")
-
-             ("Andrew Giraffe"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCrwOzu7ienZYuzAdeeRL4rQ"
-              "~/News/feeds/AndrewGiraffe.org" "Andrew Giraffe")
-
-             ("Swindles McCoop"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCLtI6aq4G8zinQjUcsxgEXA"
-              "~/News/feeds/SwindlesMcCoop.org" "Swindles McCoop")
-
-             ("RoboNuggie"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCxwcmRAmBRzZMNS37dCgmHA"
-              "~/News/feeds/RoboNuggie.org" "RoboNuggie")
-
-             ("Leeren (Vim)"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC6fXiuFCWAnVPwRhBMztLlQ"
-              "~/News/feeds/Leeren(Vim).org" "Leeren (Vim)")
-
-             ("Uncle Dave (Emacs)"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCDEtZ7AKmwS0_GNJog01D2g"
-              "~/News/feeds/UncleDave(Emacs).org" "Uncle Dave (Emacs)")
-
-             ("Kalos Likes Computers"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCSsHJShN9qNXqXD1j2emaqg"
-              "~/News/feeds/KalosLikesComputers.org" "Kalos Likes Computers")
-
-             ("Mr Volt"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCvOOv9tfBMSzcXnDkgzMufA"
-              "~/News/feeds/MrVolt.org" "Mr Volt")
-
-             ("Im Zipux"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCoS8kP28lY4mkjOt5Znv9LA"
-              "~/News/feeds/ImZipux.org" "Im Zipux")
-
-             ("Ward Co."
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCtskb5x0YBfRgbj5qXpneIw"
-              "~/News/feeds/WardCo..org" "Ward Co.")
-
-             ("AdaFruit"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCpOlOeQjj7EsVnDh3zuCgsA"
-              "~/News/feeds/AdaFruit.org" "AdaFruit")
-
-             ("Denshi"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCNwGa76xVVwdEVToRZBIUIg"
-              "~/News/feeds/Denshi.org" "Denshi")
-
-             ("Bog"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCZXW8E1__d5tZb-wLFOt8TQ"
-              "~/News/feeds/Bog.org" "Bog")
-
-             ("Ampersand"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC6jUsIEZ2F875OB2Be84cpA"
-              "~/News/feeds/Ampersand.org" "Ampersand")
-
-             ("Machinely"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCCx3M0hHhFTnpjoLKo70Mqw"
-              "~/News/feeds/Machinely.org" "Machinely")
-
-             ("BlenderStudio"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCz75RVbH8q2jdBJ4SnwuZZQ"
-              "~/News/feeds/BlenderStudio.org" "BlenderStudio")
-
-             ("You Suck at Programming"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCMN0a7GHQnC6H74SmCGSmdw"
-              "~/News/feeds/YouSuckatProgramming.org" "You Suck at Programming")
-
-             ("Programming Knowledge"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCs6nmQViDpUw0nuIx9c_WvA"
-              "~/News/feeds/ProgrammingKnowledge.org" "Programming Knowledge")
-
-             ("IMDb"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC_vz6SvmIkYs1_H3Wv2SKlg"
-              "~/News/feeds/IMDb.org" "IMDb")
-
-             ("Apple TV"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC1Myj674wRVXB9I4c6Hm5zA"
-              "~/News/feeds/AppleTV.org" "Apple TV")
-
-             ("RottenTomatoes Trailers"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCi8e0iOVk1fEOogdfu4YgfA"
-              "~/News/feeds/RottenTomatoesTrailers.org" "RottenTomatoes Trailers")
-
-             ("Programmers are also human"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCi8C7TNs2ohrc6hnRQ5Sn2w"
-              "~/News/feeds/Programmersarealsohuman.org" "Programmers are also human")
-
-             ("Sous Écoute"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCKhVag9OGIOJu_x430Dmedw"
-              "~/News/feeds/SousÉcoute.org" "Sous Écoute")
-
-             ("Arnaud Soly"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCrunkdoX2gzv_T3U_fOzLsg"
-              "~/News/feeds/ArnaudSoly.org" "Arnaud Soly")
-
-             ("Québec Fier"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCTZxD4YBmYsABei2M7A8_Sg"
-              "~/News/feeds/QuébecFier.org" "Québec Fier")
-
-             ("Le Mef"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCJs0hk9Ib9stBmiBdvG2zkQ"
-              "~/News/feeds/LeMef.org" "Le Mef")
-
-             ("Chef Michel Dumas"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCSLyEx8ISkp567AjOAHYN5Q"
-              "~/News/feeds/ChefMichelDumas.org" "Chef Michel Dumas")
-
-             ("Beardmeatsfood"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCc9CjaAjsMMvaSghZB7-Kog"
-              "~/News/feeds/Beardmeatsfood.org" "Beardmeatsfood")
-
-             ("More Best Ever Food Review Show"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCXw1ddyrUmib3zmCmvSI1ow"
-              "~/News/feeds/MoreBestEverFoodReviewShow.org" "More Best Ever Food Review Show")
-
-             ("VICE TV"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCWF0PiUvUi3Jma2oFgaiX2w"
-              "~/News/feeds/VICETV.org" "VICE TV")
-
-             ("Doublage Qc"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC-aKLZRiF6-mqH6x0zY4PPA"
-              "~/News/feeds/DoublageQc.org" "Doublage Qc")
-
-             ("Small Brained American"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCHASrbCS-niYRn-Y3WX38pA"
-              "~/News/feeds/SmallBrainedAmerican.org" "Small Brained American")
-
-             ("WalkingAlice"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCiVSJutRI7WdDuXV93fRWvA"
-              "~/News/feeds/WalkingAlice.org" "WalkingAlice")
-
-             ("Globe Trotter Alpha"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCM7rCxp0Hp3qktZKeEtKqcg"
-              "~/News/feeds/GlobeTrotterAlpha.org" "Globe Trotter Alpha")
-
-             ("Survival Mystique"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC4gYfbeWlBiCb421HqWbmfw"
-              "~/News/feeds/SurvivalMystique.org" "Survival Mystique")
-
-             ("Bad Friends"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCRBpynZV0b7ww2XMCfC17qg"
-              "~/News/feeds/BadFriends.org" "Bad Friends")
-
-             ("Pawn Stars"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCmyjVwYZbp5YPYTUyeopO2g"
-              "~/News/feeds/PawnStars.org" "Pawn Stars")
-
-             ("TheMobReporter"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCnsj4TU7mOQ-4l2HOaRekgA"
-              "~/News/feeds/TheMobReporter.org" "TheMobReporter")
-
-             ("Daily Dose Of Internet"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCdC0An4ZPNr_YiFiYoVbwaw"
-              "~/News/feeds/DailyDoseOfInternet.org" "Daily Dose Of Internet")
-
-             ("Fail Army"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCPDis9pjXuqyI7RYLJ-TTSA"
-              "~/News/feeds/FailArmy.org" "Fail Army")
-
-             ("MrBeast"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCX6OQ3DkcsbYNE6H8uQQuVA"
-              "~/News/feeds/MrBeast.org" "MrBeast")
-
-             ("penguinz0"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCq6VFHwMzcMXbuKyG7SQYIg"
-              "~/News/feeds/penguinz0.org" "penguinz0")
-
-             ("MTV"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCxAICW_LdkfFYwTqTHHE0vg"
-              "~/News/feeds/MTV.org" "MTV")
-
-             ("BnF - Classique"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCVYDg1UvnDQyFPgD7gCKfVQ"
-              "~/News/feeds/BnF-Classique.org" "BnF - Classique")
-
-             ("BnF - Jazz & Blues"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCBohV13_5x4Wek2g90Yv7FA"
-              "~/News/feeds/BnF-Jazz&Blues.org" "BnF - Jazz & Blues")
-
-             ("Taro Cross"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCwJqBYidzabghpU9tceaTBw"
-              "~/News/feeds/TaroCross.org" "Taro Cross")
-
-             ("60otaku4"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UClnUZmjARnHBybrMLvcBKmA"
-              "~/News/feeds/60otaku4.org" "60otaku4")
-
-             ("My Kind Of Music"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC6GJbcfdjJXoRTJt1ANIOEw"
-              "~/News/feeds/MyKindOfMusic.org" "My Kind Of Music")
-
-             ("Sam Jam Radio"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCTpYQ67Ko_v-jGe6s6k1YZA"
-              "~/News/feeds/SamJamRadio.org" "Sam Jam Radio")
-
-             ("Classic Rock"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCXynnXkWjVqGgZo02vCfl9g"
-              "~/News/feeds/ClassicRock.org" "Classic Rock")
-
-             ("NPR Music - TinyDesk"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC4eYXhJI4-7wSWc8UNRwD4A"
-              "~/News/feeds/NPRMusic-TinyDesk.org" "NPR Music - TinyDesk")
-
-             ("KEXP"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC3I2GFN_F8WudD_2jUZbojA"
-              "~/News/feeds/KEXP.org" "KEXP")
-
-             ("Joscho Stephan"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCOx5xSWVB-hdfHuzHk16dIw"
-              "~/News/feeds/JoschoStephan.org" "Joscho Stephan")
-
-             ("Vulf"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCtWuB1D_E3mcyYThA9iKggQ"
-              "~/News/feeds/Vulf.org" "Vulf")
-
-             ("GeorgeCollier"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCigygyPkHm07o-wQvkET7Og"
-              "~/News/feeds/GeorgeCollier.org" "GeorgeCollier")
-
-             ("Cory Wong Music"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCQqC08JWnJGJIgw43XJ0GXw"
-              "~/News/feeds/CoryWongMusic.org" "Cory Wong Music")
-
-             ("Scary Pockets"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC-2JUs_G21BrJ0efehwGkUw"
-              "~/News/feeds/ScaryPockets.org" "Scary Pockets")
-
-             ("Pomplamoose"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCSiPjfAJBgbFlIUsxOWpK0w"
-              "~/News/feeds/Pomplamoose.org" "Pomplamoose")
-
-             ("Impératrice"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCogofxZDDXkpKf0S8MnxLMQ"
-              "~/News/feeds/Impératrice.org" "Impératrice")
-
-             ("Jacos Hat Records"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCFckK8Zj2k6e6Qz8H95M4QA"
-              "~/News/feeds/JacosHatRecords.org" "Jaco's Hat Records")
-
-             ("Postmodern Jukebox"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCORIeT1hk6tYBuntEXsguLg"
-              "~/News/feeds/PostmodernJukebox.org" "Postmodern Jukebox")
-
-             ("Keep It Cosy"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCLp0_g40tNwLJWqO2PSuqWQ"
-              "~/News/feeds/KeepItCosy.org" "Keep It Cosy")
-
-             ("Lofi Girl"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCSJ4gkVC6NrvII8umztf0Ow"
-              "~/News/feeds/LofiGirl.org" "Lofi Girl")
-
-             ("Loom Room Sounds"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC6MFcLxz2_LLjEpr8aeKVnA"
-              "~/News/feeds/LoomRoomSounds.org" "Loom Room Sounds")
-
-             ("La Vinyls"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCIsAlQwF6UrwkLi1WnXZ_xA"
-              "~/News/feeds/LaVinyls.org" "La Vinyls")
-
-             ("Relax Jazz Cafe"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCZR3-lM6Z-n5_UGHlwx_Rpw"
-              "~/News/feeds/RelaxJazzCafe.org" "Relax Jazz Cafe")
-
-             ("Holiday Music"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCRp--eWwsLI_uIkCnsbfwFQ"
-              "~/News/feeds/HolidayMusic.org" "Holiday Music")
-
-             ("Snarky Puppy"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCo1t7ajBc5r44Ejxnod-h7Q"
-              "~/News/feeds/SnarkyPuppy.org" "Snarky Puppy")
-
-             ("GroundUP Music NYC"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCPl2RYo0lLLqj8RaEADYclg"
-              "~/News/feeds/GroundUPMusicNYC.org" "GroundUP Music NYC")
-
-             ("TSF JAZZ Radio"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCJhKyIvuw9CTNYXD6zMDyGw"
-              "~/News/feeds/TSFJAZZRadio.org" "TSF JAZZ Radio")
-
-             ("Tomo Fujita Music"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCe2OJ09kz2MEl6k4nsCMP6Q"
-              "~/News/feeds/TomoFujitaMusic.org" "Tomo Fujita Music")
-
-             ("Ulf Wakenius"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCJVCjSTTe6ijR3uCTm0q40A"
-              "~/News/feeds/UlfWakenius.org" "Ulf Wakenius")
-
-             ("JTC Guitar"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCBAciNG_R9nqVBk45qKJN6w"
-              "~/News/feeds/JTCGuitar.org" "JTC Guitar")
-
-             ("Mateus  Asato"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCdJvnbX52LgGrmNvREvZZoQ"
-              "~/News/feeds/MateusAsato.org" "Mateus  Asato")
-
-             ("ZaneyOG"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCmw-QGOHbHA5cDAvwwqUTKQ"
-              "~/News/feeds/ZaneyOG.org" "ZaneyOG")
-
-             ("joseanmartinez"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UC_NZ6qLS9oJgsMKQhqAkg-w"
-              "~/News/feeds/joseanmartinez.org" "joseanmartinez")
-
-             ("The Liquor Store"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCvISIg_p5A19MzavYSojNyw"
-              "~/News/feeds/TheLiquorStore.org" "The Liquor Store")
-
-             ("SystemCrafters"
-              "https://www.youtube.com/feeds/videos.xml?channel_id=UCAiiOTio8Yu69c3XnR7nQBQ"
-              "~/News/feeds/SystemCrafters.org" "SystemCrafters")
-
-             ("Reddit Quebec"
-              "https://www.reddit.com/r/Quebec/.rss"
-              "~/News/feeds/reddit-Quebec.org" "Reddit Quebec")
-
-             ("Reddit Montreal"
-              "https://www.reddit.com/r/montreal/.rss"
-              "~/News/feeds/reddit-montreal.org" "Reddit Montreal")
-
-             ("Reddit Longueuil"
-              "https://www.reddit.com/r/Longueuil/.rss"
-              "~/News/feeds/reddit-Longueuil.org" "Reddit Longueuil")
-
-             ("Reddit Laval"
-              "https://www.reddit.com/r/Laval/.rss"
-              "~/News/feeds/reddit-Laval.org" "Reddit Laval")
-
-             ("Reddit Linux"
-              "https://www.reddit.com/r/linux/.rss"
-              "~/News/feeds/reddit-linux.org" "Reddit Linux")
-
-             ("Reddit Unixporn"
-              "https://www.reddit.com/r/unixporn/.rss"
-              "~/News/feeds/reddit-unixporn.org" "Reddit Unixporn")
-
-             ("Reddit Archlinux"
-              "https://www.reddit.com/r/archlinux/.rss"
-              "~/News/feeds/reddit-archlinux.org" "Reddit Archlinux")
-
-             ("Reddit ArcoLinux"
-              "https://www.reddit.com/r/ArcoLinux/.rss"
-              "~/News/feeds/reddit-ArcoLinux.org" "Reddit ArcoLinux")
-
-             ("Reddit Freebsd"
-              "https://www.reddit.com/r/freebsd/.rss"
-              "~/News/feeds/reddit-freebsd.org" "Reddit Freebsd")
-
-             ("Reddit Kalilinux"
-              "https://www.reddit.com/r/Kalilinux/.rss"
-              "~/News/feeds/reddit-Kalilinux.org" "Reddit Kalilinux")
-
-             ("Reddit Neovim"
-              "https://www.reddit.com/r/neovim/.rss"
-              "~/News/feeds/reddit-neovim.org" "Reddit Neovim")
-
-             ("Reddit LinusTechTips"
-              "https://www.reddit.com/r/LinusTechTips/.rss"
-              "~/News/feeds/reddit-LinusTechTips.org" "Reddit LinusTechTips")
-
-             ("Reddit Bitcoin"
-              "https://www.reddit.com/r/Bitcoin/.rss"
-              "~/News/feeds/reddit-Bitcoin.org" "Reddit Bitcoin")
-
-             ("Reddit Monero"
-              "https://www.reddit.com/r/Monero/.rss"
-              "~/News/feeds/reddit-Monero.org" "Reddit Monero")
-
-             ("Reddit Ethereum"
-              "https://www.reddit.com/r/ethereum/.rss"
-              "~/News/feeds/reddit-ethereum.org" "Reddit Ethereum")
-
-             ("Reddit Framework"
-              "https://www.reddit.com/r/framework/.rss"
-              "~/News/feeds/reddit-framework.org" "Reddit Framework")
-
-             ("Reddit Qutebrowser"
-              "https://www.reddit.com/r/qutebrowser/.rss"
-              "~/News/feeds/reddit-qutebrowser.org" "Reddit Qutebrowser")
-
-             ("Reddit User The Compiler"
-              "https://www.reddit.com/user/The-Compiler/.rss"
-              "~/News/feeds/reddit-user-The-Compiler.org" "Reddit User The Compiler")
-
-             ("Reddit Artixlinux"
-              "https://www.reddit.com/r/artixlinux/.rss"
-              "~/News/feeds/reddit-artixlinux.org" "Reddit Artixlinux")
-
-             ("Reddit Emacs"
-              "https://www.reddit.com/r/emacs/.rss"
-              "~/News/feeds/reddit-emacs.org" "Reddit Emacs")
-
-             ("Reddit Emacsporn"
-              "https://www.reddit.com/r/emacsporn/.rss"
-              "~/News/feeds/reddit-emacsporn.org" "Reddit Emacsporn")
-
-             ("Reddit DoomEmacs"
-              "https://www.reddit.com/r/DoomEmacs/.rss"
-              "~/News/feeds/reddit-DoomEmacs.org" "Reddit DoomEmacs")
-
-             ("Reddit Programming"
-              "https://www.reddit.com/r/programming/.rss"
-              "~/News/feeds/reddit-programming.org" "Reddit Programming")
-
-             ("Reddit Orgmode"
-              "https://www.reddit.com/r/orgmode/.rss"
-              "~/News/feeds/reddit-orgmode.org" "Reddit Orgmode")
-
-             ("Reddit Freemacs"
-              "https://www.reddit.com/r/freemacs/.rss"
-              "~/News/feeds/reddit-freemacs.org" "Reddit Freemacs")
-
-             ("Emacsair Me Feed"
-              "https://emacsair.me/feed.xml"
-              "~/News/feeds/emacsair-me-feed.org" "Emacsair Me Feed")
-
-             ("Distrowatch News Distro Artix"
-              "https://distrowatch.com/news/distro/artix.xml"
-              "~/News/feeds/distrowatch-news-distro-artix.org" "Distrowatch News Distro Artix")
-
-             ("Eff Org Rss Updates"
-              "https://www.eff.org/rss/updates.xml"
-              "~/News/feeds/eff-org-rss-updates.org" "Eff Org Rss Updates")
-             ))
+  (setq org-feed-alist
+        '(("Slashdot"
+           "https://rss.slashdot.org/Slashdot/slashdot"
+           "~/News/feeds/feeds.org" "Slashdot Entries")
+
+          ("QC - Fil de Presse"
+           "https://www.quebec.ca/fil-de-presse.rss"
+           "~/News/feeds/quebec_fil_de_presse.org" "Fil de Presse du Québec")
+
+          ("ArchLinux - Pkgs"
+           "https://archlinux.org/feeds/packages/x86_64/.rss"
+           "~/News/feeds/ArchLinux-Pkgs.org" "ArchLinux - Pkgs")
+
+          ("ArchLinux - Pkgs Added"
+           "https://archlinux.org/feeds/packages/added/x86_64/"
+           "~/News/feeds/ArchLinux-PkgsAdded.org" "ArchLinux - Pkgs Added")
+
+          ("ArchLinux - Pkgs Removed"
+           "https://archlinux.org/feeds/packages/removed/x86_64/"
+           "~/News/feeds/ArchLinux-PkgsRemoved.org" "ArchLinux - Pkgs Removed")
+
+          ("ArchLinux - Pkgs Issues"
+           "https://gitlab.archlinux.org/groups/archlinux/packaging/packages/-/issues?format=atom"
+           "~/News/feeds/ArchLinux-PkgsIssues.org" "ArchLinux - Pkgs Issues")
+
+          ("ArchLinux - Pacman Issues"
+           "https://gitlab.archlinux.org/pacman/pacman/-/issues?format=atom"
+           "~/News/feeds/ArchLinux-PacmanIssues.org" "ArchLinux - Pacman Issues")
+
+          ("ArchLinux - AUR Issues"
+           "https://gitlab.archlinux.org/archlinux/aurweb/-/issues?format=atom"
+           "~/News/feeds/ArchLinux-AURIssues.org" "ArchLinux - AUR Issues")
+
+          ("Neovim"
+           "https://neovim.io/news.xml"
+           "~/News/feeds/Neovim.org" "Neovim")
+
+          ("ArchLinux"
+           "https://archlinux.org/feeds/news"
+           "~/News/feeds/ArchLinux.org" "ArchLinux")
+
+          ("ArtixLinux"
+           "https://artixlinux.org/feed.php"
+           "~/News/feeds/ArtixLinux.org" "ArtixLinux")
+
+          ("Its FoSS"
+           "https://itsfoss.com/rss"
+           "~/News/feeds/ItsFoSS.org" "It's FoSS")
+
+          ("Suckless"
+           "https://suckless.org/atom.xml"
+           "~/News/feeds/Suckless.org" "Suckless")
+
+          ("FFmpeg"
+           "https://ffmpeg.org/main.rss"
+           "~/News/feeds/FFmpeg.org" "FFmpeg")
+
+          ("Chris Titus Tech - Linux"
+           "https://christitus.com/categories/linux/index.xml"
+           "~/News/feeds/ChrisTitusTech-Linux.org" "Chris Titus Tech - Linux")
+
+          ("Qutebrowser"
+           "https://blog.qutebrowser.org/feeds/all.rss.xml"
+           "~/News/feeds/Qutebrowser.org" "Qutebrowser")
+
+          ("Framework"
+           "https://frame.work/ca/en/blog.rss"
+           "~/News/feeds/Framework.org" "Framework")
+
+          ("chamook lol"
+           "https://chamook.lol/rss.xml"
+           "~/News/feeds/chamooklol.org" "chamook lol")
+
+          ("books"
+           "https://protesilaos.com/books.xml"
+           "~/News/feeds/books.org" "books")
+
+          ("codelog"
+           "https://protesilaos.com/codelog.xml"
+           "~/News/feeds/codelog.org" "codelog")
+
+          ("commentary"
+           "https://protesilaos.com/commentary.xml"
+           "~/News/feeds/commentary.org" "commentary")
+
+          ("interpretations"
+           "https://protesilaos.com/interpretations.xml"
+           "~/News/feeds/interpretations.org" "interpretations")
+
+          ("keeb"
+           "https://protesilaos.com/keeb.xml"
+           "~/News/feeds/keeb.org" "keeb")
+
+          ("poems"
+           "https://protesilaos.com/poems.xml"
+           "~/News/feeds/poems.org" "poems")
+
+          ("news"
+           "https://protesilaos.com/news.xml"
+           "~/News/feeds/news.org" "news")
+
+          ("politics"
+           "https://protesilaos.com/politics.xml"
+           "~/News/feeds/politics.org" "politics")
+
+          ("master"
+           "https://protesilaos.com/master.xml"
+           "~/News/feeds/master.org" "master")
+
+          ("La Relève"
+           "https://www.lareleve.qc.ca/feed/rss"
+           "~/News/feeds/LaRelève.org" "La Relève")
+
+          ("Le Devoir - Manchettes"
+           "https://www.ledevoir.com/rss/manchettes.xml"
+           "~/News/feeds/LeDevoir-Manchettes.org" "Le Devoir - Manchettes")
+
+          ("La Presse - Actualités"
+           "https://www.lapresse.ca/actualites/rss"
+           "~/News/feeds/LaPresse-Actualités.org" "La Presse - Actualités")
+
+          ("La Presse - Techno"
+           "https://www.lapresse.ca/affaires/techno/rss"
+           "~/News/feeds/LaPresse-Techno.org" "La Presse - Techno")
+
+          ("Le Journal de Montréal - Actualités"
+           "https://www.journaldemontreal.com/actualite/rss.xml"
+           "~/News/feeds/LeJournaldeMontréal-Actualités.org" "Le Journal de Montréal - Actualités")
+
+          ("QC - Fil de Presse"
+           "https://www.quebec.ca/fil-de-presse.rss"
+           "~/News/feeds/QC-FildePresse.org" "QC - Fil de Presse")
+
+          ("AssNatQC - Actualités"
+           "https://www.assnat.qc.ca/fr/rss/SyndicationRSS-214.html"
+           "~/News/feeds/AssNatQC-Actualités.org" "AssNatQC - Actualités")
+
+          ("CTV"
+           "https://montreal.ctvnews.ca/rss/ctv-news-montreal-1.822366"
+           "~/News/feeds/CTV.org" "CTV")
+
+          ("Emacsair Me Feed"
+           "https://emacsair.me/feed.xml"
+           "~/News/feeds/emacsair-me-feed.org" "Emacsair Me Feed")
+
+          ("Distrowatch News Distro Artix"
+           "https://distrowatch.com/news/distro/artix.xml"
+           "~/News/feeds/distrowatch-news-distro-artix.org" "Distrowatch News Distro Artix")
+
+          ("Eff Org Rss Updates"
+           "https://www.eff.org/rss/updates.xml"
+           "~/News/feeds/eff-org-rss-updates.org" "Eff Org Rss Updates")
+          ))
 
   (setq org-agenda-custom-commands
         '(("u" "Unscheduled" tags "+personal-SCHEDULED={.+}-DEADLINE={.+}/!+TODO"
@@ -3834,7 +3454,6 @@ The function can be called interactively with \\[cf/cliplink-task] or as an
 
   (require 'subr-x)
   (require 's)
-
   (defvar cf-org-title-header "")
   (defvar cf-org-file-name-regex
     (rx-to-string `(group (1+ (any word ?- ?_)) ".org") t)
@@ -3845,7 +3464,6 @@ The function can be called interactively with \\[cf/cliplink-task] or as an
     "Regex matching slugified title header (no extension).")
 
   (defvar cf-uname-flags "srmo")
-
   (defun cf-author-header-format (&optional user uname)
     "Format for author header: USER [UNAME]."
     (let* ((user (or user (user-login-name)))
@@ -3868,7 +3486,7 @@ The function can be called interactively with \\[cf/cliplink-task] or as an
       (string-join (mapcar #'capitalize words) " ")))
 
   (defun cf/update-org-date-property ()
-      "Automatically update saved Org files with custom user set variables.
+    "Automatically update saved Org files with custom user set variables.
 Checks the first 3 lines for the presence of required title, author, and date headers,
 updating their values based on `cf-org-title-header', `cf-org-author-header', and file mtime.
 
@@ -3903,51 +3521,51 @@ Where `user-login-name' and `cf-uname-flags' values were \"cf\" and \"-srmo\".
   device where the file is saved.
 - The filename is transformed from header title or derived from filename, whichever is
   last manually set."
-  (when (derived-mode-p 'org-mode)
-    (let* ((mtime (nth 5 (file-attributes buffer-file-name)))
-           (mtime-str (format-time-string "<%Y-%m-%d %H:%M>" mtime))
-           (author-str (cf-author-header-format))
-           (filename (file-name-nondirectory buffer-file-name))
-           (dir (file-name-directory buffer-file-name))
-           (expected-title (cf/title-from-safe-filename filename))
-           title title-was-manual)
-      (save-excursion
-        (goto-char (point-min))
-        (let ((search-limit (save-excursion (forward-line 3) (point))))
-
-          ;; Update or insert #+date:
-          (if (re-search-forward "^#\\+date: .*" search-limit t)
-              (replace-match (concat "#+date: " mtime-str))
-            (goto-char (point-min))
-            (insert "#+date: " mtime-str "\n"))
-
-          ;; Update or insert #+author:
+    (when (derived-mode-p 'org-mode)
+      (let* ((mtime (nth 5 (file-attributes buffer-file-name)))
+             (mtime-str (format-time-string "<%Y-%m-%d %H:%M>" mtime))
+             (author-str (cf-author-header-format))
+             (filename (file-name-nondirectory buffer-file-name))
+             (dir (file-name-directory buffer-file-name))
+             (expected-title (cf/title-from-safe-filename filename))
+             title title-was-manual)
+        (save-excursion
           (goto-char (point-min))
-          (if (re-search-forward "^#\\+author: .*" search-limit t)
-              (replace-match (concat "#+author: " author-str))
-            (goto-char (point-min))
-            (insert "#+author: " author-str "\n"))
+          (let ((search-limit (save-excursion (forward-line 3) (point))))
 
-          ;; Update or insert #+title:
-          (goto-char (point-min))
-          (if (re-search-forward "^#\\+title: \\(.*\\)" search-limit t)
-              (progn
-                (setq title (match-string 1))
-                (setq title-was-manual (not (string= title expected-title))))
-            ;; Insert title from filename if missing
-            (setq title expected-title)
-            (goto-char (point-min))
-            (insert "#+title: " title "\n"))))
+            ;; Update or insert #+date:
+            (if (re-search-forward "^#\\+date: .*" search-limit t)
+                (replace-match (concat "#+date: " mtime-str))
+              (goto-char (point-min))
+              (insert "#+date: " mtime-str "\n"))
 
-      ;; Rename file only if title was not set manually
-      (when (and (not title-was-manual)
-                 (string-match cf-org-title-regex title))
-        (let ((new-filename (cf/safe-filename-from-title title)))
-          (unless (string= filename new-filename)
-            (let ((new-path (expand-file-name new-filename dir)))
-              (rename-file buffer-file-name new-path t)
-              (set-visited-file-name new-path t t))))))))
-    (add-hook 'before-save-hook #'cf/update-org-date-property)
+            ;; Update or insert #+author:
+            (goto-char (point-min))
+            (if (re-search-forward "^#\\+author: .*" search-limit t)
+                (replace-match (concat "#+author: " author-str))
+              (goto-char (point-min))
+              (insert "#+author: " author-str "\n"))
+
+            ;; Update or insert #+title:
+            (goto-char (point-min))
+            (if (re-search-forward "^#\\+title: \\(.*\\)" search-limit t)
+                (progn
+                  (setq title (match-string 1))
+                  (setq title-was-manual (not (string= title expected-title))))
+              ;; Insert title from filename if missing
+              (setq title expected-title)
+              (goto-char (point-min))
+              (insert "#+title: " title "\n"))))
+
+        ;; Rename file only if title was not set manually
+        (when (and (not title-was-manual)
+                   (string-match cf-org-title-regex title))
+          (let ((new-filename (cf/safe-filename-from-title title)))
+            (unless (string= filename new-filename)
+              (let ((new-path (expand-file-name new-filename dir)))
+                (rename-file buffer-file-name new-path t)
+                (set-visited-file-name new-path t t))))))))
+  (add-hook 'before-save-hook #'cf/update-org-date-property)
 
   (use-package org-modern
     :ensure nil
@@ -3961,24 +3579,24 @@ Where `user-login-name' and `cf-uname-flags' values were \"cf\" and \"-srmo\".
   (mapc #'(lambda (x)
             (unless (assoc (car x) org-structure-template-alist)
               (add-to-list 'org-structure-template-alist x)))
-            '(("el"     . "src emacs-lisp")
-              ("txt"    . "src text")
-              ("cfg"    . "src conf")
-              ("awk"    . "src awk")
-              ("cc"     . "src C")
-              ("cout"   . "src C :async :results output")
-              ("pl"     . "src perl :async :results output")
-              ("gp"     . "src gnuplot")
-              ("li"     . "src lisp")
-              ("la"     . "src latex")
-              ("sh"     . "src shell")
-              ("esh"    . "example shell")
-              ("ecf"    . "example conf")
-              ("shsc"  . "src shell :shebang #!/bin/sh :export both :tangle")
-              ("shcmd"  . "src shell :async :results output :cmdline")
-              ("sho"    . "src shell :async :results output")
-              ("py"     . "src python :results output")
-              ("pys"    . "src python :results output :session yes")))
+        '(("el"     . "src emacs-lisp")
+          ("txt"    . "src text")
+          ("cfg"    . "src conf")
+          ("awk"    . "src awk")
+          ("cc"     . "src C")
+          ("cout"   . "src C :async :results output")
+          ("pl"     . "src perl :async :results output")
+          ("gp"     . "src gnuplot")
+          ("li"     . "src lisp")
+          ("la"     . "src latex")
+          ("sh"     . "src shell")
+          ("esh"    . "example shell")
+          ("ecf"    . "example conf")
+          ("shsc"   . "src shell :shebang #!/bin/sh :export both :tangle")
+          ("shcmd"  . "src shell :async :results output :cmdline")
+          ("sho"    . "src shell :async :results output")
+          ("py"     . "src python :results output")
+          ("pys"    . "src python :results output :session yes")))
 
   (require 'org-tempo)
 
@@ -4010,6 +3628,37 @@ Used as a workaround for \\[TAB] in `org-mode' until a better fix."
    ("<tab>"     . cf/org-complete-or-cycle)
    ("C-c C--"   . org-table-insert-hline)))
 
+;; Browse URL
+(use-package net
+  :ensure nil
+  :config
+  (require 'browse-url)
+  (defun cf/browse-url-mpv (url &rest _args)
+    "Open the given URL in mpv."
+    (start-process-shell-command "mpv" nil (format "mpv %s" url)))
+  (setq browse-url-handlers
+        '(("https://www\\.youtube\\.com/watch\\?v=.*"       . cf/browse-url-mpv)
+          ("https://youtube\\.com/watch\\?v=.*"             . cf/browse-url-mpv)
+          ("https://www\\.youtube\\.com/playlist\\?list=.*" . cf/browse-url-mpv)
+          ("https://youtu\\.be/.*"                          . cf/browse-url-mpv)
+          ("https://vimeo\\.com/.*"                         . cf/browse-url-mpv)
+          ("https://www\\.dailymotion\\.com/video/.*"       . cf/browse-url-mpv)
+          ("https://www\\.twitch\\.tv/videos/.*"            . cf/browse-url-mpv)
+          ("https://www\\.twitch\\.tv/.*"                   . cf/browse-url-mpv)
+          ("https://odysee\\.com/.*"                        . cf/browse-url-mpv)
+          ("https://www\\.bitchute\\.com/video/.*"          . cf/browse-url-mpv)
+          ("https://rumble\\.com/.*"                        . cf/browse-url-mpv)
+          ("https://www\\.peertube\\..*"                    . cf/browse-url-mpv)
+          ("https://media\\.ccc\\.de/.*"                    . cf/browse-url-mpv)
+          ("https://www\\.facebook\\.com/.*/videos/.*"      . cf/browse-url-mpv)
+          ("https://www\\.instagram\\.com/reel/.*"          . cf/browse-url-mpv)
+          ("https://www\\.tiktok\\.com/@.*/video/.*"        . cf/browse-url-mpv)))
+  (setq browse-url-browser-function 'eww-browse-url)
+  :bind
+  (:map global-map
+        ("C-c u" . browse-url-at-point)
+        ("C-c x" . browse-url-at-point)))
+
 
 
 ;;; Directory Editor
@@ -4029,21 +3678,6 @@ Allows multiple subdirectories in split windows with thumbnails."
                                     (mode-line-format . (" " "%b"))))))
     (with-current-buffer buffer
       (rename-buffer "*yt-dired*"))))
-
-(setq browse-url-handlers
-      '(("https://www\\.youtube\\.com/watch\\?v=.*" . cf/browse-url-mpv)
-        ("https://www\\.youtube\\.com/playlist\\?list=.*" . cf/browse-url-mpv)))
-
-(defun cf/browse-url-mpv (url &rest _args)
-  "Open the given URL in mpv."
-  (start-process-shell-command "mpv" nil (format "mpv %s" url)))
-
-(setq browse-url-browser-function
-      (lambda (url &rest args)
-        (if (or (string-match-p "^https://www\\.youtube\\.com/watch\\?v=" url)
-                (string-match-p "^https://www\\.youtube\\.com/playlist\\?list=" url))
-            (cf/browse-url-mpv url)
-          (apply 'eww url args))))
 
 ;; DirEd
 (use-package dired
@@ -4068,6 +3702,26 @@ Allows multiple subdirectories in split windows with thumbnails."
   (require 'dired-list)
   (require 'dired-open)
   (require 'dired-subtree)
+
+  (defun cf/dired-linkhandler ()
+    "Apply `linkhandler` to all marked files that are not directories."
+    (interactive)
+    (dolist (target (dired-get-marked-files))
+      (if (file-directory-p target)
+          (dired-find-file)
+        (start-process-shell-command "linkhandler" nil
+                                     (format "linkhandler %s" (shell-quote-argument target))))))
+
+  (define-minor-mode dired-yt-mode
+    "Minor mode for YouTube-specific Dired enhancements."
+    :init-value nil
+    :lighter " YT"
+    :keymap (let ((map (make-sparse-keymap)))
+              (define-key map (kbd "RET") #'cf/dired-linkhandler)
+              map)
+    (when (and dired-yt-mode (not (derived-mode-p 'dired-mode)))
+      (dired-yt-mode -1)))
+
   (defun cf/dired-open (file &optional filelist)
     "Open FILE or FILELIST in mpv, or use `dired-find-file` as a fallback.
 If FILE is a JPEG image, attempt to extract an embedded link with `exifjpg'.
@@ -4086,7 +3740,7 @@ For non-media files, fall back to `dired-find-file`."
             (dolist (f filelist)
               (insert (format "%s\n"
                               (string-trim (shell-command-to-string
-                                            (format "exifjpg %s -M" (shell-quote-argument f))))))))
+                                            (format "exifjpg -M %s" (shell-quote-argument f))))))))
           (find-file-other-window playlist-path)
           (dired-open--start-process playlist-path "mpv"))
 
@@ -4103,73 +3757,80 @@ For non-media files, fall back to `dired-find-file`."
         (file-truename path))))
 
   (defun cf/dnd-exifjpg-M (event)
-    "Extract EXIF data from JPG via `exifjpg -M` on drag event in Dired buffers."
+    "Extract EXIF data from JPG via `exifjpg -M` on drag event in Dired buffers.
+Only acts if the dropped file is actually a JPEG (MIME type)."
     (interactive "e")
     (let* ((posn (event-start event))
            (window (posn-window posn))
            (buffer (window-buffer window)))
       (with-current-buffer buffer
         (when (eq major-mode 'dired-mode)
-          (let* ((file (dired-get-filename nil t)))
-            (when (and file (string-match-p "\\.jpe?g\\'" file))
+          (let* ((file (dired-get-filename nil t))
+                 (mimetype (and file
+                                (string-trim
+                                 (shell-command-to-string
+                                  (format "file --dereference --brief --mime-type %s"
+                                          (shell-quote-argument file))))))
+                 (is-jpeg (string= mimetype "image/jpeg")))
+            (when (and file is-jpeg)
               (let ((output (shell-command-to-string
-                             (format "exifjpg %s -M"
+                             (format "exifjpg -M %s"
                                      (shell-quote-argument file)))))
                 (unless (string-blank-p output)
                   (with-current-buffer (window-buffer (selected-window))
                     (insert output))))))))))
 
   (defun cf/dnd-exifjpg-handler (uri action)
-    "Handle dropped JPG files by inserting output of `exifjpg -M'."
-    (let ((file (cf/dnd-uri-to-file uri)))
-      (if (and file (string-match-p "\\.jpe?g\\'" file) (file-readable-p file))
-          (let ((output (shell-command-to-string
-                         (format "exifjpg %s -M" (shell-quote-argument file)))))
-            (unless (string-blank-p output)
-              (insert output)))
-        (dnd-open-local-file uri action))))
-  (add-to-list 'dnd-protocol-alist '("^file:" . cf/dnd-exifjpg-handler))
+      "Handle dropped JPG files by inserting output of `exifjpg -M'."
+      (let ((file (cf/dnd-uri-to-file uri)))
+        (if (and file (string-match-p "\\.jpe?g\\'" file) (file-readable-p file))
+            (let ((output (shell-command-to-string
+                           (format "exifjpg -M %s" (shell-quote-argument file)))))
+              (unless (string-blank-p output)
+                (insert output)))
+          (dnd-open-local-file uri action))))
+    (add-to-list 'dnd-protocol-alist '("^file:" . cf/dnd-exifjpg-handler))
 
-  (defun cf-dired-truncate-symlinks-display ()
-    "Truncate the symlink display by hiding the ' -> TARGET' part in Dired."
-    (let ((inhibit-read-only t))
-      (save-excursion
-        (goto-char (point-min))
-        (while (re-search-forward " -> .*" nil t)
-          (put-text-property (match-beginning 0) (match-end 0) 'invisible t)))))
+    (defun cf-dired-truncate-symlinks-display ()
+      "Truncate the symlink display by hiding the ' -> TARGET' part in Dired."
+      (let ((inhibit-read-only t))
+        (save-excursion
+          (goto-char (point-min))
+          (while (re-search-forward " -> .*" nil t)
+            (put-text-property (match-beginning 0) (match-end 0) 'invisible t)))))
 
- (defun dired-init-hooks ()
-    "Disables whitespaces and display-line-numbers in dired buffers."
+    (defun dired-init-hooks ()
+      "Disables whitespaces and display-line-numbers in dired buffers."
+      (whitespace-mode -1)
+      (visual-line-mode -1)
+      (global-whitespace-mode -1)
+      (display-line-numbers-mode -1)
+      (setq-local truncate-lines t)
+      (setq buffer-display-table nil))
+    (add-hook 'dired-mode-hook 'dired-init-hooks)
+    (add-hook 'dired-mode-hook (lambda () (dired-omit-mode)))
+    (add-hook 'dired-after-readin-hook #'cf-dired-truncate-symlinks-display)
+    :bind
+    (:map dired-mode-map
+          ("h"     . dired-up-directory)
+          ("l"     . dired-find-file)
+          ("<"     . cf/dired-open)
+          (">"     . cf/link-handler)
+          ("o"     . dired-open-file)
+          ("O"     . dired-find-file-other-window)
+          ("("     . dired-hide-details-mode)
+          (")"     . dired-omit-mode)
+          ("C-c L" . dired-list-mpc))
+    :init
     (whitespace-mode -1)
-    (visual-line-mode -1)
     (global-whitespace-mode -1)
-    (display-line-numbers-mode -1)
-    (setq-local truncate-lines t)
-    (setq buffer-display-table nil))
-  (add-hook 'dired-mode-hook 'dired-init-hooks)
-  (add-hook 'dired-mode-hook (lambda () (dired-omit-mode)))
-  (add-hook 'dired-after-readin-hook #'cf-dired-truncate-symlinks-display)
-  :bind
-  (:map dired-mode-map
-        ("h"     . dired-up-directory)
-        ("l"     . dired-find-file)
-        ("<"     . cf/dired-open)
-        (">"     . cf/region-to-linkhandler)
-        ("o"     . dired-open-file)
-        ("O"     . dired-find-file-other-window)
-        ("("     . dired-hide-details-mode)
-        (")"     . dired-omit-mode)
-        ("C-c L" . dired-list-mpc))
-  :init
-  (whitespace-mode -1)
-  (global-whitespace-mode -1)
-  (global-display-line-numbers-mode -1))
+    (global-display-line-numbers-mode -1))
 
 ;; Dired-X
 (use-package dired-x
   :ensure nil
-  :hook (dired-mode . dired-omit-mode)
   :init (require 'dired-x)
+  :hook (dired-mode . dired-omit-mode)
   :custom
   (dired-omit-files "\\`[.]?#\\|\\`\\.[.]?\\'\\|^\\..+\\|package-lock\\.json\\|vimwiki")
   (dired-omit-extensions
@@ -4304,24 +3965,25 @@ For non-media files, fall back to `dired-find-file`."
 
 (use-package dired-open
   :ensure nil
-  :bind (:map dired-mode-map
-              ("o" . dired-open-file)
-              ("<" . cf/dired-open))
+  :init
+  (require 'dired-open)
   :custom
   (dired-open-extensions
-   '(("gif" . "nsxiv")
-     ("png" . "nsxiv")
+   '(("gif"  . "nsxiv")
+     ("png"  . "nsxiv")
      ("webp" . "nsxiv")
-     ("m3u" . "linkhandler")
+     ("m3u"  . "linkhandler")
      ("m3u8" . "linkhandler")
      ("jpeg" . "linkhandler")
-     ("mkv" . "linkhandler")
+     ("mkv"  . "linkhandler")
      ("webm" . "linkhandler")
-     ("mp4" . "linkhandler")
-     ("pdf" . "zathura")
-     ("jpg" . "linkhandler")))
-  :config
-  (require 'dired-open))
+     ("mp4"  . "linkhandler")
+     ("pdf"  . "zathura")
+     ("jpg"  . "linkhandler")))
+  :bind
+  (:map dired-mode-map
+        ("o" . dired-open-file)
+        ("<" . cf/dired-open)))
 
 (use-package emms
   :ensure t
@@ -4389,7 +4051,7 @@ For non-media files, fall back to `dired-find-file`."
   (when (version< emacs-version "26")
     (with-eval-after-load 'eww
       (advice-add 'eww-display-html :around
-                  'eww-display-html--override-shr-external-rendering-functions))))
+                 'eww-display-html--override-shr-external-rendering-functions))))
 
 ;; ShrFace
 (use-package shrface
@@ -4521,8 +4183,7 @@ For non-media files, fall back to `dired-find-file`."
           (shr-use-fonts nil))
       (apply orig-fun args)))
   (with-eval-after-load 'mu4e
-  (advice-add 'mu4e-shr2text :around #'shrface-mu4e-advice))
-)
+  (advice-add 'mu4e-shr2text :around #'shrface-mu4e-advice)))
 
 ;;; Emacs Web Wowser :eww:
 (use-package eww
@@ -4530,7 +4191,7 @@ For non-media files, fall back to `dired-find-file`."
   :custom
   (eww-search-confirm-send-region nil)
   :bind
-  (("s-/" . eww-search-words)
+  (("s-/" . cf/eww-duckbang)
    :map eww-mode-map
    ("<tab>" . forward-button)
    ("<backtab>" . backward-button)
@@ -4547,6 +4208,7 @@ For non-media files, fall back to `dired-find-file`."
    ("a" . backward-sentence)
    ("N" . eww-next-url)
    ("P" . eww-previous-url)
+   ("f" . eww-forward-url)
    ("r" . eww-readable)
    ("R" . eww-reload)
    ("W" . eww-beginning-of-text)
@@ -4557,6 +4219,7 @@ For non-media files, fall back to `dired-find-file`."
    ("M" . eww--open-url-in-new-buffer)
    ("D" . eww-download)
    ("C-c h" . shrface-headline-counsel)
+   ("C-<backspace>" . cf/eww-list-gh-raw-files)
    :map url-cookie-mode-map
    ("DEL" . url-cookie-delete)
    ("u" . url-cookie-undo))
@@ -4567,6 +4230,35 @@ For non-media files, fall back to `dired-find-file`."
   (require 'eww)
   (require 'shrface)
   (require 'shr-tag-pre-highlight)
+  (require 'cf-visit-gh-raw)
+
+  (defvar cf/eww-duckbang-presets
+    '("archwiki" "wikipedia" "github" "emacswiki" "man" "youtube" "yt" "r" "so")
+    "Predefined DuckDuckGo bang shortcuts.")
+
+  (defun cf/eww-duckbang (&optional bang)
+    "Send active region to EWW using DuckDuckGo bang.
+With BANG numeric prefix argument, use preset at index.
+Otherwise prompt for bang using `completing-read` with fallback.
+
+Example:
+  (cf/eww-duckbang \"archwiki\") with region \"dbus\"
+  → opens: https://duckduckgo.com/?q=!archwiki%20dbus"
+    (interactive "P")
+    (let* ((query (if (use-region-p)
+                      (buffer-substring-no-properties (region-beginning) (region-end))
+                    (read-string "Search query: ")))
+           (bang-str
+            (cond
+             ((numberp bang)
+              (or (nth bang cf/eww-duckbang-presets)
+                  (user-error "Invalid preset index")))
+             ((and (not (null bang)) (stringp bang)) bang)
+             (t (completing-read "bang!: " cf/eww-duckbang-presets nil nil)))))
+      (eww (format "https://duckduckgo.com/?q=!%s%%20%s"
+                   (url-hexify-string bang-str)
+                   (url-hexify-string query)))))
+
   (defun cf-eww-init-hooks ()
     "EWW init hooks."
     (display-line-numbers-mode -1)
@@ -4624,6 +4316,121 @@ If missing, prompts for ELVI and/or QUERY."
    ("C-M-`"  . eww-search-words)
    ("M-s-\\" . cf/link-handler)))
 
+;; Elpher gemini/gopher Browser :gmi:
+(use-package elpher
+  :ensure nil
+  :load-path "~/.emacs.d/custom/"
+  :hook (elpher-mode . hl-line-mode)
+  :init
+  (require 'sdcv-definition)
+  (require 'multiple-cursors)
+  (require 'expreg)
+  (require 'crux)
+  :mode
+  (("file:\\*\\.gmi\\'" . elpher-mode)
+   ("gemini:\\*.*'" . elpher-mode)
+   ("gopher:\\*.*'" . elpher-mode)
+   ("finger:\\*.*'" . elpher-mode))
+  :config
+  (defun cf/elpher-open-link-at-point ()
+    "Handle elpher link at point: open known media URLs in mpv, else fallback."
+    (interactive)
+    (let* ((page (get-text-property (point) 'elpher-page))
+           (url-obj (and (consp page)
+                         (url-p (cadr page))
+                         (cadr page)))
+           (url-str (and url-obj (url-recreate-url url-obj)))
+           (proto (and url-obj (url-type url-obj)))
+           (path (and url-obj (url-filename url-obj))))
+      (cond
+       ((not url-obj)
+        (message "No link at point."))
+       ((and (string= proto "file")
+             (string-match-p "\\.\\(webm\\|m3u8\\|mp4\\|mkv\\|avi\\|mov\\)$" path))
+        (start-process "mpv" nil "mpv" (expand-file-name path)))
+       ((and (string= proto "https")
+             (string-match-p "https://\\(www\\.youtube\\.com/watch\\?v=\\|youtube\\.com/watch\\?v=\\|www\\.youtube\\.com/playlist\\?list=\\|youtu\\.be/\\|vimeo\\.com/\\|www\\.dailymotion\\.com/video/\\|www\\.twitch\\.tv/videos/\\|www\\.twitch\\.tv/\\|odysee\\.com/\\|www\\.bitchute\\.com/video/\\|rumble\\.com/\\|www\\.peertube\\.\\|media\\.ccc\\.de/\\|www\\.facebook\\.com/.*/videos/\\|www\\.instagram\\.com/reel/\\|www\\.tiktok\\.com/@.*/video/\\).*"
+                             url-str))
+        (start-process "mpv" nil "mpv" url-str))
+       ((string= proto "https")
+        (eww-browse-url url-str))
+       (t
+        (elpher-follow-current-link)))))
+  :bind
+  (:map elpher-mode-map
+        ("d" . cf/scroll-up-and-recenter)
+        ("u" . cf/scroll-down-and-recenter)
+        ("n" . forward-line)
+        ("p" . previous-line)
+        ("j" . forward-line)
+        ("k" . previous-line)
+        ("e" . forward-sentence)
+        ("a" . backward-sentence)
+        ("]" . forward-paragraph)
+        ("[" . backward-paragraph)
+        (";" . cf/expreg-expand-dwim)
+        ("F" . elpher-forget-current-certificate)
+        ("!" . elpher-set-gopher-coding-system)
+        ("B" . elpher-show-bookmarks)
+        ("A" . elpher-bookmark-current)
+        ("w" . elpher-bookmark-link)
+        ("C" . elpher-copy-current-url)
+        ("c" . elpher-copy-link-url)
+        ("I" . elpher-info-current)
+        ("x" . isearch-forward-symbol-at-point)
+        ("f" . forward-char)
+        ("b" . backward-char)
+        ("i" . elpher-info-link)
+        ("m" . elpher-jump)
+        ("D" . elpher-download-current)
+        ("s" . elpher-download)
+        ("v" . elpher-view-raw)
+        ("X" . cf/elpher-open-link-at-point)
+        ("<return>" . cf/elpher-open-link-at-point)
+        ("RET" . cf/elpher-open-link-at-point)
+        ("," . cf/lookup-word)
+        ("." . ffap-string-at-point)
+        ("T" . elpher-toggle-tls)
+        ("R" . elpher-reload)
+        ("r" . elpher-redraw)
+        ("N" . mc/mark-next-like-this)
+        ("P" . mc/mark-previous-like-this)
+        ("S" . elpher-show-visited-pages)
+        ("H" . elpher-show-history)
+        ("O" . elpher-root-dir)
+        ("o" . elpher-go-current)
+        ("g" . elpher-go)
+        ("U" . elpher-back-to-start)
+        ("<mouse-3>" . elpher-back)
+        ("^" . elpher-back)
+        ("-" . elpher-back)
+        ("l" . elpher-back)
+        ("<backtab>" . elpher-prev-link)
+        ("S-TAB" . elpher-prev-link)
+        ("<tab>" . elpher-next-link)
+        ("TAB" . elpher-next-link)
+        ("g" . revert-buffer)
+        ("<" . beginning-of-buffer)
+        (">" . end-of-buffer)
+        ("h" . describe-mode)
+        ("?" . describe-mode)
+        ("DEL" . scroll-down-command)
+        ("S-SPC" . scroll-down-command)
+        ("SPC" . scroll-up-command)
+        ("q" . quit-window)
+        ("9" . digit-argument)
+        ("8" . digit-argument)
+        ("7" . digit-argument)
+        ("6" . digit-argument)
+        ("5" . digit-argument)
+        ("4" . digit-argument)
+        ("3" . digit-argument)
+        ("2" . digit-argument)
+        ("1" . digit-argument)
+        ("0" . digit-argument)
+        ("-" . negative-argument)
+        ("~" . cf/link-handler)))
+
 ;; ici première.
 (defun cf/mpc-radio-can ()
   "Ajoute le stream de Radio-Canada dans la playlist mpc."
@@ -4659,10 +4466,11 @@ If missing, prompts for ELVI and/or QUERY."
   (require 'crux)
   :config
   (key-chord-mode 1)
-  (key-chord-define-global "vm" #'view-mode)
+  (key-chord-define-global "v=" #'view-mode)
   (key-chord-define-global "wf" #'follow-mode)
-  (key-chord-define-global "wq" #'quit-window)
+  (key-chord-define-global "q2" #'quit-window)
   (key-chord-define-global ",-" #'text-scale-adjust)
+  (key-chord-define-global ",=" #'text-scale-adjust)
 
   (key-chord-define-global "w0" #'delete-window)
   (key-chord-define-global "w1" #'delete-other-windows)
@@ -4688,16 +4496,12 @@ If missing, prompts for ELVI and/or QUERY."
   (key-chord-define-global "bm" #'bookmark-set)
   (key-chord-define-global "bs" #'bookmark-save)
   (key-chord-define-global "m," #'set-mark-command)
-  (key-chord-define-global "rt" #'er/expand-region)
-  (key-chord-define-global "ml" #'crux-duplicate-current-line-or-region)
-  (key-chord-define-global "mw" #'cf/mark-word)
   (key-chord-define-global "m." #'cf/mark-construct-dwim)
 
   (key-chord-define-global "p]" #'forward-page)
   (key-chord-define-global "p[" #'backward-page)
-  (key-chord-define-global "b]" #'next-buffer)
-  (key-chord-define-global "b[" #'previous-buffer)
-  (key-chord-define-global "sb" #'save-buffer)
+  (key-chord-define-global ";[" #'next-buffer)
+  (key-chord-define-global "']" #'previous-buffer)
 
   (key-chord-define-global "rg" #'undo-redo)
   (key-chord-define-global "hu" #'undo)
@@ -4721,32 +4525,19 @@ If missing, prompts for ELVI and/or QUERY."
   (key-chord-define-global "i3" #'forward-button)
   (key-chord-define-global "i4" #'backward-sentence)
   (key-chord-define-global "i5" #'forward-sentence)
-  (key-chord-define-global "lp" #'previous-line)
-  (key-chord-define-global "l," #'forward-line)
-
-  (key-chord-define-global "bw" #'backward-word)
-  (key-chord-define-global "fw" #'forward-word)
-  (key-chord-define-global "df" #'cf/lookup-word)
-  (key-chord-define-global "tb" #'cf/toggle-mode-line)
+  (key-chord-define-global "bt" #'cf/toggle-global-mode-line)
   (key-chord-define-global "a0" #'abbrev-mode)
-
-  (key-chord-define-global "km" #'crux-kill-and-join-forward)
-  (key-chord-define-global "jn" #'crux-top-join-line)
   (key-chord-define-global "kl" #'cf/copy-whole-line)
 
   ;; :kc:help
-  (key-chord-define-global "hb" #'cf/describe-symbol-at-point)
-  (key-chord-define-global "hg" #'cf/describe-function-at-point)
-  (key-chord-define-global "hv" #'cf/describe-variable-at-point)
-  (key-chord-define-global "hf" #'cf/describe-face-at-point)
+  (key-chord-define-global "hb" #'cf/describe-symbol-at-point))
 
-)
-
-;; Toggle Prefix Map
+;; Toggle Prefix Map :toggle:
 (defvar-keymap cf-toggle-prefix-map
   :doc "Toggle Prefix Map"
   "a" #'abbrev-mode
-  "b" #'cf/toggle-mode-line
+  "A" #'auto-fill-mode
+  "b" #'cf/mode-line-toggle
   "c" #'cf/insert-palette-color
   "d" #'eldoc-box-hover-mode
   "e" #'eww-search-words
@@ -4822,40 +4613,58 @@ If missing, prompts for ELVI and/or QUERY."
 (keymap-global-set "C-<kp-add>" #'text-scale-increase)
 (keymap-global-set "C-<kp-subtract>" #'text-scale-decrease)
 (keymap-global-set "C-\\" #'vterm-toggle)
+(keymap-global-set "C-c C-;" #'next-buffer)
+(keymap-global-set "C-c C-c" #'compile)
+(keymap-global-set "C-c C-g" #'previous-buffer)
 
 (defun cf/load-mail ()
   "Interactively loads the mail account config file."
   (interactive)
-  (if (file-exists-p "~/.emacs.d/custom/accounts.el")
-      (load-file "~/.emacs.d/custom/accounts.el")
+  (if (file-exists-p "~/.emacs.d/custom/cf-mu4e.el")
+      (load-file "~/.emacs.d/custom/cf-mu4e.el")
     (keymap-global-set "C-x m" #'sendmail-query-once)))
 (keymap-global-set "C-x m" #'cf/load-mail)
 
-(put 'set-goal-column 'disabled nil)
-(put 'narrow-to-page 'disabled nil)
-(put 'narrow-to-region 'disabled nil)
+(mapc
+ (lambda (command)
+   (put command 'disabled nil))
+ '(list-timers narrow-to-region narrow-to-page set-goal-column upcase-region downcase-region))
 
 
 ;;; Hooks
+
+(defun cf/set-cursor-when-mark-activated ()
+  (unless (derived-mode-p 'pdf-view-mode)
+    (setq cursor-type 'bar)))
+
+(defun cf/reset-cursor-when-mark-deactivated ()
+  (unless (derived-mode-p 'pdf-view-mode)
+    (setq cursor-type 't)))
+
+(add-hook 'activate-mark-hook #'cf/set-cursor-when-mark-activated)
+(add-hook 'deactivate-mark-hook #'cf/reset-cursor-when-mark-deactivated)
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 (add-hook 'after-save-hook #'executable-make-buffer-file-executable-if-script-p)
-(add-hook 'org-babel-post-tangle-hook
-          #'executable-make-buffer-file-executable-if-script-p)
-(add-hook 'activate-mark-hook (lambda() (setq cursor-type 'bar)))
-(add-hook 'deactivate-mark-hook (lambda() (setq cursor-type t)))
+(add-hook 'org-babel-post-tangle-hook #'executable-make-buffer-file-executable-if-script-p)
+(add-hook 'text-mode-hook #'abbrev-mode)
+(add-hook 'prog-mode-hook #'abbrev-mode)
+(add-hook 'before-save-hook 'time-stamp)
+(add-hook 'package-menu-mode-hook #'hl-line-mode)
 
-(setq sentence-end-double-space nil)
 (defvar modes-with-autofill
-  '(text-mode-hook message-mode-hook
-    adoc-mode-hook markdown-mode-hook
-    emacs-lisp-mode-hook org-mode-hook
+  '(text-mode-hook
+    message-mode-hook
+    adoc-mode-hook
+    markdown-mode-hook
+    emacs-lisp-mode-hook
+    org-mode-hook
     lisp-interaction-mode-hook)
   "Modes that benefit from auto-fill mode.")
 
-(mapc (lambda (mode)
-        (add-hook mode #'turn-on-auto-fill))
-      modes-with-autofill)
-
+(mapc
+ (lambda (mode)
+   (add-hook mode #'turn-on-auto-fill))
+ modes-with-autofill)
 
 
 ;;; _
