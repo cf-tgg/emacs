@@ -1,0 +1,36 @@
+# -*- mode: snippet -*-
+# name: hdoc
+# --
+usage() {
+    env sc="\${0##*/}" envsubst <<MAN
+
+    \$sc --- ${1:shortdoc}
+
+    NAME
+
+    SYNTAX
+        \$sc -[\$opt] [-\$optdesc]
+
+    OPTIONS
+        -\$opt   \$optarg    \$optdesc
+
+    EXAMPLES
+         \$sc
+
+    RATIONALE
+
+    AUTHOR
+
+    \$sc                    ${(format (current-date "%Y"))}                    \$sc
+MAN
+}
+
+while getopts "${2:h}" opt ; do
+    case "$opt" in
+       ${2:opt1}) ;;
+       h) usage >&2 ; exit 0 ;;
+    esac
+done
+shift \$((\$OPTIND - 1))
+
+$0
