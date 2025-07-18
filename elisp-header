@@ -1,0 +1,27 @@
+# -*- mode: snippet -*-
+# name: header
+# key: header
+# --
+;;; ${1:$(file-name-base)}.el --- ${2:Short description} -*- lexical-binding: t; -*-
+
+;;; Commentary:
+
+;; ${3:Full description.}
+
+;;; Code:
+
+(require '${4:library})
+
+$0
+
+
+
+;;; _
+(provide '${1:$(file-name-base)})
+;; Local Variables:
+;; coding: utf-8
+;; fill-column: 90
+;; indent-tabs-mode: nil
+;; require-final-newline: t
+;; End:
+;;; ${1:$(file-name-base)}.el ends here

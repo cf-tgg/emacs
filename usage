@@ -1,0 +1,69 @@
+# -*- mode: snippet -*-
+# name: usage
+# key: usage
+# --
+
+usage () {
+    env PGN=\${\0##*/} envsubst <<MAN
+
+    \${PGN} ---- ${$1:short description}
+
+    NAME
+        \${PGN}
+
+    SYNOPSIS
+        ${1:SYNOPSIS}
+
+    CONFIGURATION
+        ${2:CONFIGURATION}
+
+    DESCRIPTION
+        ${3:DESCRIPTION}
+
+    OPTIONS
+        ${4:OPTIONS}
+
+    EXIT STATUS
+        ${5:EXIT STATUS}
+
+    RETURN VALUE
+        ${6:RETURN VALUE}
+
+    ERRORS
+        ${7:ERRORS}
+
+    ENVIRONMENT
+        ${8:ENVIRONMENT}
+
+    FILES
+        ${9:FILES}
+
+    VERSIONS
+        ${10:VERSIONS}
+
+    STANDARDS
+        ${11:STANDARDS}
+
+    NOTES
+        ${12:NOTES}
+
+    BUGS
+        ${13:BUGS}
+
+    EXAMPLE
+        ${14:EXAMPLE}
+
+    AUTHORS
+        cf (C) cf dot gg
+        E-Mail: <cf.gg.tty@protonmail.com>
+        Github: <https://github.com/cf-tgg/>
+        Gitlab: <https://gitlab.com/cf.gg.tty/>
+        Codeberg: <https://codeberg.org/cfggtty/>
+
+    SEE ALSO
+        ${15:man(1)}
+
+MAN
+}
+
+$0

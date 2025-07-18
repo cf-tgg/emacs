@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: mktemp
+# key: mktmp
+# --
+
+tmpfile=\$(mktemp) || exit 1
+trap 'rm -f "\$tmpfile"' EXIT
