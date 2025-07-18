@@ -1,4 +1,4 @@
-;;; mark-url-and-save.el --- Local HTML with baseenc64 embedded images -*- lexical-binding: t; -*-
+;;; cf-mark-url-and-save.el --- Local HTML with baseenc64 embedded images -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2025 cf dot gg
 
@@ -279,5 +279,5 @@ BOOKMARK non-nil triggers bookmarking."
 
 
 ;;; _
-(provide 'mark-url-and-save)
-;;; mark-url-and-save.el ends here
+(provide 'cf-mark-url-and-save)
+;;; cf-mark-url-and-save.el ends here

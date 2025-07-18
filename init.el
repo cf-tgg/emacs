@@ -123,6 +123,7 @@ DEFINITIONS is a sequence of string and command pairs."
 (require 'cf-common-abbrev-table)
 (require 'cf-common)
 (require 'cf-custom-functions)
+(require 'cf-elfeed-frame)
 (require 'cf-gemtext-mode)
 (require 'cf-gnus)
 (require 'cf-hls-playlist-mode)

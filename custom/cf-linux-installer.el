@@ -1,4 +1,4 @@
-;;; cf/linux-installer.el --- Interactive LUKS+Linux blkencrypt -*- lexical-binding: t -*-
+;;; cf-linux-installer.el --- Interactive LUKS+Linux blkencrypt -*- lexical-binding: t -*-
 
 ;;; Commentary:
 ;;
@@ -71,7 +71,7 @@
 
 
 ;;; _
-(provide 'cf/linux-installer)
+(provide 'cf-linux-installer)
 ;; Local Variables:
 ;; coding: utf-8
 ;; fill-column: 90

@@ -1,4 +1,4 @@
-;;; popup-frame.el --- Popup frame management -*- lexical-binding: t; -*-
+;;; cf-popup-frame.el --- Popup frame management -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2025 cf
 
@@ -121,5 +121,5 @@ SCROLL-BAR: 'left or 'right enables a scrollbar on that side."
 
 
 ;;; _
-(provide 'popup-frame)
-;;; popup-frame.el ends here
+(provide 'cf-popup-frame)
+;;; cf-popup-frame.el ends here

@@ -1,4 +1,4 @@
-;;; sdcv-definition.el --- SDCV Word lookups -*- lexical-binding: t; -*-
+;;; cf-sdcv-definition.el --- SDCV Word lookups -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 ;;   Provides interactive `sdcv' dictionary lookup with ANSI decoding,
@@ -333,11 +333,11 @@ Returns non-nil if a definition retrieval was started."
 
 
 ;;; _
-(provide 'sdcv-definition)
+(provide 'cf-sdcv-definition)
 ;; Local Variables:
 ;; coding: utf-8
 ;; fill-column: 80
 ;; indent-tabs-mode: nil
 ;; require-final-newline: t
 ;; End:
-;;; sdcv-definition.el ends here
+;;; cf-sdcv-definition.el ends here

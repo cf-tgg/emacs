@@ -1,4 +1,4 @@
-;;; yt-dired.el --- Dired-based YouTube playlist manager with thumbnails -*- lexical-binding: t; -*-
+;;; cf-yt-dired.el --- Dired-based YouTube playlist manager with thumbnails -*- lexical-binding: t; -*-
 
 (require 'dired)
 (require 'tabulated-list)
@@ -138,6 +138,6 @@
 (define-key yt-dired-playlist-mode-map (kbd "M-<down>") #'yt-dired-playlist-move-entry-down)
 (define-key yt-dired-playlist-mode-map (kbd "C-c C-s") #'yt-dired-playlist-generate-m3u)
 
-(provide 'yt-dired)
+(provide 'cf-yt-dired)
 
-;;; yt-dired.el ends here
+;;; cf-yt-dired.el ends here

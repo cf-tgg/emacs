@@ -1,4 +1,4 @@
-;;; gemtext-mode.el ---- Major-mode for editing gemtext -*- lexical-binding: t; -*-
+;;; cf-gemtext-mode.el ---- Major-mode for editing gemtext -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2025 cf dot gg
 
@@ -96,5 +96,5 @@
 
 
 ;;; _
-(provide 'gemtext-mode)
-;;; gemtext-mode.el ends here
+(provide 'cf-gemtext-mode)
+;;; cf-gemtext-mode.el ends here

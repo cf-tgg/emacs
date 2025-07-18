@@ -152,5 +152,5 @@
 
 
 
-(provide 'hls-playlist-mode)
-;;; hls-playlist-mode.el ends here
+(provide 'cf-hls-playlist-mode)
+;;; cf-hls-playlist-mode.el ends here

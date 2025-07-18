@@ -1,4 +1,4 @@
-;;; app-launchers.el --- Possible alternatives to dmenu/rofi -*- lexical-binding: t -*-
+;;; cf-app-launchers.el --- Possible alternatives to dmenu/rofi -*- lexical-binding: t -*-
 
 ;;; Commentary:
 ;;    Counsel-Linux-App
@@ -61,5 +61,5 @@ Delete the frame after entered command has exited."
 
 
 ;;; _
-(provide 'app-launchers)
-;;; app-launchers.el ends here
+(provide 'cf-app-launchers)
+;;; cf-app-launchers.el ends here

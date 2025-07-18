@@ -1,4 +1,4 @@
-;;; spmacs.el --- Named scratchpad Emacs frame for dwm -*- lexical-binding: t -*-
+;;; cf-spmacs.el --- Named scratchpad Emacs frame for dwm -*- lexical-binding: t -*-
 
 ;;; Commentary:
 ;;   Emacsclient popup frame for the WM's
@@ -40,5 +40,5 @@
 
 
 ;;; _
-(provide 'spmacs)
-;;; spmacs.el ends here
+(provide 'cf-spmacs)
+;;; cf-spmacs.el ends here
