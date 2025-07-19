@@ -29,6 +29,8 @@
 ;;; Code:
 
 (require 'gnus)
+(require 'nnmail)
+
 (defconst nnrss-description-field "X-Description")
 (defconst nnrss-url-field "X-Feed-URL")
 

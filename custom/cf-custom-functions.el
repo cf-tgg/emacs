@@ -79,8 +79,8 @@ managers such as DWM, BSPWM refer to this state as 'monocle'."
     (when (and arg
                (not (one-window-p)))
       (delete-window)))
-  :bind (("s-m" . cf/window-single-toggle)
-         ("s-k" . cf/kill-buffer-current)))
+  :bind (("C-c w" . cf/window-single-toggle)
+         ("C-x k" . cf/kill-buffer-current)))
 
 ;;; Marking constructs
 

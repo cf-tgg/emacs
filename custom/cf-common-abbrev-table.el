@@ -1,6 +1,7 @@
 ;;; cf-common-abbrev-table.el --- Common Abbrevs -*- lexical-binding: t; -*-
 
-;;  Time-stamp: <2025-07-10 04:40:09 cf>
+;; Time-stamp: <2025-07-18 21:40:48 cf>
+;; Box: [Linux 6.15.6-zen1-1-zen x86_64 GNU/Linux]
 
 ;; Copyright (C) 2025 cf dot gg
 
@@ -28,8 +29,9 @@
 
 ;;; Code:
 
+(require 'ispell)
 (require 'abbrev)
-(abbrev-mode 1)
+(require 's)
 
 ;;; Globals
 
@@ -292,6 +294,47 @@ If at end of buffer, inserts a newline before moving to next line."
     "\n")))
 (define-abbrev sh-mode-abbrev-table "gopts" "" #'abrv/insert-getopts)
 
+(defun cf/simple-get-word ()
+  (car-safe (save-excursion (ispell-get-word nil))))
+
+;;;###autoload
+(defun cf/ispell-word-then-abbrev (p)
+  "Call `ispell-word', then create an abbrev for it.
+With prefix P, create local abbrev. Otherwise it will
+be global.
+If there's nothing wrong with the word at point, keep
+looking for a typo until the beginning of buffer. You can
+skip typos you don't want to fix with `SPC', and you can
+abort completely with `C-g'."
+  (interactive "P")
+  (let (bef aft)
+    (save-excursion
+      (while (if (setq bef (cf/simple-get-word))
+                 ;; Word was corrected or used quit.
+                 (if (ispell-word nil 'quiet)
+                     nil ; End the loop.
+                   ;; Also end if we reach `bob'.
+                   (not (bobp)))
+               ;; If there's no word at point, keep looking
+               ;; until `bob'.
+               (not (bobp)))
+        (backward-word)
+        (backward-char))
+      (setq aft (cf/simple-get-word)))
+    (if (and aft bef (not (equal aft bef)))
+        (let ((aft (downcase aft))
+              (bef (downcase bef)))
+          (define-abbrev
+            (if p local-abbrev-table global-abbrev-table)
+            bef aft)
+          (message "\"%s\" now expands to \"%s\" %sally"
+                   bef aft (if p "loc" "glob")))
+      (user-error "No typo at or before point"))))
+
+(define-key ctl-x-map "\C-i" #'cf/ispell-word-then-abbrev)
+
+(setq save-abbrevs 'silently)
+(setq-default abbrev-mode t)
 
  
 ;;; _

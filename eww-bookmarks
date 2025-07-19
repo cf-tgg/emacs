@@ -1,5 +1,20 @@
 ;; Auto-generated file; don't edit -*- mode: lisp-data -*-
-((:url "https://cabal.readthedocs.io/en/stable/" :title
+((:url
+  "https://www.sourceware.org/autobook/autobook/autobook_toc.html"
+  :title "Autoconf, Automake, and Libtool: Table of Contents" :time
+  "Fri Jul 18 21:06:33 2025")
+ (:url "https://www.gnu.org/software/autoconf/" :title
+       "Autoconf - GNU Project - Free Software Foundation" :time
+       "Fri Jul 18 21:03:35 2025")
+ (:url "https://github.com/harfbuzz/harfbuzz" :title
+       "GitHub - harfbuzz/harfbuzz: HarfBuzz text shaping engine"
+       :time "Fri Jul 18 20:30:13 2025")
+ (:url
+  "file:///home/cf/.local/eww/endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct.html"
+  :title
+  "Emacs, Ispell and Abbrev, the Perfect Auto-Correct · Endless Parentheses"
+  :time "Fri Jul 18 20:25:41 2025")
+ (:url "https://cabal.readthedocs.io/en/stable/" :title
        "Welcome to the Cabal User Guide — Cabal 3.16.0.0 User's Guide"
        :time "Fri Jul 18 18:23:01 2025")
  (:url "https://tronche.com/gui/x/xlib/" :title "" :time

@@ -777,7 +777,7 @@ such directory, in the user's home directory."
   (when (use-region-p)
     (capitalize-region beg end)))
 
-;; http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct.html
+;; https://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct.html
 ;;;###autoload
 (defun crux-ispell-word-then-abbrev (p)
   "Call `ispell-word', then create an abbrev for it.

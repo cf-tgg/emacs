@@ -2,7 +2,7 @@
 
 ;;; Commentary:
 ;;     Emacs from scratch.
-;;     Time-stamp: <2025-07-18 19:21:21 cf>
+;;     Time-stamp: <2025-07-18 21:38:15 cf>
 ;;     [Linux 6.14.6-zen1-1-zen x86_64 GNU/Linux]
 
 ;;; Code:
@@ -1948,7 +1948,7 @@ Return cons (ICON . POSITION) or nil."
   ;; (setq prescient-sort-length-enable nil)
   (ivy-prescient-mode 1))
 
-;; yaSnippets
+;; yaSnippets :snip:
 (use-package yasnippet
   :ensure t
   :commands yas-minor-mode
@@ -2009,7 +2009,7 @@ Return cons (ICON . POSITION) or nil."
   (add-hook 'c-mode-hook 'eglot-ensure)
   (add-hook 'c++-mode-hook 'eglot-ensure))
 
-;; Simple C
+;; Simple C :simpc:
 (use-package simpc-mode
   :ensure nil
   :diminish " "
@@ -2025,11 +2025,12 @@ Return cons (ICON . POSITION) or nil."
                 c-block-comment-ender "\\n */"))
   (add-hook 'simpc-mode-hook 'cf-simpc-mode-comment-setup))
 
+;; AWK :awk:
 (use-package awk-ts-mode
   :ensure t
   :defer t)
 
-;; Go
+;; Go :go:
 (use-package go-mode
   :ensure t
   :defer t
@@ -2049,8 +2050,12 @@ Return cons (ICON . POSITION) or nil."
   :defer t
   :mode "\\.m3u8\\'"
   :config
-  (require 'cf-hls-playlist-mode))
+  (defun cf--hls-playlist-auto-revert ()
+    (unless (and buffer-read-only buffer-file-name)
+      (revert-buffer nil t)))
+  (add-hook 'hls-playlist-mode-hook (cf--hls-playlist-auto-revert)))
 
+;; Cider
 (use-package cider
   :ensure t
   :defer t
@@ -2061,11 +2066,11 @@ Return cons (ICON . POSITION) or nil."
   :hook ((clojure-mode . cider-mode)
          (cider-repl-mode . paredit-mode)))
 
+;; Clojure :clj:
 (use-package clojure-mode
   :ensure t
   :mode ("\\.clj\\'" "\\.cljs\\'" "\\.cljc\\'" "\\.edn\\'")
   :hook (clojure-mode . paredit-mode))
-
 
 ;; Markdown :md:
 (use-package markdown-mode
@@ -3576,6 +3581,7 @@ Where `user-login-name' and `cf-uname-flags' values were \"cf\" and \"-srmo\".
               (let ((new-path (expand-file-name new-filename dir)))
                 (rename-file buffer-file-name new-path t)
                 (set-visited-file-name new-path t t))))))))
+
   (add-hook 'before-save-hook #'cf/update-org-date-property)
 
   (use-package org-modern
@@ -3610,7 +3616,6 @@ Where `user-login-name' and `cf-uname-flags' values were \"cf\" and \"-srmo\".
           ("pys"    . "src python :results output :session yes")))
 
   (require 'org-tempo)
-
   (defun cf/org-complete-or-cycle ()
     "Run `org-cycle-level' if `org-tempo-complete-tag' returns nil.
 Used as a workaround for \\[TAB] in `org-mode' until a better fix."
@@ -4275,9 +4280,10 @@ Example:
     (display-line-numbers-mode -1)
     (toggle-truncate-lines 1)
     (shrface-mode 1)
-    (olivetti-mode 1))
+    (olivetti-mode 1)
+    (cf--hidden-mode-line-format))
   (cf-eww-init-hooks)
-  (add-hook 'eww-after-render-hook #'eww-readable))
+  (add-hook 'eww-after-render-hook #'cf-eww-init-hooks))
 
 ;; Local, org-formatted, webpages minus the bloat, with embedded base64 images.
 (use-package cf-mark-url-and-save

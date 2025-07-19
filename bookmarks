@@ -795,9 +795,8 @@
 (":eww: local html" (filename . "~/.local/eww/")
  (front-context-string . "  /home/cf/.loca") (rear-context-string)
  (position . 1) (last-modified 26701 1887 760908 236000))
-("org-capture-last-stored"
- (filename . "~/Documents/org/definitions.org")
- (front-context-string . "** Duplex\n\n/dupl")
- (rear-context-string . "-02 lun 21:01>\n\n") (position . 1940)
- (last-modified 26745 25786 964233 133000))
+("org-capture-last-stored" (filename . "~/Documents/Agenda/tasks.org")
+ (front-context-string . "* TODO Add dwm w")
+ (rear-context-string . "-16 mer 20:22>\n\n") (position . 3565)
+ (last-modified 26746 60177 377057 706000))
 )

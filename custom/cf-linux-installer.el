@@ -1,7 +1,12 @@
 ;;; cf-linux-installer.el --- Interactive LUKS+Linux blkencrypt -*- lexical-binding: t -*-
 
 ;;; Commentary:
-;;
+
+;;  Simple linux installer for Emacs.
+;;  :wip: This tool isn't ready nor has it been tested yet, for now it is just a scratch idea
+;;  for customizing linux installs from within Emacs.a
+
+;;  See daviwil (System Crafters) <https://github.com/daviwil/> for a complete working solution.
 
 ;;; Code:
 
@@ -72,10 +77,4 @@
 
 ;;; _
 (provide 'cf-linux-installer)
-;; Local Variables:
-;; coding: utf-8
-;; fill-column: 90
-;; indent-tabs-mode: nil
-;; require-final-newline: t
-;; End:
 ;;; cf-linux-installer.el ends here

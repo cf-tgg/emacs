@@ -277,6 +277,7 @@ BOOKMARK non-nil triggers bookmarking."
 (keymap-global-set "C-M-~" #'cf/alternate-mark-url-and-save)
 (keymap-global-set "C-M-#" #'cf/save-eww-page)
 
+
 
 ;;; _
 (provide 'cf-mark-url-and-save)

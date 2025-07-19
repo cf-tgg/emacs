@@ -31,6 +31,7 @@
        (switch-to-buffer " cf-window-hidden-buffer-for-popup-frame")
        (condition-case nil
            (call-interactively ',command)
+         (delete-other-windows)
          ((quit error user-error)
           (delete-frame frame))))))
 
