@@ -7,9 +7,9 @@
 
 (use-package nano-mu4e
   :ensure nil
-  :after mu4e
   :load-path "~/.emacs.d/custom/"
   :commands mu4e
+  :hook (mu4e-mode . nano-mu4e-mode)
   :custom-face
   (nano-default :family "Iosevka Nerd Font Mono")
   :custom

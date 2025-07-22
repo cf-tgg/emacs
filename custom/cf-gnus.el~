@@ -23,14 +23,13 @@
 
 ;;; Commentary:
 
-;;     + https://www.gnu.org/software/emacs/manual/html_node/gnus/RSS.html
-;;     + (info "gnus")
+;;     - [[https://www.gnu.org/software/emacs/manual/html_node/gnus/RSS.html][RSS (Gnus Manual)]]
+;;     - (info "gnus")
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'gnus)
-  (require 'nnmail))
+(require 'gnus)
+(require 'nnmail)
 
 (defconst nnrss-description-field "X-Description")
 (defconst nnrss-url-field "X-Feed-URL")
@@ -38,6 +37,7 @@
 (add-to-list 'nnmail-extra-headers nnrss-description-field)
 (add-to-list 'nnmail-extra-headers nnrss-url-field)
 
+(add-to-list 'nnmail-extra-headers nnrss-description-field)
 (setq gnus-summary-line-format "%U%R%z%I%(%[%4L: %-15,15f%]%) %s%uX\n")
 
 (defun gnus-user-format-function-X (header)
@@ -82,6 +82,8 @@
 (with-eval-after-load "gnus"
   (define-key gnus-summary-mode-map
     (kbd "<RET>") 'browse-nnrss-url))
+
+(add-to-list 'nnmail-extra-headers nnrss-url-field)
 
 ;; Set the default value of mm-discouraged-alternatives.
 (with-eval-after-load "gnus-sum"

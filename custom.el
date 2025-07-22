@@ -21,6 +21,7 @@
  '(comment-column 42)
  '(comment-inline-offset 2)
  '(comment-padding 2)
+ '(company-show-quick-access nil nil nil "Customized with use-package company")
  '(completion-pcm-leading-wildcard t)
  '(custom-safe-themes
    '("90cfee0fb29a5f9a9a22f06c7c3339058c1aa03225626426207ad1c86d67b11f"
@@ -85,6 +86,7 @@
  '(shr-color-visible-distance-min 1)
  '(shr-cookie-policy nil)
  '(shr-discard-aria-hidden t)
+ '(shr-fill-text nil)
  '(shr-image-zoom-levels '(fit original image fill-width fill-height))
  '(shr-max-image-proportion 0.7)
  '(shr-max-inline-image-size '(0.9 . 0.9))
@@ -165,9 +167,10 @@
  '(persp-selected-face ((t (:foreground "#484848" :slant oblique :weight ultra-light))))
  '(pulsar-red ((t (:extend t :background "#342424"))))
  '(region ((t (:extend t :background "#323232"))))
+ '(shr-abbreviation ((t (:inherit underline :underline (:color foreground-color :style dots :position nil)))))
  '(shr-code ((t (:inherit fixed-pitch :family "IosevkaTerm Nerd Font Mono"))))
  '(shr-h1 ((t (:weight bold :height 1.3 :family "Aporetic Serif"))))
- '(shr-link ((t (nil nil "#f8f8f8" :inherit :italic :foreground))))
+ '(shr-link ((t (nil nil "#f2e8ef" :inherit :italic :foreground))))
  '(shr-mark ((t (:background "#ffdd33" :foreground "black"))))
  '(shrface-h6-face ((t (:inherit org-level-6))))
  '(shrface-href-file-face ((t (:inherit org-link :foreground "#565f73"))))

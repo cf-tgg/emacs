@@ -1,9 +1,10 @@
 ;;; init.el --- Emacs init. file -*- lexical-binding:t; -*-
 
 ;;; Commentary:
-;;     Emacs from scratch.
-;;     Time-stamp: <2025-07-18 21:38:15 cf>
-;;     [Linux 6.14.6-zen1-1-zen x86_64 GNU/Linux]
+
+;;  Emacs from scratch.
+;;  Time-stamp: <2025-07-21 19:46:14 cf>
+;;  Box: [Linux 6.14.6-zen1-1-zen x86_64 GNU/Linux]
 
 ;;; Code:
 
@@ -125,12 +126,13 @@ DEFINITIONS is a sequence of string and command pairs."
 (require 'cf-custom-functions)
 (require 'cf-elfeed-frame)
 (require 'cf-gemtext-mode)
+(require 'nnmail)
 (require 'cf-gnus)
 (require 'cf-hls-playlist-mode)
-(require 'cf-linux-installer)
+; (require 'cf-linux-installer)
 (require 'cf-mark-url-and-save)
 (require 'cf-modeline)
-(require 'cf-mu4e)
+; (require 'cf-mu4e)
 (require 'cf-pjumper)
 (require 'cf-popup-frame)
 (require 'cf-scratch)
@@ -138,15 +140,8 @@ DEFINITIONS is a sequence of string and command pairs."
 (require 'cf-spmacs)
 (require 'cf-visit-gh-raw)
 (require 'cf-yt-dired)
+(require 'cf-window-popup-frame)
 ;;  (require 'cf-minibuffer-frame.el)
-
-(use-package taxy
-  :ensure nil
-  :load-path "~/.emacs.d/custom/taxy/"
-  :config
-  (require 'taxy)
-  (add-to-list 'load-path (expand-file-name "~/.emacs.d/custom/taxy/examples/"))
-  (require 'musicy))
 
 (use-package server
   :ensure nil
@@ -964,19 +959,26 @@ Leaves point after the sexp and region active."
   (ido-everywhere 1)
   (ido-mode 1))
 
+(use-package taxy
+  :ensure nil
+  :load-path "~/.emacs.d/custom/taxy/"
+  :config
+  (require 'taxy)
+  (add-to-list 'load-path (expand-file-name "~/.emacs.d/custom/taxy/examples/"))
+  (require 'musicy))
+
 
 ;;; Custom Features
 ;; git clone https://gitlab.com/ajgrf/edwina ~/.emacs.d/edwina
 (use-package edwina
   :ensure nil
-  :load-path "~/.emacs.d/custom/edwina"
-  :hook after-init
+  :load-path "~/.emacs.d/custom/edwina/"
+  :hook ((after-init . edwina-mode)
+         (edwina-mode . edwina-setup-dwm-keys))
   :config
-  (edwina-setup-dwm-keys)
   (edwina-mode 1)
-(setq display-buffer-base-action
+  (setq display-buffer-base-action
         '(display-buffer-at-bottom display-buffer-below-selected)))
-
 
 ;; Pops scratch-buffer for current major-mode with active marked region content.
 (use-package cf-scratch
@@ -1024,8 +1026,8 @@ managers such as DWM, BSPWM refer to this state as \\='monocle\\='."
 ;; From Protesilaos' backlog: "Marking constructs" <https://protesilaos.com/emacs/dotemacs/>
 (use-package emacs
   :ensure nil
-  :commands (cf/mark-symbol
-             cf/mark-sexp-backward)
+  :functions (cf/mark-symbol
+              cf/mark-sexp-backward)
   :config
   (defmacro cf/mark (name object &optional docstring)
     "Produce function for marking small syntactic constructs.
@@ -1496,7 +1498,6 @@ With optional COUNT prefix argument (C-u N), insert the copied text COUNT times 
   :ensure nil
   :load-path "~/.emacs.d/custom/google-maps/")
 
-
 
 ;;; Completion
 
@@ -1816,7 +1817,6 @@ Return cons (ICON . POSITION) or nil."
         read-buffer-completion-ignore-case t
         completion-ignore-case t)
   (setq completion-in-region-function #'consult-completion-in-region)
-
   ;; Prompt indicator for `completing-read-multiple'.
   (when (< emacs-major-version 31)
     (advice-add #'completing-read-multiple :filter-args
@@ -2252,8 +2252,7 @@ named 'eqtabac'.  Otherwise, displays the inserted transaction in the echo area.
                      (ledger-report  "tabac-journalier" nil)))
           (message "%s" (string-trim tabac-ya))))))
 
-  :bind
-  ("C-c C-0" . cf/ledger-insert-tabac))
+  :bind ("C-c C-0" . cf/ledger-insert-tabac))
 
 
 ;;; Conviniences
@@ -4222,6 +4221,8 @@ Only acts if the dropped file is actually a JPEG (MIME type)."
    ("k" . previous-line)
    ("e" . forward-sentence)
    ("a" . backward-sentence)
+   ("]" . forward-paragraph)
+   ("[" . backward-paragraph)
    ("N" . eww-next-url)
    ("P" . eww-previous-url)
    ("f" . eww-forward-url)
@@ -4381,6 +4382,8 @@ If missing, prompts for ELVI and/or QUERY."
         ("p" . previous-line)
         ("j" . forward-line)
         ("k" . previous-line)
+        ("e" . forward-sentence)
+        ("a" . backward-sentence)
         ("e" . forward-sentence)
         ("a" . backward-sentence)
         ("]" . forward-paragraph)
