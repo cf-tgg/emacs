@@ -1,0 +1,2024 @@
+This is ses-fr.info, produced by makeinfo version 7.2 from ses-fr.texi.
+
+Ce fichier documente SES : le tableur simple d’Emacs (Simple Emacs
+Spreadsheet).
+
+   Copyright © 2002-2025 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with no Invariant Sections, with the Front-Cover Texts
+     being "A GNU Manual," and with the Back-Cover Texts as in (a)
+     below.  A copy of the license is included in the section entitled
+     "GNU Free Documentation License."
+
+     (a) The FSF's Back-Cover Text is: "You have the freedom to copy and
+     modify this GNU manual."
+INFO-DIR-SECTION Emacs misc features
+START-INFO-DIR-ENTRY
+* SES-fr: (ses-fr).        Le tableur simple d’Emacs.
+END-INFO-DIR-ENTRY
+
+
+File: ses-fr.info,  Node: Top,  Next: Sales Pitch,  Up: (dir)
+
+SES: Simple Emacs Spreadsheet
+*****************************
+
+     SES est mode majeur de GNU Emacs pour éditer des fichiers
+     tableur, c.-à-d. des fichiers contenant une grille rectangulaire de
+     cellules. Les valeurs des cellules sont spécifiées par des formules
+     pouvant se référer aux valeurs d’autres cellules.
+
+   Pour les rapports d’anomalie, utiliser ‘M-x report-emacs-bug’.
+
+   Ce fichier documente SES : le tableur simple d’Emacs (Simple Emacs
+Spreadsheet).
+
+   Copyright © 2002-2025 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with no Invariant Sections, with the Front-Cover Texts
+     being "A GNU Manual," and with the Back-Cover Texts as in (a)
+     below.  A copy of the license is included in the section entitled
+     "GNU Free Documentation License."
+
+     (a) The FSF's Back-Cover Text is: "You have the freedom to copy and
+     modify this GNU manual."
+
+* Menu:
+
+* Boniment: Sales Pitch.        Pourquoi utiliser SES?
+* Tuto: Quick Tutorial.         Une introduction sommaire
+* Les bases: The Basics.        Les commandes de base du tableur
+* Fonctions avancées: Advanced Features. Vous voulez en savoir plus ?
+* Pour les gourous: For Gurus.  Vous voulez en savoir _encore plus_ ?
+* Index: Index.                Index des concepts, fonctions et variables
+* Remerciements: Acknowledgments. Remerciements
+* Licence GNU pour la documentation libre: GNU Free Documentation License. La licence de cette documentation.
+
+
+File: ses-fr.info,  Node: Sales Pitch,  Next: Quick Tutorial,  Prev: Top,  Up: Top
+
+1 Boniment
+**********
+
+   - Créer et éditer des feuilles de calcul avec un minimum de tracas.
+   - Prise en charge complète du Défaire/Refaire/Sauvegarde auto.
+   - Protection contre les virus enfouis dans les feuilles de calcul.
+   - Les formules de cellule sont directement du code Emacs Lisp.
+   - Fonctions d’impression pour contrôler l’apparence des cellules.
+   - Raccourcis clavier intuitifs : C-o = insérer une ligne, M-o =
+     insérer une colonne, etc.
+   - « Débordement » des valeurs de cellule longues dans les cellules
+     vides suivantes.
+   - La ligne d’en-tête montre les lettres désignant les colonnes.
+   - Autocomplétion pour la saisie des symboles de cellules nommées lors
+     de la saisie des formules.
+   - Couper, copier et coller peut transferer les formules et les
+     fonctions d’impression.
+   - Import and export de valeurs séparées par des tabulations, ou de
+     formules séparées par des tabulations.
+   - Format de fichier en texte, facile à bidouiller.
+
+
+File: ses-fr.info,  Node: Quick Tutorial,  Next: The Basics,  Prev: Sales Pitch,  Up: Top
+
+2 Tuto
+******
+
+Si vous désirez être rapidement lancé et pensez que vous savez ce que
+vous attendez d’un tableur simple, alors ce chapitre peut être tout ce
+dont vous avez besoin.
+
+   Premièrement, visitez un nouveau fichier avec pour extension de nom
+de fichier ‘.ses’.  Emacs vous présente alors une feuille de calcul vide
+contenant une seule cellule.
+
+   Commencez par saisir une ligne d’en-tête : ‘"Revenu<RET>’.  Le
+guillemet double ‘"’ indique que vous saisissez une cellule textuelle,
+il ne fait pas partie de la valeur de la cellule, et aucun guillemet de
+fermeture n’est nécessaire.
+
+   Pour insérer votre première valeur de revenu, vous devez d’abord
+redimensionner la feuille.  Appuyer sur la touche <TAB> pour ajouter une
+nouvelle cellule et revenez à elle en remontant.  Saisissez un nombre,
+tel que ‘2.23’.  Puis continuer pour ajouter quelques valeurs
+supplémentaires de revenu, par ex. :
+
+     A
+      Revenu
+        2.23
+        0.02
+       15.76
+       -4.00
+
+   Pour additionner les valeurs entre elles, saisissez une expression
+Lisp :
+
+     (+ A2 A3 A4 A5)
+
+   Peut-être désirez vous ajouter une cellule à la droite de la cellule
+‘A4’ pour expliquer pourquoi vous avez une valeur négative.  En appuyant
+sur ‘TAB’ dans cette cellule vous ajouter entièrement une nouvelle
+colonne ‘B’ où vous pourrez ajouter une telle note.
+
+   La colonne est assez étroite par défaut, mais en appuyant sur ‘w’
+vous pouvez la redimensionner selon vos besoins.  Faites la de 22
+caractères de large.  Vous pouvez maintenant ajoutez des notes
+descriptives pour chacune des cases, par ex. :
+
+     A       B
+      Revenu
+        2.23  Frais de consultation
+        0.02       Opinion informée
+       15.76         Stand limonade
+          -4          Prêt à Joseph
+       14.01                  Total
+
+   Par défaut, l’impression des valeurs de cellule se fait alignée à
+droite, c’est la raison d’un tel alignement pour les notes dans la
+colonne ‘B’.  Pour changer cela, vous pouvez saisir une fonction
+d’impression pour la colonne entière, en utilisant par ex.  ‘M-p
+("%s")’.  Le fait que ‘"%s"’ soit contenu dans une liste indique à SES
+que l’alignement est à faire à gauche.  Vous pouvez l’emporter sur la
+fonction d’impression de colonne pour l’une quelconque de ses cellules
+en donnant une fonction d’impression par cellule avec ‘p’.
+
+   Vous pouvez nommer une fonction d’impression, et utiliser le nom de
+la fonction à la place de sa définition, de sorte à faciliter la
+modification de l’impression de toutes les cellules utilisant cette
+fonction.  Par exemple tapez ‘M-x ses-define-local-printer<ret>’, puis
+‘note<ret>’, puis ‘("%s")’ pour définir une fonction d’impression nommée
+‘note’ dont la définition est ‘("%s")’, puis sur la colonne ‘B’ tapez
+‘M-p note<ret>’
+
+     A       B
+      Revenu
+        2.23 Frais de consultation
+        0.02 Opinion informée
+       15.76 Stand limonade
+          -4 Prêt à Joseph
+       14.01 Total
+
+   Si maintenant vous redéfinissez ‘note’ avec pour nouvelle définition
+‘("*%s")’ qui ajoute un astérisque ‘*’ devant le texte, la zone
+d’impression est modifiée ainsi :
+     A       B
+      Revenu
+        2.23 *Frais de consultation
+        0.02 *Opinion informée
+       15.76 *Stand limonade
+          -4 *Prêt à Joseph
+       14.01 *Total
+
+   Notez que la cellule ‘B1’ reste affichée vide et n’est pas affichée
+comme ‘*’.  C’est parce que la valeur de la cellule est ‘nil’, et que
+les fonctions d’impression définies à partir d’une chaîne de formatage
+comme ‘"%s"’ dans ‘("%s")’ impriment systématiquement ‘nil’ comme une
+chaîne vide, et tentent d’imprimer toute valeur non-‘nil’ en utilisant
+la fonction standarde ‘format’ avec la chaîne de formatage, et si cela
+échoue, utilisent la fonction de repli ‘ses-prin1’ la place.
+
+   Si maintenant Joseph rembourse son prêt, vous pourriez effacer cette
+case ; par ex. en positionnant le curseur sur la cellule A5 et en
+appuyant sur ‘C-d’.  Si vous faites celle le total imprimé dans la
+cellule A6 affichera ‘######’.  La raison de cela est la valeur dans une
+cellule vide est typiquement ‘nil’ et que l’opérateur ‘+’ ordinaire
+échoue à gérer une telle valeur.  Au lieu de vider la cellule, vous
+pourriez littéralement saisir ‘0’, ou supprimer entièrement la ligne en
+utilisant ‘C-k’.  Une alternative est d’utiliser la fonction spéciale
+‘ses+’ au lieu du ‘+’ ordinaire :
+
+     (ses+ A2 A3 A4 A5)
+
+   Pour rendre une formule robuste au changement de géométrie de la
+feuille, vous pouvez utiliser la macro ‘ses-range’ pour faire référence
+à une plage de cellules par ses extrémités, par ex. :
+
+     (apply 'ses+ (ses-range A2 A5))
+
+   (Le ‘apply’ est nécessaire parce que ‘ses-range’ produite une _liste_
+de valeurs, ce qui ouvre des possibilités plus complexes).
+
+   Alternativement vous pouvez utiliser le modificateur ‘!’ de
+‘ses-range’ pour retirer les cellules vides de la liste renvoyée, ce qui
+permet d’utiliser ‘+’ au lieu de ‘ses+’:
+
+     (apply '+ (ses-range A2 A5 !))
+
+
+File: ses-fr.info,  Node: The Basics,  Next: Advanced Features,  Prev: Quick Tutorial,  Up: Top
+
+3 Les bases
+***********
+
+Pour créer une nouveau tableur, visitez un fichier inexistant dont le
+nom se termine en ‘.ses’.  Par exemple, ‘C-x C-f essai.ses <ret>’.
+
+   Un “identificateur de cellule” est un symbole avec une lettre de
+colonne et un numéro de ligne.  La cellule B7 est la 2e column de la 7e
+ligne.  Pour les feuilles très larges, il ya deux lettres de colonne :
+la cellule AB7 les la 28e colonne de la 7e ligne.  Les feuilles encore
+plus larges ont AAA1, etc.  On se déplace avec les commandes ordinaires
+de déplacement d’Emacs.
+
+‘j’
+     Déplace le point vers la cellule spécifiée par identificateur
+     (‘ses-jump’).  À moins que la cellule ne soit une cellule renommée,
+     l’identificateur est insensible à la casse.  Un argument préfixe n
+     déplace vers la cellule de coordonnées (n\div R, n \% C) pour une
+     feuille de R ligne et C colonnes, et ‘A1’ étant aux coordonnées
+     (0,0).  La façon dont l’identificateur ou l’argument préfixe de
+     commande sont interprétés peut être personnalisée via les variables
+     ‘ses-jump-cell-name-function’ et ‘ses-jump-prefix-function’.
+
+   Le Point est toujours sur le bord de gauche d’une cellule, ou à la
+fin de ligne vide.  Quand la marque est inactive, la cellule courante
+est soulignée.  Quand la marque est active, la plage est le rectangle de
+cellules mis en vedette (SES utilise toujours le mode de marque
+transitoire).  Faire glisser la souris de ‘A1’ à ‘A3’ crée la plage
+‘A1-A2’.  Beaucoup de commandes SES opèrent seulement sur une seule
+cellule, et non sur une plage.
+
+‘C-<SPC>’
+‘C-@’
+     Règle la marque au point (‘set-mark-command’).
+
+‘C-g’
+     Désactive la marque (‘keyboard-quit’).
+
+‘M-h’
+     Met en vedette la ligne courante (‘ses-mark-row’).
+
+‘S-M-h’
+     Met en vedette la colonne courante (‘ses-mark-column’).
+
+‘C-x h’
+     Mettre en vedette toutes les cellules (‘mark-whole-buffer’).
+
+* Menu:
+
+* Formules: Formulas.
+* Redimensionner: Resizing.
+* Fonctions d’impression: Printer functions.
+* Effacer des cellules: Clearing cells.
+* Copier/couper/coller: Copy/cut/paste.
+* Personnaliser SES: Customizing SES.
+
+
+File: ses-fr.info,  Node: Formulas,  Next: Resizing,  Up: The Basics
+
+3.1 Formules de cellule
+=======================
+
+Pour insérer une valeur dans une cellule, tapez juste une expression
+numérique, un ‘"texte entre guillemets anglais"’, ou une expression
+Lisp.
+
+‘0..9’
+     Auto-insérer un nombre (‘ses-read-cell’).
+
+‘-’
+     Auto-insérer un nombre négatif (‘ses-read-cell’).
+
+‘.’
+     Auto-insérer un nombre décimal (‘ses-read-cell’).
+
+‘"’
+     Auto-insérer une chaîne de caractères.  Le guillemet anglais de
+     terminaison est inséré automatiquement (‘ses-read-cell’).
+
+‘(’
+     Auto-insérer une expression.  La parenthèse de droite est insérée
+     automatiquement (‘ses-read-cell’).  Pour accéder à la valeur d’une
+     autre cellule, il suffit d’utiliser son identificateur dans votre
+     expression.  Dès que l’autre cellule change, la formule de cette
+     cellule-ci est réévaluée.  En tapant l’expression, vous pouvez
+     utiliser les raccourcis clavier suivants :
+     ‘M-<TAB>’
+          pour compléter les noms de symboles, et
+     ‘C-h C-n’
+          pour lister les symboles de cellules renommées dans un tampon
+          d’aide.
+
+‘' (apostrophe)’
+     Entrer un symbole (‘ses-read-symbol’).  SES se souvient de tous les
+     symboles qui ont été utilisés comme formules, de sorte que vous
+     pouvez taper juste le début d’un symbole et utiliser ‘<SPC>’,
+     ‘<TAB>’, et ‘?’ pour le compléter.
+
+   Pour saisire quelque-chose d’autre (par ex., un vecteur), commencer
+avec un chiffre, puis effacer le chiffre et tapez ce que vous désirez.
+
+‘<RET>’
+     Édite la formule existante dans la cellule courante
+     (‘ses-edit-cell’).
+
+‘C-c C-c’
+     Force le recalcul de la cellule ou plage courante
+     (‘ses-recalculate-cell’).
+
+‘C-c C-l’
+     Recalcule la feuille entière (‘ses-recalculate-all’).
+
+
+File: ses-fr.info,  Node: Resizing,  Next: Printer functions,  Prev: Formulas,  Up: The Basics
+
+3.2 Redimensionner la feuille
+=============================
+
+Commande de base :
+
+‘C-o’
+     (‘ses-insert-row’)
+
+‘M-o’
+     (‘ses-insert-column’)
+
+‘C-k’
+     (‘ses-delete-row’)
+
+‘M-k’
+     (‘ses-delete-column’)
+
+‘w’
+     (‘ses-set-column-width’)
+
+‘<TAB>’
+     Déplace le point sur la prochaine cellule vers la droite, ou insère
+     une nouvelle colonne si on est déjà sur la dernière cellule de la
+     ligne, ou insère une nouvelle ligne si on est sur la ligne de
+     terminaison (‘ses-forward-or-insert’).
+
+‘C-j’
+     Insère une nouvelle ligne sous la ligne courante et va à la colonne
+     A de cette ligne (‘ses-append-row-jump-first-column’).
+
+   En redimensionnant la feuille (à moins que vous ne fassiez que
+changer la largeur d’une colonne) les références de cellule au sein des
+formules sont toutes relocalisées de sorte à continuer à faire référence
+aux mêmes cellules.  Si une formule mentionne B1 et que vous insérez une
+nouvelle première ligne, alors la formule mentionnera B2.
+
+   Si vous supprimez une cellule à laquelle une formule fait référence,
+le symbole de cellule est supprimé de la formule, de sorte que ‘(+ A1 B1
+C1)’ après suppression de la troisième colonne devient ‘(+ A1 B1)’.  Au
+cas où cela ne serait pas ce que vous désiriez :
+
+‘C-_’
+‘C-x u’
+     Défait l’action action précédente (‘(undo)’).
+
+
+File: ses-fr.info,  Node: Printer functions,  Next: Clearing cells,  Prev: Resizing,  Up: The Basics
+
+3.3 Fonctions d’impression
+==========================
+
+Les fonctions d’impression convertissent des valeurs binaires de cellule
+en formes d’impression qu’Emacs affiche à l’écran.
+
+* Menu:
+
+* Différents types de fonctions d’impression: Various kinds of printer functions.
+* Configurer quelle fonction d’impression s’applique: Configuring what printer function applies.
+* Les fonctions d’impression standardes: Standard printer functions.
+* Les fonctions d’impression locales: Local printer functions.
+* Écrire une fonctions d’impression lambda: Writing a lambda printer function.
+
+
+File: ses-fr.info,  Node: Various kinds of printer functions,  Next: Configuring what printer function applies,  Up: Printer functions
+
+3.3.1 Différents types de fonctions d’impression
+------------------------------------------------
+
+Lorsque on configure quelle fonction d’impression s’applique (*note
+Configuring what printer function applies::), on peut saisir une
+fonction d’impression comme l’une des possibilités suivantes :
+
+   • Une chaîne de formatage, telle que ‘"$%.2f"’.  la chaîne formatée
+     résultante est alignée à droite au sein de la cellule d’impression.
+     Pour obtenir un alignement à gauche, utilisez des parenthèses :
+     ‘("$%.2f")’.
+   • Une fonction d’impression peut aussi être une fonction à un
+     argument dont la valeur renvoyée est une chaîne (pour obtenir un
+     alignement à droite) ou une liste d’une chaîne (pour obtenir un
+     alignement à gauche).  Une telle fonction peut à son tour être
+     configurée comme :
+        • Une expression lambda, par exemple :
+
+               (lambda (x)
+                 (cond
+                    ((null x) "")
+                    ((numberp x) (format "%.2f" x))
+                    (t (ses-center-span x ?# 'ses-prin1))))
+
+          Pendant la saisie d’une lambda, vous pouvez utiliser ‘M-<TAB>’
+          pour completer les noms de symboles.
+        • Un symbole faisant référence à une fonction d’impression
+          standarde (*note Standard printer functions::).
+        • Un symbole faisant référence à une fonction d’impression
+          locale (*note Local printer functions::).
+
+
+File: ses-fr.info,  Node: Configuring what printer function applies,  Next: Standard printer functions,  Prev: Various kinds of printer functions,  Up: Printer functions
+
+3.3.2 Configurer quelle fonction d’impression s’applique
+--------------------------------------------------------
+
+Chaque cellule a une fonction d’impression.  Si c’est ‘nil’, alors la
+fonction d’impression de la colonne de cette cellule est utilisée.  Et
+si cela est aussi ‘nil’, alors la fonction d’impression par défaut de la
+feuille est utilisée.
+
+‘p’
+     Saisit une fonction d’impression pour la cellule ou plage courante
+     (‘ses-read-cell-printer’).
+
+‘M-p’
+     Saisit une fonction d’impression pour la colonne courante
+     (‘ses-read-column-printer’).
+
+‘C-c C-p’
+     Saisit la fonction d’impression par défaut de la feuille
+     (‘ses-read-default-printer’).
+
+   Les commandes ‘ses-read-XXX-printer’ permettent les commandes
+suivantes pendant l’édition:
+
+‘<arrow-up>’
+‘<arrow-down>’
+     Pour parcourir l’historique : les commandes ‘ses-read-XXX-printer’
+     ont leur propre historique de mini-tampon, il est préchargé avec
+     l’ensemble de toutes les fonctions d’impression utilisées dans
+     cette feuille, plus les fonctions d’impression standardes (*note
+     Standard printer functions::) et les fonctions d’impression locales
+     (*note Local printer functions::).
+‘<TAB>’
+     Pour compléter les symboles de fonctions d’impression locales, et
+‘C-h C-p’
+     Pour lister les fonctions d’impression locales dans un tampon
+     d’aide.
+
+
+File: ses-fr.info,  Node: Standard printer functions,  Next: Local printer functions,  Prev: Configuring what printer function applies,  Up: Printer functions
+
+3.3.3 Les fonctions d’impression standardes
+-------------------------------------------
+
+Mise à part ‘ses-prin1’, les autres fonctions d’impression standardes ne
+conviennent que pour les cellules, et non pour les colonnes ou comme
+fonction d’impression par défaut de la feuille, parce qu’elles formatent
+la valeur en utilisant la fonction d’impression de colonne (ou par
+défaut si ‘nil’) et ensuite post-traite le résultat, par ex. le centre :
+
+‘ses-center’
+     Centre juste.
+
+‘ses-center-span’
+     Centrer en débordant sur les cellules vides suivantes.
+
+‘ses-dashfill’
+     Centrer en utilisant des tirets (‘-’) au lieu d’espaces.
+
+‘ses-dashfill-span’
+     Centrer avec tirets et débordement.
+
+‘ses-tildefill-span’
+     Centrer avec tildes (‘~’) et débordement.
+
+‘ses-prin1’
+     C’est la fonction d’impression de repli, utilisée quand l’appel à
+     la fonction d’impression configurée envoie une erreur.
+
+
+File: ses-fr.info,  Node: Local printer functions,  Next: Writing a lambda printer function,  Prev: Standard printer functions,  Up: Printer functions
+
+3.3.4 Les fonctions d’impression locales
+----------------------------------------
+
+Vous pouvez définir une fonction d’impression locale à la feuille avec
+la commande ‘ses-define-local-printer’.  Par exemple, définissez une
+fonction d’impression ‘toto’ à ‘"%.2f"’, et ensuite utilisez le symbole
+‘toto’ comme fonction d’impression.  Ensuite, si vous rappelez
+‘ses-define-local-printer’ sur ‘toto’ pour le redéfinir comme ‘"%.3f"’,
+alors toutes les cellules utilisant la fonction d’impression ‘toto’
+seront re-imprimées conformément.
+
+   Il peut arriver que vous désiriez définir ou redéfinir certaines
+fonctions d’impression à chaque fois que vous ouvrez une feuille.  Par
+exemple, imaginez que vous désiriez définir/re-définir automatiquement
+une fonction d’impression locale ‘euro’ pour afficher un nombre comme
+une somme en euros, par exemple le nombre ‘3.1’ serait affiché comme
+‘3.10€’.  Pour faire cela dans tout tampon SES qui n’est pas en lecture
+seule, vous pouvez ajouter ce genre de code à votre fichier d’init
+‘.emacs’ :
+
+     (defun my-ses-mode-hook ()
+       (unless buffer-read-only
+         (ses-define-local-printer
+          'euro
+          (lambda (x)
+            (cond
+             ((null x) "")
+             ((numberp x) (format "%.2f€" x))
+             (t (ses-center-span x ?# 'ses-prin1)))))))
+     (add-hook 'ses-mode-hook 'my-ses-mode-hook)
+
+   Si vous remplacez la commande ‘ses-define-local-printer’ par la
+fonction ‘ses-define-if-new-local-printer’ la définition ne se produira
+que si aucune fonction d’impression de même nom n’est déjà définie.
+
+
+File: ses-fr.info,  Node: Writing a lambda printer function,  Prev: Local printer functions,  Up: Printer functions
+
+3.3.5 Écrire une fonctions d’impression lambda
+----------------------------------------------
+
+Vous pouvez écrire une fonction d’impression avec une expression lambda
+prenant un seul argument en deux cas :
+
+   • quand vous configurez la fonction d’impression s’appliquant à une
+     cellule ou colonne, ou
+   • quand vous définissez une fonction d’impression avec la commande
+     ‘ses-define-local-printer’.
+
+   En faisant cela, prenez garde à ce que la valeur renvoyée soit une
+chaîne, ou une liste contenant une chaîne, même quand l’argument
+d’entrée a une valeur inattendue.  Voici un exemple :
+
+     (lambda (val)
+        (cond
+           ((null val) "")
+           ((and (numberp val) (>= val 0)) (format "%.1f" val))
+           (t (ses-center-span val ?# 'ses-prin1))))
+
+   Cet exemple fait ceci :
+
+   • Quand la cellule est vide (c.-à-d. quand ‘val’ est ‘nil’), imprime
+     une chaîne vide ‘""’
+   • Quand la valeur de cellule est un nombre positif ou nul, formate la
+     valeur en notation à virgule fixe avec une decimale après la
+     virgule
+   • Sinon, gère la valeur comme erronnée en l’imprimant comme une
+     s-expression (avec ‘ses-prin1’), centrée et entourée de croisillons
+     ‘#’ de bourrage.
+
+   Une autre précaution à prendre est d’éviter un débordement de pile à
+cause d’une fonction d’impression se rappelant elle-même sans fin.
+Cette erreur peut se produire quand vous utilisez une fonction
+d’impression locale comme fonction d’impression de colonne, et que cette
+fonction d’impression locale appelle implicitement la fonction
+d’impression de colonne courante, ainsi elle se rappelle elle-même
+récursivement.  Imaginez par exemple que vous désirez créer une fonction
+d’impression locale ‘=bourre’ qui centre le contenu imprimé d’une
+cellule et l’entoure de signes égal ‘=’, et que vous le faites
+(erronnément) comme cela :
+
+     ;; CODE ERRONÉ
+     (lambda (x)
+       (cond
+        ((null x) "")
+        (t (ses-center x 0 ?=))))
+
+   Comme ‘=bourre’ utilise la fonction d’impression standarde
+‘ses-center’ mais sans lui passer exemplicitement une fonction
+d’impression, ‘ses-center’ appelle la fonction d’impression de colonne
+courante s’il y en a une, ou la fonction d’impression par défaut de la
+feuille sinon.  Aussi, utiliser ‘=bourre’ comme fonction d’impression de
+colonne aura pour résultat de causer un débordement de pile dans cette
+colonne sur toute cellule non vide, puisque ‘ses-center’ rappelle
+récursivement la fonction qui l'a appelé.  SES ne vérifie pas cela ; il
+vous faut donc faire attention.  Par exemple, reécrivez ‘=bourre’
+ainsi :
+
+     (lambda (x)
+       (cond
+        ((null x) "")
+        ((stringp x) (ses-center x 0 ?= " %s "))
+        (t (ses-center-span x ?# 'ses-prin1))))
+
+   Le code ci-dessus est réparé au sens où ‘ses-center’ et
+‘ses-center-span’ sont toutes deux appelées avec un dernier argument
+PRINTER explicite spécifiant la fonction d'impression, respectivement ‘"
+%s "’ et ‘'ses-prin1’.
+
+   Le code ci-dessus applique le bourrage de ‘=’ seulement aux chaînes ;
+et aussi il entoure la chaîne par un espace de chaque côté avant de
+bourrer avec des signes ‘=’.  Ainsi la chaîne ‘Ula’ s’affichera comme
+‘=== Ula ===’ dans une colonne large de 11 caractères.  Toute valeur qui
+n’est ni ‘nil’ (c.-à-d. une cellule vide) ni une chaîne est affichée
+comme une erreur par l’usage de bourrage par des croisillons ‘#’.
+
+
+File: ses-fr.info,  Node: Clearing cells,  Next: Copy/cut/paste,  Prev: Printer functions,  Up: The Basics
+
+3.4 Effacer des cellules
+========================
+
+Ces commandes règlent à la fois la formule et la fonction d’impression à
+‘nil’ :
+
+‘<DEL>’
+     Se deplace à gauche et efface la cellule
+     (‘ses-clear-cell-backward’).
+
+‘C-d’
+     Efface la cellule et se déplace à droite
+     (‘ses-clear-cell-forward’).
+
+
+File: ses-fr.info,  Node: Copy/cut/paste,  Next: Customizing SES,  Prev: Clearing cells,  Up: The Basics
+
+3.5 Copier, couper, et coller
+=============================
+
+Les fonctions de copie opèrent sur des regions rectangulaires de
+cellules.  Vous pouvez coller les copies dans des tampons non-SES pour
+exporter le texte d’impression.
+
+‘M-w’
+‘[copy]’
+‘[C-insert]’
+     Copie les cellules en vedette vers l’anneau presse-papier et le
+     presse-papier primaire (‘kill-ring-save’).
+
+‘[drag-mouse-1]’
+     Marque une region et la copie vers l’anneau presse-papier et le
+     presse-papier primaire (‘mouse-set-region’).
+
+‘[M-drag-mouse-1]’
+     Marque une region et la copie vers l’anneau presse-papier et le
+     presse-papier secondaire (‘mouse-set-secondary’).
+
+‘C-w’
+‘[cut]’
+‘[S-delete]’
+     Les fonctions couper ne suppriment pas en fait de lignes ou de
+     colonnes -- elles les copient et puis les effacent
+     (‘ses-kill-override’).
+
+‘C-y’
+‘[S-insert]’
+     Colle à partir de l’anneau presse-papier (‘yank’).  Les fonctions
+     coller se comportent différemment selon le format du texte qu’elles
+     insèrent :
+        • Quand on colle des cellules qui ont été coupées ou copiées à
+          partir d’un tampon SES, le texte d’impression est ignoré et
+          seulement la formule et fonction d’impression jointes sont
+          insérées ; les références de cellule de la formule sont
+          relocalisées à moins que vous n’utilisiez ‘C-u’.
+        • Le texte collé écrase un rectangle de cellules dont le coin
+          haut gauche est la cellule courante.  Si une partie du
+          rectangle est au-délà des bords de la feuille, vous devez
+          confirmer l’augmentation de la taille de la feuille.
+        • Du texte Non-SES est d’ordinaire inséré comme formule de
+          remplacement pour la cellule courante.  Si la formule serait
+          un symbole, elle est traitée comme une chaîne à moins que vous
+          n’utilisiez ‘C-u’.  Les formules collées comprenant des
+          erreurs de syntaxe sont toujours traitées comme des chaînes.
+
+‘[paste]’
+     Colle à partir du presse-papier primaire ou de l’anneau
+     presse-papier (‘clipboard-yank’).
+
+‘[mouse-2]’
+     Règle le point et colle à partir du presse-papier primaire
+     (‘mouse-yank-at-click’).
+
+‘[M-mouse-2]’
+     Règle le point et colle à partir du presse-papier secondaire
+     (‘mouse-yank-secondary’).
+
+‘M-y’
+     Immédiatement après un coller, vous pouvez remplacer le texte avec
+     un élément précédent à partir de l’anneau presse-papier
+     (‘ses-yank-pop’).  Contrairement au yank-pop standard d’Emacs, la
+     version de SES utilise ‘undo’ pour supprimer l’ancien collage.
+     Est-ce que cela ne fait aucune différence ?
+
+
+File: ses-fr.info,  Node: Customizing SES,  Prev: Copy/cut/paste,  Up: The Basics
+
+3.6 Personnaliser SES
+=====================
+
+Par défaut, une feuille venant d’être créée a 1 ligne et 1 colonne.  La
+largeur de colonne est 7 et la fonction d’impression par défaut est
+‘"%.7g"’.  Chacune de ces choses peut être personnalisée.  Allez voir
+dans le groupe « ses ».
+
+   Après avoir saisi une valeur de cellule, normalement ‘forward-char’
+est appelé, ce qui déplace le point vers la cellule suivante à droite,
+ou à la première cellule à gauche de la ligne suivante si la cellule
+courante est la plus à droite de la feuille.  Vous pouvez personnaliser
+‘ses-after-entry-functions’ pour que le déplacement soit vers la gauche
+ou le haut ou le bas.  Pour un mouvement diagonal, selectionnez deux
+fonctions de la liste.
+
+   ‘ses-jump-cell-name-function’ est une variable personnalisable réglée
+par défaut à la fonction ‘upcase’.  Cette fonction est appelée quand
+vous passez un nom de cellule à la commande ‘ses-jump’ (‘j’), et que ce
+nom n’est pas le nom d’une cellule renommée.  Elle change le nom de
+cellule saisi en celui de la cellule vers laquelle sauter.  Le réglage
+par défaut ‘upcase’ vous permet de saisir le nom de cellule en bas de
+casse.  Un autre usage de ‘ses-jump-cell-name-function’ pourrait être
+une internationalisation pour convertir des caractères non latins en
+équivalents latins pour nommer la cellule.  Au lieu d’un nom de cellule,
+la fonction peut renvoyer des coordonnées de cellule sous la forme d’un
+cons, par exemple ‘(0 . 0)’ pour la cellule ‘A1’, ‘(1 . 0)’ pour la
+cellule ‘A2’, etc.
+
+   ‘ses-jump-prefix-function’ est une variable personnalisable réglée
+par défaut à la fonction ‘ses-jump-prefix’.  Cette fonction est appelée
+quand vous donnez un argument préfixe à la commande ‘ses-jump’ (‘j’).
+Elle renvoie un nom de cellule ou des coordonnées de cellule
+correspondant à l’argument préfixe.  Les coordonnées de cellule sont
+sous la forme d’un cons, par exemple ‘(1 . 0)’ pour la cellule ‘A2’.  Le
+réglage par défaut ‘ses-jump-prefix’ numérote les cellules de gauche à
+droite et puis de haut en bas, de sorte que si on suppose une feuille
+4×3, l’argument préfixe ‘0’ saute à la cellule ‘A1’, l’argument préfixe
+‘2’ saute à ‘C1’, l’argument préfixe ‘3’ saute à ‘A2’, etc.
+
+   ‘ses-mode-hook’ est un crochet de mode normal (une liste de fonctions
+qui s’exécutent quand le mode SES démarre sur un tampon).
+
+   La variable ‘safe-functions’ est une liste de fonctions
+potentiellement risquées à traiter comme si elles étaient sûres lors de
+l’analyse des formules et fonctions d’impression.  *Note Virus
+protection::.  Avant de personnaliser ‘safe-functions’, réfléchissez à
+quel point vous faites confiance à la personne qui vous suggère cette
+modification.  La valeur ‘t’ désactive toute protection anti-virus.  Une
+valeur donnant une liste-de-fonctions peut rendre une feuille « trop
+bien », mais elle crée aussi des portes dérobées dans votre armure
+anti-virus.  Pour que votre protection contre les virus fonctionne, vous
+devez toujours appuyer sur ‘n’ quand un avertissement contre un virus
+vous est présenté, à moins que vous compreniez ce que le code en
+question essaie de faire.  N’écoutez pas ceux qui vous racontent de
+personnaliser ‘enable-local-eval’ -- cette variable est pour les gens
+qui ne portent pas de ceinture de sécurité !
+
+
+File: ses-fr.info,  Node: Advanced Features,  Next: For Gurus,  Prev: The Basics,  Up: Top
+
+4 Fonctions avancées
+********************
+
+‘C-c M-C-h’
+     (‘ses-set-header-row’).  La ligne d’en-tête au sommet de la fenêtre
+     SES affiche normalement la ligne de colonne pour chaque colonne.
+     Vous pouvez la régler pour afficher une copie de l’une des lignes,
+     tell que qu’une ligne de titres de colonnes, ainsi cette ligne sera
+     toujours visible.  Par défaut la commande règle la ligne courante
+     comme en-tête ; utiliser C-u pour une invite à désigner la ligne
+     d’en-têre.  Régler la ligne d’en-tête à la ligne 0 pour afficher
+     les lettres de colonne de nouveau.
+‘[header-line mouse-3]’
+     Affiche un menu pour régler la ligne courante comme en-tête, ou
+     revenir à des lettres de colonne.
+‘M-x ses-rename-cell’
+     Renomme une cellule pour passer d'un nom standard du genre de A1 à
+     toute chaîne pouvant être un nom valide pour une variable locale
+     (Voir aussi *note Nonrelocatable references::).
+‘M-x ses-repair-cell-reference-all’
+     Quand vous interrompez la mise à jour d’une formule de cellule en
+     tapant ‘C-g’, alors cela peut casser le lien de référence de
+     cellule, ce qui compromet la mise à jour automatique de cellule
+     quand toute autre cellule dont elle dépend est modifiée.  Pour
+     réparer cela, utilisez la fonction ‘ses-repair-cell-reference-all’
+
+* Menu:
+
+* La zone d’impression:  The print area.
+* Plages dans les formules:  Ranges in formulas.
+* Trier par colonne:  Sorting by column.
+* Fonctions de formule standardes:  Standard formula functions.
+* Plus sur l’impression de cellule:  More on cell printing.
+* Import et export:  Import and export.
+* Protection contre les virus:  Virus protection.
+* Feuilles avec détails et synthèse:  Spreadsheets with details and summary.
+
+
+File: ses-fr.info,  Node: The print area,  Next: Ranges in formulas,  Up: Advanced Features
+
+4.1 La zone d’impression
+========================
+
+Un fichier SES consiste en une zone d’impression et une zone de données.
+Normalement le tampon est réduit de sorte à n’afficher que la zone
+d’impression.  La zone d’impression est en lecture seule, hormis pour
+les commandes spéciales de SES ; elle contient les valeurs de cellule
+formatées par les fonctions d’impression.  La zone de données enregistre
+les formules, fonctions d’impression, etc.
+
+‘C-x n w’
+     Affiche à la fois les zones d’impression et de données (‘widen’).
+
+‘C-c C-n’
+     Affiche seulement la zone d’impression (‘ses-renarrow-buffer’).
+
+‘S-C-l’
+‘M-C-l’
+     Recrée la zone d’impression en réévaluant pour toutes les cellules
+     sa fonction d’impression (‘ses-reprint-all’).
+
+
+File: ses-fr.info,  Node: Ranges in formulas,  Next: Sorting by column,  Prev: The print area,  Up: Advanced Features
+
+4.2 Plages dans les formules
+============================
+
+Une formule du genre de :
+     (+ A1 A2 A3)
+   est la somme de trois cellules spécifiques.  Si vous insérez une
+nouvelle deuxième ligne, la formule devient
+     (+ A1 A3 A4)
+   et la nouvelle ligne n’est pas incluse dans la somme.
+
+   La macro ‘(ses-range DE À)’ s’évalue en une liste des valeurs dans un
+rectangle de cellules.  Si votre formule est
+     (apply '+ (ses-range A1 A3))
+   et que vous insérez une nouvelle deuxième ligne, elle devient
+     (apply '+ (ses-range A1 A4))
+   et la nouvelle ligne est incluse dans la somme.
+
+   Alors que vous saisissez ou éditez une formule dans le minitampon,
+vous pouvez sélectionner une plage dans la feuille (en utilisant la
+souris ou le clavier), et injecter une représentation de cette plage
+dans votre formule.  Supposez que vous sélectionnez ‘A1-C1’ :
+
+‘[S-mouse-3]’
+     Insère ‘A1 B1 C1’ (‘ses-insert-range-click’)
+
+‘C-c C-r’
+     Version clavier (‘ses-insert-range’).
+
+‘[C-S-mouse-3]’
+     Insère ‘(ses-range A1 C1)’ (‘ses-insert-ses-range-click’).
+
+‘C-c C-s’
+     Version clavier (‘ses-insert-ses-range’).
+
+   Si vous supprimez la cellule DE ou À d’une plage, la cellule la plus
+proche toujours existante est utilisée à la place.  Si vous supprimez
+l’entière plage, le relocalisateur de formule supprime le ‘ses-range’ de
+la formule.
+
+   Si vous insérez une nouvelle ligne juste au delà de la fin d’une
+plage à une colonne, ou une nouvelle colonne juste au delà d’une plage à
+une ligne, la nouvelle cellule est incluse dans la plage.  Les nouvelles
+cellules insérées juste avant une plage ne sont pas incluses.
+
+   Des fanions peuvent être ajoutés à ‘ses-range’ immédiatement après la
+cellule À .
+‘!’
+     Les cellules vides de la plage peuvent être enlevées en ajoutant le
+     fanion ‘!’.  Une cellule vide est une cellule dont la valeur est
+     l’un des symboles ‘nil’ ou ‘*skip*’.  Par exemple ‘(ses-range A1 A4
+     !)’ fait la même chose que ‘(list A1 A3)’ quand les cellules ‘A2’
+     et ‘A4’ sont vides.
+‘_’
+     Les valeurs de cellules vides sont remplacées par l’argument
+     suivant le fanion ‘_’, ou ‘0’ quand le fanion ‘_’ est le dernier
+     dans la liste d’arguments.  Par exemple ‘(ses-range A1 A4 _
+     "vide")’ fera la même chose que ‘(list A1 "vide" A3 "vide")’ quand
+     les cellules ‘A2’ et ‘A4’ sont vides.  Similairement, ‘(ses-range
+     A1 A4 _ )’ fera la même chose que ‘(list A1 0 A3 0)’.
+‘>v’
+     Quand l’ordre a de l’importance, liste les cellules en lisant les
+     cellules ligne par ligne de la cellule en haut à gauche vers la
+     cellule en bas à droite.  Ce fanion est fourni pour être complet
+     car c’est déjà l’ordre par défaut.
+‘<v’
+     Liste les cellules en lisant les cellules ligne par ligne de la
+     cellule en haut à droite vers la cellule en bas à gauche.
+‘v>’
+     Liste les cellules en lisant les cellules colonne par colonne de la
+     cellule en haut à gauche vers la cellule en bas à droite.
+‘v<’
+     Liste les cellules en lisant les cellules colonne par colonne de la
+     cellule en haut à droite vers la cellule en bas à gauche.
+‘v’
+     Un raccourci pour ‘v>’.
+‘^’
+     Un raccourci pour ‘^>’.
+‘>’
+     Un raccourci pour ‘>v’.
+‘<’
+     Un raccourci pour ‘>^’.
+‘*’
+     Au lieu de lister les cellules, en fait un vecteur ou une matrice
+     Calc (*note (calc)Top::).  Si la plage contient seulement une ligne
+     ou une colonne un vecteur est fait, sinon une matrice est faite.
+‘*2’
+     Idem que ‘*’ à ceci près qu’une matrice est toujours faite même
+     quand il y a une seule ligne ou colonne dans la plage.
+‘*1’
+     Idem que ‘*’ à ceci près qu’un vecteur est toujours fait même quand
+     il n’y a qu’une ligne ou colonne dans la plage, c.-à-d. que la
+     matrice correspondante est aplatie.
+
+
+File: ses-fr.info,  Node: Sorting by column,  Next: Standard formula functions,  Prev: Ranges in formulas,  Up: Advanced Features
+
+4.3 Trier par colonne
+=====================
+
+‘C-c M-C-s’
+     Trie les cellules d’une plage en utilisant l’une des colonnes
+     (‘ses-sort-column’).  Les lignes (ou lignes partielles si la plage
+     n’inclut pas toutes les colonnes) sont réarrangées de sorte que la
+     colonne choisie soit ordonnée.
+
+‘[header-line mouse-2]’
+     La façon la plus facile de trier est de cliquer sur mouse-2 sur la
+     ligne d’en-tête de colonne (‘ses-sort-column-click’).
+
+   La comparaison du tri utilise ‘string<’, ce qui fonctionne bien pour
+des nombres alignés à droite ou des chaînes alignées à gauche.
+
+   Avec un argument préfixe, trie dans l’ordre descendant.
+
+   Les lignes sont déplacées une à la fois, avec relocalisation des
+formules.  Ceci fonctionne bien si les formules font référence à
+d’autres cellules dans leur ligne, mais non pas si bien pour des
+formules qui font référence à d’autres lignes dans la plage ou à des
+cellules hors de la plage.
+
+
+File: ses-fr.info,  Node: Standard formula functions,  Next: More on cell printing,  Prev: Sorting by column,  Up: Advanced Features
+
+4.4 Fonctions de formule standardes
+===================================
+
+Souvent on désire qu’un calcul exclue les cellules vides.  Voici
+quelques fonctions utiles à appeler dans vos formules :
+
+‘(ses-delete-blanks &rest ARGS)’
+     Renvoie une liste dont toutes les cellules vides (dont la valeur
+     est soit ‘nil’ ou ‘'*skip*’) ont été supprimées.  L’ordre des
+     arguments est inversé.  Prière de noter que ‘ses-range’ a un
+     modificateur ‘!’ qui permet de supprimer les cellules vides, ainsi
+     il est possible d’écrire :
+          (ses-range A1 A5 !)
+     au lieu de
+          (apply 'ses-delete-blanks (ses-range A1 A5 <))
+
+‘(ses+ &rest ARGS)’
+     Somme des arguments non vides pris en ordre inverse.
+
+‘(ses-average LISTE)’
+     Moyenne des éléments non vides de LISTE.  Ici la liste est passée
+     comme un seul argument, vu que typiquement on la forme avec
+     ‘ses-range’.
+
+
+File: ses-fr.info,  Node: More on cell printing,  Next: Import and export,  Prev: Standard formula functions,  Up: Advanced Features
+
+4.5 Plus sur l’impression de cellule
+====================================
+
+Valeurs spéciales de cellule :
+   • nil s’imprime typiquement de la même façon que "", mais permet que
+     la cellule précédente déborde dessus.
+   • '*skip* remplace nil quand la cellule précédente déborde
+     effectivement ; rien n’est donc imprimée pour cette cellule.
+   • '*error* indique que la formule a signalé une erreur au lieu de
+     produire une valeur : la cellule imprimée est remplie de
+     croisillons (#).
+
+   Lorsque la fonction d’impression est définie par une chaîne de
+formatage, par ex.  ‘"%.3f"’, SES imprime automatiquement ‘nil’ comme
+une chaîne vide, mais si la fonction d’impression est définie par une
+expression lambda, vous devez définir explicitement comment ‘nil’ est
+traité, par ex. :
+     (lambda (x)
+       (cond
+        ((null x) "")
+        ((stringp x) (list x))
+        ((numberp x) (format "%.3f" x))
+        (t (ses-prin1 x)))
+   imprime ‘nil’ comme une chaîne vide, aligne à gauche la valeur si
+c’est une chaîne, et si c’est un nombre l’aligne à droite en l’imprimant
+avec trois décimales.
+
+   Il n’est pas nécessaire par contre que vous vous souciez de ‘'*skip*’
+dans la définition d’une fonction d’impression, en effet aucune fonction
+d’impression n’est appelée sur ‘'*skip*’.
+
+   Si le résultat de la fonction d’impression est trop large pour la
+cellule et que la cellule suivante est ‘nil’, le résultat débordera sur
+la cellule suivante.  Les résultats très larges peuvent déborder sur
+plusieurs cellules.  Si le résultat est trop large pour l’espace
+disponible (jusqu'à la fin de la ligne ou la prochaine cellule
+non-‘nil’), le résultat est tronqué si la valeur de cellule est une
+chaîne, ou remplacé par des croisillons (‘#’) sinon.
+
+   SES pourrait être perturbé par des résultats de fonction d'impression
+contenant des sauts de ligne ou des tabulations, aussi ces caractères
+sont remplacés par des points d'interrogation.
+
+‘t’
+     Confine une cellule à sa propre colonne (‘ses-truncate-cell’).
+     Ceci vous permet de déplacer le point sur la cellule de droite qui
+     sinon serait couverte par un débordement.  Si vous ne modifiez pas
+     la cellule de droite, la cellule confinée débordera de nouveau la
+     prochaine fois qu’elle sera imprimée.
+
+‘c’
+     Appliquée à une seule cellule, cette commande affiche dans la zone
+     d’écho toute erreur de formule ou erreur d’impression survenue
+     pendant le recalcul/la réimpression (‘ses-recalculate-cell’).  Vous
+     pouvez utiliser cela pour défaire l’effet de ‘t’.
+
+   Quand une fonction d’impression signale une erreur, la fonction
+d’impression de repli ‘ses-prin1’ lui est substituée.  Ceci est utile
+quand votre fonction d’impression de colonne est seulement numérique et
+que vous utilisez une chaîne comme valeur de cellule.  Notez que la
+fonction d’impression par défaut standarde est ‘"%.7g"’ qui est
+numérique seulement, ainsi les cellules auxquelles la fonction
+d’impression par défaut standarde s’applique et qui ne sont pas vides et
+ne contiennent pas un nombre utilisent la fonction d’impression de repli
+‘ses-prin1’, par ex. les cellules qui contiennent une chaîne font cela.
+‘c’ sur de telles cellules affiche « Format specifier doesn't match
+argument type ».
+
+
+File: ses-fr.info,  Node: Import and export,  Next: Virus protection,  Prev: More on cell printing,  Up: Advanced Features
+
+4.6 Import et export
+====================
+
+‘x t’
+     Exporte une plage de cellules comme des valeurs séparées par des
+     tabulations (‘ses-export-tsv’).
+‘x T’
+     Exporte une plage de cellules comme des formules séparées par des
+     tabulations (‘ses-export-tsf’).
+
+   Le texte exporté va dans l’anneau presse-papier ; vous pouvez le
+coller dans un autre tampon.  Les colonnes sont séparées par des
+tabulations, les lignes par des sauts de lignes.
+
+   Pour importer du texte, utilisez n’importe laquelle des commandes
+coller où le texte à coller contient des tabulations et/ou des sauts de
+lignes.  Les formules importées ne sont pas relocalisées.
+
+
+File: ses-fr.info,  Node: Virus protection,  Next: Spreadsheets with details and summary,  Prev: Import and export,  Up: Advanced Features
+
+4.7 Protection contre les virus
+===============================
+
+À chaque fois une formule ou fonction d’impression est lue d’un fichier
+ou est collée dans la feuille, elle est marquée comme « nécessitant une
+vérification de sécurité ».  Plus tard, quand la formule ou la fonction
+d’impression est évaluée pour la première fois, elle est vérifiée comme
+sûre en utilisant le prédicat ‘unsafep’ ; si elle s’avère
+« potentiellement risquée », la formule ou fonction d’impression en
+question est affichée et vous devez appuyer ‘Y’ pour l’approuver ou ‘N’
+pour utiliser un substitut.  Le substitut signale toujours une erreur.
+
+   Les formules ou fonctions d’impression que vous tapez sont
+immédiatement vérifiées quant à leur sûreté.  Si elles s’avèrent
+potentiellement risquées et que vous appuyez ‘N’ pour refuser, l’action
+est annulée et l’ancienne formule ou fonction d’impression demeure.
+
+   En plus des virus (qui tentent de se recopier dans d’autres
+fichiers), ‘unsafep’ peut aussi détecter toutes sortes de chevaux de
+Troie, tels que des feuilles de calcul qui effacent les fichiers,
+envoient des courriels, inondent des sites Web, corrompent vos réglages
+d’Emacs, etc.
+
+   Généralement, les formules et fonctions d’impression de feuilles sont
+des choses simples qui n’ont pas besoin de faire des traitements
+exotiques, aussi toute partie potentiellement dangereuse de
+l’environnement Emacs Lisp peut être exclus sans entraver votre style
+comme écrivain de formule.  Lisez la documentation dans ‘unsafep.el’
+pour plus d’information sur la façon dont les formes Lisp sont
+classifiées comme sûres ou risquées.
+
+
+File: ses-fr.info,  Node: Spreadsheets with details and summary,  Prev: Virus protection,  Up: Advanced Features
+
+4.8 Feuilles avec détails et synthèse
+=====================================
+
+Une organisation usuelle pour une feuille de calcul est d’avoir un tas
+de lignes de « détail », chacune décrivant possiblement une transaction,
+et ensuite un ensemble de lignes de « synthèse » qui affichent chacune
+des données condensées pour un certain sous-ensemble des détails.  SES
+prend en charge ce type d’organisation via la fonction ‘ses-select’.
+
+‘(ses-select DE-PLAGE TEST À-PLAGE)’
+     Renvoie un sous-ensemble de À-PLAGE.  Pour chaque membre dans
+     DE-PLAGE qui est égal à TEST, le membre correspondant de À-PLAGE
+     est inclus dans le résultat.
+
+   Exemple d’utilisation :
+     (ses-average (ses-select (ses-range A1 A5) 'Bidochon (ses-range B1 B5)))
+   Ceci calcule la moyenne des valeurs de la colonne ‘B’ pour les lignes
+dont la valeur dans la colonne ‘A’ est le symbole ‘'Bidochon’.
+
+   Vous vous demandez peut-être pourquoi les arguments de ‘ses-select’
+ne consistent pas au lieu de À-PLAGE de décalages DÉCALAGE-À-LA-LIGNE et
+DÉCALAGE-À-LA-COLONNE relativement à DE-PLAGE : spécifier À-PLAGE
+explicitement assure que la formule est recalculée si l’une quelconque
+des cellules de cette plage est modifiée.
+
+   Le fichier ‘etc/ses-example.el’ dans la distribution Emacs est un
+exemple d’une feuille organisée en détails-et-synthèse.
+
+
+File: ses-fr.info,  Node: For Gurus,  Next: Index,  Prev: Advanced Features,  Up: Top
+
+5 Pour les gourous
+******************
+
+* Menu:
+
+* Mises à jour différées:  Deferred updates.
+* Références non-relocalisables:  Nonrelocatable references.
+* La zone données:  The data area.
+* Variables locales-tampon dans les feuilles: Buffer-local variables in spreadsheets.
+* Utilisation de advice-add dans SES: Uses of advice-add in SES.
+
+
+File: ses-fr.info,  Node: Deferred updates,  Next: Nonrelocatable references,  Up: For Gurus
+
+5.1 Mises à jour différées
+==========================
+
+Pour épargner du temps de calcul redondant, les cellules dont le
+recalcul est rendu nécessaire par des changements dans d’autres cellules
+sont ajoutées à un ensemble.  À la fin de la commande, chaque cellule de
+cet ensemble est recalculée une fois.  Ceci peut créer un nouvel
+ensemble de cellules nécessitant un recalcul.  Ce processus est répété
+jusqu'à ce que l’ensemble soit vide ou que des références circulaires
+soient détectées.  Dans les cas extrêmes, et notamment si une référence
+circulaire est en cours de détection, vous pourriez voir des messages de
+progression de la forme « Recalculating...  (NNN cells left) ».  Si vous
+interrompez le calcul avec ‘C-g’, la feuille demeurera dans un état
+incohérent, utilisez alors ‘C-_’ ou ‘C-c C-l’ pour réparer cela.
+
+   Pour épargner encore plus de temps en évitant les écritures
+redondantes, les cellules qui sont modifiées sont ajoutées à un ensemble
+au lieu d’être immédiatement écrites dans la zone de données.  Chaque
+cellule de cet ensemble est écrite une fois à la fin de la commande.  Si
+vous modifiez un grand nombre de cellules, vous pourriez voir un message
+de progression de la forme « Writing...  (NNN cells left) ».  Ces
+écritures différées de cellules ne peuvent pas être interrompues par
+‘C-g’, alors il vous faudra juste attendre.
+
+   SES utilise ‘run-with-idle-timer’ pour déplacer le souligné de
+cellule quand Emacs fait défiler le tampon à la fin d’une commande, et
+aussi pour réduire et souligner après visiter un fichier.  Ceci peut
+être visible par une perturbation transitoire après visiter un fichier
+et certaines commandes de défilement.  Vous pouvez continuer à taper
+sans vous inquiéter de cette perturbation.
+
+
+File: ses-fr.info,  Node: Nonrelocatable references,  Next: The data area,  Prev: Deferred updates,  Up: For Gurus
+
+5.2 Références non relocalisables
+=================================
+
+‘C-y’ relocalise toutes les références de cellule dans une formule
+collée, alors que ‘C-u C-y’ n’en relocalise aucune.  Et pour les cas
+mélangés ?
+
+   La meilleure approche est de renommer les cellules que vous _ne_
+voulez _pas_ être relocalisables en utilisant ‘ses-rename-cell’.  Les
+cellules qui n’ont pas un style de nom du genre de A1 ne sont pas
+relocalisées au collage.  En utilisant cette méthode, les cellules
+concernées ne seront pas relocalisées quelle que soit la formule où
+elles apparaissent.  Prière toutefois de noter que dans une formule
+contenant quelque plage ‘(ses-range CELL1 CELL2)’ alors dans la formule
+collée chacune des bornes CELL1 et CELL2 de la plage est relocalisée, ou
+non, indépendemment, selon qu’elle est nommée du genre de ‘A1’ ou
+renommée.
+
+   Une méthode alternative est d’utiliser
+     (symbol-value 'B3)
+   pour faire une “référence absolue”.  Le relocalisateur de formule
+saute par dessus tout ce qui est sous un ‘quote’, aussi cela ne sera pas
+relocalisé quand on le colle ou quand des lignes/colonnes sont
+insérées/supprimées.  Toutefois, ‘B3’ ne sera pas enregistrée comme une
+dépendance de cette cellule, et donc cette cellule ne sera pas mise à
+jour automatiquement quand ‘B3’ est modifiée, c’est pourquoi l’usage de
+‘ses-rename-cell’ est la plupart du temps préférable.
+
+   Les variables ‘row’ et ‘col’ sont liées dynamiquement pendant
+l’évaluation d’une formule de cellule.  Vous pouvez utiliser
+     (ses-cell-value row 0)
+   pour obtenir la valeur de la colonne la plus à gauche de la ligne
+courante.  Ce type de dépendance n’est pas non plus enregistré.
+
+
+File: ses-fr.info,  Node: The data area,  Next: Buffer-local variables in spreadsheets,  Prev: Nonrelocatable references,  Up: For Gurus
+
+5.3 La zone de données
+======================
+
+Commence avec un caractère saut de page (de code ASCII 014 en octal),
+suivi par un ensemble de macros de définition de cellule pour chaque
+ligne, suivi par l’ensemble des définitions de fonctions d’impression
+locales, suivi par les largeurs de colonnes, fonctions d’impression de
+colonne, fonction d’impression par défaut, et ligne d’en-tête.  Ensuite
+il y a les paramètres globaux (ID de format fichier, nombre de lignes,
+nombre de colonnes, nombre de fonctions d’impression locales) et les
+variables locales (spécification du mode SES pour le tampon, etc.).
+
+   Quand un fichier SES est chargé, tout d’abord les paramètres globaux
+sont chargés, puis l’ensemble de la zone de données est ‘eval’ué, et
+finalement les variables locales sont traitées.
+
+   Vous pouvez éditer la zone de données, mais n’insérez pas ni ne
+supprimez de sauts de ligne, hormis dans la partie des variables
+locales, en effet SES localise les choses en comptant les sauts de
+ligne.  Utilisez ‘C-x C-e’ à la fin d’une ligne pour installer ce que
+vous avez édité dans les structures de données de la feuille (ceci ne
+met pas à jour la zone d’impression, utilisez, par ex., ‘C-c C-l’ pour
+cela).
+
+   La zone de données est maintenue comme une image des structures de
+données de la feuille stockée dans des variables locales tampon au
+moment du chargement initial de la zone.  Si le contenu de la zone de
+données se trouve corrompu par la suite, vous pouvez essayer de
+reconstruire la zone de données à partir des structures de données
+avec :
+
+‘C-c M-C-l’
+     (‘ses-reconstruct-all’).
+
+
+File: ses-fr.info,  Node: Buffer-local variables in spreadsheets,  Next: Uses of advice-add in SES,  Prev: The data area,  Up: For Gurus
+
+5.4 Les variables locales-tampon dans les feuilles de calcul
+============================================================
+
+Vous pouvez ajouter des variables locales supplémentaires à la liste au
+bas de la zone de données, telles que des constantes cachées auxquelles
+vous désirez faire référence dans vos formules.
+
+   Vous pouvez initialiser la variable ‘ses--symbolic-formulas’ pour
+être une liste de symboles (comme une suite de chaînes entre
+parenthèses) à proposer comme complétions pour la commande ‘'’.  Cette
+liste initiale de complétions sera utilisée à la place de l’ensemble
+effectif des symboles-comme-formules de la feuille.
+
+   Pour un exemple de ceci, voir le fichier ‘etc/ses-example.ses’.
+
+   Si (pour une raison quelconque) vous désirez que vos formules ou
+fonctions d’impression sauvegardent des données dans des variables, vous
+devez déclarer ces variables comme locales tampon pour éviter un
+avertissement de virus.
+
+   Vous pouvez définir des fonctions en en faisant des valeurs pour la
+fausse variable locale ‘eval’.  De telles fonctions peuvent ensuite être
+utilisées dans les formules et comme fonctions d’impression, mais
+d’ordinaire chaque ‘eval’ est présenté à l’utilisateur pendant le
+chargement du fichier comme un virus potentiel.  Et cela peut devenir
+gênant.
+
+   Vous pouvez définir des fonctions dans votre fichier ‘.emacs’.  Toute
+personne pourra encore lire la zone d’impression de votre feuille, mais
+ne pourra pas recalculer ou réimprimer quoi que ce soit qui dépende de
+vos fonctions.  Pour éviter des avertissements contre les virus, chaque
+fonction utilisée dans une formule nécessite
+     (put 'le-nom-de-votre-fonction 'safe-function t)
+
+
+File: ses-fr.info,  Node: Uses of advice-add in SES,  Prev: Buffer-local variables in spreadsheets,  Up: For Gurus
+
+5.5 Utilisation de advice-add dans SES
+======================================
+
+‘copy-region-as-kill’
+     Quand on copie de la zone d’impression d’une feuille, traite la
+     région comme un rectangle et joint pour chaque cellule sa formule
+     et sa fonction d’impression comme des propriétés ‘'ses’.
+
+‘yank’
+     Quand on colle dans la zone d’impression d’une feuille de calcul,
+     essaie de coller comme des cellules (si le texte à coller a des
+     propriétés ‘'ses’), ensuite comme des formules séparées par des
+     tabulations, ensuite (si tout le reste a échoué) comme une seule
+     formule pour la cellule courante.
+
+
+File: ses-fr.info,  Node: Index,  Next: Acknowledgments,  Prev: For Gurus,  Up: Top
+
+Index
+*****
+
+ [index ]
+* Menu:
+
+* *error*:                               Standard formula functions.
+                                                               (line  6)
+* *skip*:                                Standard formula functions.
+                                                               (line  6)
+* à:                                     Ranges in formulas.   (line  6)
+* advice-add:                            Uses of advice-add in SES.
+                                                               (line  6)
+* ajouter des lignes ou colonnes:        Resizing.             (line  6)
+* avancées, fonctions:                   Advanced Features.    (line  6)
+* avancées, fonctions <1>:               For Gurus.            (line  6)
+* base, commandes de:                    The Basics.           (line  6)
+* C-c M-C-h:                             Advanced Features.    (line  7)
+* cellule, plus sur l'impression:        More on cell printing.
+                                                               (line  6)
+* cellules, formater:                    Printer functions.    (line  6)
+* clipboard-yank:                        Copy/cut/paste.       (line  6)
+* coller:                                Copy/cut/paste.       (line  6)
+* colonne, ajout ou suppression:         Resizing.             (line  6)
+* commandes de base:                     The Basics.           (line  6)
+* copier:                                Copy/cut/paste.       (line  6)
+* copy-region-as-kill:                   Uses of advice-add in SES.
+                                                               (line  6)
+* couper:                                Copy/cut/paste.       (line  6)
+* de:                                    Ranges in formulas.   (line  6)
+* détails et synthèse:                   Spreadsheets with details and summary.
+                                                               (line  6)
+* différées, mises à jour:               Deferred updates.     (line  6)
+* dimensions:                            Resizing.             (line  6)
+* données, zone de:                      The data area.        (line  6)
+* éditer des cellules:                   Formulas.             (line  6)
+* effacer, commandes:                    Clearing cells.       (line  6)
+* enable-local-eval:                     Customizing SES.      (line  6)
+* enlever des lignes ou colonnes:        Resizing.             (line  6)
+* export, et import:                     Import and export.    (line  6)
+* features:                              Sales Pitch.          (line  6)
+* fonctions avancées:                    For Gurus.            (line  6)
+* fonctions d’impression:                Printer functions.    (line  6)
+* fonctions standardes de formule:       Standard formula functions.
+                                                               (line  6)
+* formatage de cellule:                  Printer functions.    (line  6)
+* formules:                              Formulas.             (line  6)
+* formules, saisire:                     Formulas.             (line  6)
+* import et export:                      Import and export.    (line  6)
+* impression de cellule:                 More on cell printing.
+                                                               (line  6)
+* impression, zone d’:                   The print area.       (line  6)
+* insérer des lignes ou colonnes:        Resizing.             (line  6)
+* introduction:                          Quick Tutorial.       (line  6)
+* keyboard-quit:                         The Basics.           (line  6)
+* kill-ring-save:                        Copy/cut/paste.       (line  6)
+* ligne, ajout ou suppression:           Resizing.             (line  6)
+* locales-tampon, variables:             Buffer-local variables in spreadsheets.
+                                                               (line  6)
+* mises à jour différées:                Deferred updates.     (line  6)
+* mouse-set-region:                      Copy/cut/paste.       (line  6)
+* mouse-set-secondary:                   Copy/cut/paste.       (line  6)
+* mouse-yank-at-click:                   Copy/cut/paste.       (line  6)
+* mouse-yank-at-secondary:               Copy/cut/paste.       (line  6)
+* non-relocalisables, références:        Nonrelocatable references.
+                                                               (line  6)
+* personnaliser:                         Customizing SES.      (line  6)
+* plages:                                Ranges in formulas.   (line  6)
+* redimensionner des feuilles:           Resizing.             (line  6)
+* références non-relocalisables:         Nonrelocatable references.
+                                                               (line  6)
+* run-with-idle-timer:                   Deferred updates.     (line  6)
+* safe-functions:                        Customizing SES.      (line 46)
+* ses-append-row-jump-first-column:      Resizing.             (line  6)
+* ses-average:                           Standard formula functions.
+                                                               (line  6)
+* ses-center:                            Standard printer functions.
+                                                               (line 12)
+* ses-center-span:                       Standard printer functions.
+                                                               (line 15)
+* ses-clear-cell-backward:               Clearing cells.       (line  6)
+* ses-clear-cell-forward:                Clearing cells.       (line  6)
+* ses-dashfill:                          Standard printer functions.
+                                                               (line 18)
+* ses-dashfill-span:                     Standard printer functions.
+                                                               (line 21)
+* ses-define-if-new-local-printer:       Local printer functions.
+                                                               (line 35)
+* ses-define-local-printer:              Local printer functions.
+                                                               (line  6)
+* ses-delete-blanks:                     Standard formula functions.
+                                                               (line  6)
+* ses-delete-column:                     Resizing.             (line  6)
+* ses-delete-row:                        Resizing.             (line  6)
+* ses-edit-cell:                         Formulas.             (line  6)
+* ses-export-tsf:                        Import and export.    (line  6)
+* ses-export-tsv:                        Import and export.    (line  6)
+* ses-forward-or-insert:                 Resizing.             (line  6)
+* ses-insert-column:                     Resizing.             (line  6)
+* ses-insert-plage:                      Ranges in formulas.   (line  6)
+* ses-insert-plage-click:                Ranges in formulas.   (line  6)
+* ses-insert-row:                        Resizing.             (line  6)
+* ses-insert-ses-plage:                  Ranges in formulas.   (line  6)
+* ses-insert-ses-plage-click:            Ranges in formulas.   (line  6)
+* ses-jump:                              The Basics.           (line  6)
+* ses-jump-cell-name-function:           Customizing SES.      (line 19)
+* ses-jump-prefix-function:              Customizing SES.      (line 32)
+* ses-kill-override:                     Copy/cut/paste.       (line  6)
+* ses-mark-column:                       The Basics.           (line  6)
+* ses-mark-row:                          The Basics.           (line  6)
+* ses-mark-whole-buffer:                 The Basics.           (line  6)
+* ses-mode-hook:                         Customizing SES.      (line 43)
+* ses-prin1:                             Standard printer functions.
+                                                               (line 27)
+* ses-prin1 <1>:                         More on cell printing.
+                                                               (line 60)
+* ses-read-cell:                         Formulas.             (line  6)
+* ses-read-cell-printer:                 Configuring what printer function applies.
+                                                               (line 12)
+* ses-read-column-printer:               Configuring what printer function applies.
+                                                               (line 16)
+* ses-read-default-printer:              Configuring what printer function applies.
+                                                               (line 20)
+* ses-read-header-row:                   Advanced Features.    (line  6)
+* ses-read-symbole:                      Formulas.             (line  6)
+* ses-recalculate-all:                   Formulas.             (line  6)
+* ses-recalculate-cell:                  Formulas.             (line  6)
+* ses-recalculate-cell <1>:              More on cell printing.
+                                                               (line  6)
+* ses-reconstruct-all:                   The data area.        (line  6)
+* ses-rename-cell:                       Advanced Features.    (line 19)
+* ses-rename-cell <1>:                   Nonrelocatable references.
+                                                               (line 11)
+* ses-renarrow-buffer:                   The print area.       (line  6)
+* ses-repair-cell-reference-all:         Advanced Features.    (line 23)
+* ses-reprint-all:                       The print area.       (line  6)
+* ses-set-column-width:                  Resizing.             (line  6)
+* ses-set-header-row:                    Advanced Features.    (line  7)
+* ses-sort-column:                       Sorting by column.    (line  6)
+* ses-sort-column-click:                 Sorting by column.    (line  6)
+* ses-tildefill-span:                    Standard printer functions.
+                                                               (line 24)
+* ses-truncate-cell:                     More on cell printing.
+                                                               (line  6)
+* ses-yank-pop:                          Copy/cut/paste.       (line  6)
+* ses+:                                  Standard formula functions.
+                                                               (line  6)
+* set-mark-command:                      The Basics.           (line  6)
+* supprimer des lignes ou colonnes:      Resizing.             (line  6)
+* synthèses, et détails:                 Spreadsheets with details and summary.
+                                                               (line  6)
+* trier:                                 Sorting by column.    (line  6)
+* tuto:                                  Quick Tutorial.       (line  6)
+* valeurs:                               Formulas.             (line  6)
+* valeurs de cellule:                    Formulas.             (line  6)
+* variables locales-tampon:              Buffer-local variables in spreadsheets.
+                                                               (line  6)
+* virus protection:                      Virus protection.     (line  6)
+* widen:                                 The print area.       (line  6)
+* yank:                                  Copy/cut/paste.       (line  6)
+* yank <1>:                              Uses of advice-add in SES.
+                                                               (line  6)
+* zone d’impression:                     The print area.       (line  6)
+* zone de données:                       The data area.        (line  6)
+
+
+File: ses-fr.info,  Node: Acknowledgments,  Next: GNU Free Documentation License,  Prev: Index,  Up: Top
+
+Remerciements
+*************
+
+Codé par :
+     Jonathan Yavner, Stefan Monnier, Shigeru Fukaya, Vincent Belaïche
+
+Manuel Texinfo de :
+     Jonathan Yavner, Brad Collins, Vincent Belaïche
+
+Idées de :
+     Christoph Conrad, CyberBob, Syver Enstad, Ami Fischman, Thomas
+     Gehrlein, Chris F.A. Johnson, Yusong Li, Juri Linkov, Harald Maier,
+     Alan Nash, François Pinard, Pedro Pinto, Stefan Reichör, Oliver
+     Scholz, Richard M. Stallman, Luc Teirlinck, J. Otto Tennant,
+     Jean-Philippe Theberge, Andrés Ramírez
+
+
+File: ses-fr.info,  Node: GNU Free Documentation License,  Prev: Acknowledgments,  Up: Top
+
+Annexe A GNU Free Documentation License
+***************************************
+
+                     Version 1.3, 3 November 2008
+
+     Copyright © 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc.
+     <https://fsf.org/>
+
+     Everyone is permitted to copy and distribute verbatim copies
+     of this license document, but changing it is not allowed.
+
+  0. PREAMBLE
+
+     The purpose of this License is to make a manual, textbook, or other
+     functional and useful document “free” in the sense of freedom: to
+     assure everyone the effective freedom to copy and redistribute it,
+     with or without modifying it, either commercially or
+     noncommercially.  Secondarily, this License preserves for the
+     author and publisher a way to get credit for their work, while not
+     being considered responsible for modifications made by others.
+
+     This License is a kind of "copyleft", which means that derivative
+     works of the document must themselves be free in the same sense.
+     It complements the GNU General Public License, which is a copyleft
+     license designed for free software.
+
+     We have designed this License in order to use it for manuals for
+     free software, because free software needs free documentation: a
+     free program should come with manuals providing the same freedoms
+     that the software does.  But this License is not limited to
+     software manuals; it can be used for any textual work, regardless
+     of subject matter or whether it is published as a printed book.  We
+     recommend this License principally for works whose purpose is
+     instruction or reference.
+
+  1. APPLICABILITY AND DEFINITIONS
+
+     This License applies to any manual or other work, in any medium,
+     that contains a notice placed by the copyright holder saying it can
+     be distributed under the terms of this License.  Such a notice
+     grants a world-wide, royalty-free license, unlimited in duration,
+     to use that work under the conditions stated herein.  The
+     "Document", below, refers to any such manual or work.  Any member
+     of the public is a licensee, and is addressed as "you".  You accept
+     the license if you copy, modify or distribute the work in a way
+     requiring permission under copyright law.
+
+     A "Modified Version" of the Document means any work containing the
+     Document or a portion of it, either copied verbatim, or with
+     modifications and/or translated into another language.
+
+     A "Secondary Section" is a named appendix or a front-matter section
+     of the Document that deals exclusively with the relationship of the
+     publishers or authors of the Document to the Document's overall
+     subject (or to related matters) and contains nothing that could
+     fall directly within that overall subject.  (Thus, if the Document
+     is in part a textbook of mathematics, a Secondary Section may not
+     explain any mathematics.)  The relationship could be a matter of
+     historical connection with the subject or with related matters, or
+     of legal, commercial, philosophical, ethical or political position
+     regarding them.
+
+     The "Invariant Sections" are certain Secondary Sections whose
+     titles are designated, as being those of Invariant Sections, in the
+     notice that says that the Document is released under this License.
+     If a section does not fit the above definition of Secondary then it
+     is not allowed to be designated as Invariant.  The Document may
+     contain zero Invariant Sections.  If the Document does not identify
+     any Invariant Sections then there are none.
+
+     The "Cover Texts" are certain short passages of text that are
+     listed, as Front-Cover Texts or Back-Cover Texts, in the notice
+     that says that the Document is released under this License.  A
+     Front-Cover Text may be at most 5 words, and a Back-Cover Text may
+     be at most 25 words.
+
+     A "Transparent" copy of the Document means a machine-readable copy,
+     represented in a format whose specification is available to the
+     general public, that is suitable for revising the document
+     straightforwardly with generic text editors or (for images composed
+     of pixels) generic paint programs or (for drawings) some widely
+     available drawing editor, and that is suitable for input to text
+     formatters or for automatic translation to a variety of formats
+     suitable for input to text formatters.  A copy made in an otherwise
+     Transparent file format whose markup, or absence of markup, has
+     been arranged to thwart or discourage subsequent modification by
+     readers is not Transparent.  An image format is not Transparent if
+     used for any substantial amount of text.  A copy that is not
+     "Transparent" is called "Opaque".
+
+     Examples of suitable formats for Transparent copies include plain
+     ASCII without markup, Texinfo input format, LaTeX input format,
+     SGML or XML using a publicly available DTD, and standard-conforming
+     simple HTML, PostScript or PDF designed for human modification.
+     Examples of transparent image formats include PNG, XCF and JPG.
+     Opaque formats include proprietary formats that can be read and
+     edited only by proprietary word processors, SGML or XML for which
+     the DTD and/or processing tools are not generally available, and
+     the machine-generated HTML, PostScript or PDF produced by some word
+     processors for output purposes only.
+
+     The "Title Page" means, for a printed book, the title page itself,
+     plus such following pages as are needed to hold, legibly, the
+     material this License requires to appear in the title page.  For
+     works in formats which do not have any title page as such, "Title
+     Page" means the text near the most prominent appearance of the
+     work's title, preceding the beginning of the body of the text.
+
+     The "publisher" means any person or entity that distributes copies
+     of the Document to the public.
+
+     A section "Entitled XYZ" means a named subunit of the Document
+     whose title either is precisely XYZ or contains XYZ in parentheses
+     following text that translates XYZ in another language.  (Here XYZ
+     stands for a specific section name mentioned below, such as
+     "Acknowledgements", "Dedications", "Endorsements", or "History".)
+     To "Preserve the Title" of such a section when you modify the
+     Document means that it remains a section "Entitled XYZ" according
+     to this definition.
+
+     The Document may include Warranty Disclaimers next to the notice
+     which states that this License applies to the Document.  These
+     Warranty Disclaimers are considered to be included by reference in
+     this License, but only as regards disclaiming warranties: any other
+     implication that these Warranty Disclaimers may have is void and
+     has no effect on the meaning of this License.
+
+  2. VERBATIM COPYING
+
+     You may copy and distribute the Document in any medium, either
+     commercially or noncommercially, provided that this License, the
+     copyright notices, and the license notice saying this License
+     applies to the Document are reproduced in all copies, and that you
+     add no other conditions whatsoever to those of this License.  You
+     may not use technical measures to obstruct or control the reading
+     or further copying of the copies you make or distribute.  However,
+     you may accept compensation in exchange for copies.  If you
+     distribute a large enough number of copies you must also follow the
+     conditions in section 3.
+
+     You may also lend copies, under the same conditions stated above,
+     and you may publicly display copies.
+
+  3. COPYING IN QUANTITY
+
+     If you publish printed copies (or copies in media that commonly
+     have printed covers) of the Document, numbering more than 100, and
+     the Document's license notice requires Cover Texts, you must
+     enclose the copies in covers that carry, clearly and legibly, all
+     these Cover Texts: Front-Cover Texts on the front cover, and
+     Back-Cover Texts on the back cover.  Both covers must also clearly
+     and legibly identify you as the publisher of these copies.  The
+     front cover must present the full title with all words of the title
+     equally prominent and visible.  You may add other material on the
+     covers in addition.  Copying with changes limited to the covers, as
+     long as they preserve the title of the Document and satisfy these
+     conditions, can be treated as verbatim copying in other respects.
+
+     If the required texts for either cover are too voluminous to fit
+     legibly, you should put the first ones listed (as many as fit
+     reasonably) on the actual cover, and continue the rest onto
+     adjacent pages.
+
+     If you publish or distribute Opaque copies of the Document
+     numbering more than 100, you must either include a machine-readable
+     Transparent copy along with each Opaque copy, or state in or with
+     each Opaque copy a computer-network location from which the general
+     network-using public has access to download using public-standard
+     network protocols a complete Transparent copy of the Document, free
+     of added material.  If you use the latter option, you must take
+     reasonably prudent steps, when you begin distribution of Opaque
+     copies in quantity, to ensure that this Transparent copy will
+     remain thus accessible at the stated location until at least one
+     year after the last time you distribute an Opaque copy (directly or
+     through your agents or retailers) of that edition to the public.
+
+     It is requested, but not required, that you contact the authors of
+     the Document well before redistributing any large number of copies,
+     to give them a chance to provide you with an updated version of the
+     Document.
+
+  4. MODIFICATIONS
+
+     You may copy and distribute a Modified Version of the Document
+     under the conditions of sections 2 and 3 above, provided that you
+     release the Modified Version under precisely this License, with the
+     Modified Version filling the role of the Document, thus licensing
+     distribution and modification of the Modified Version to whoever
+     possesses a copy of it.  In addition, you must do these things in
+     the Modified Version:
+
+       A. Use in the Title Page (and on the covers, if any) a title
+          distinct from that of the Document, and from those of previous
+          versions (which should, if there were any, be listed in the
+          History section of the Document).  You may use the same title
+          as a previous version if the original publisher of that
+          version gives permission.
+
+       B. List on the Title Page, as authors, one or more persons or
+          entities responsible for authorship of the modifications in
+          the Modified Version, together with at least five of the
+          principal authors of the Document (all of its principal
+          authors, if it has fewer than five), unless they release you
+          from this requirement.
+
+       C. State on the Title page the name of the publisher of the
+          Modified Version, as the publisher.
+
+       D. Preserve all the copyright notices of the Document.
+
+       E. Add an appropriate copyright notice for your modifications
+          adjacent to the other copyright notices.
+
+       F. Include, immediately after the copyright notices, a license
+          notice giving the public permission to use the Modified
+          Version under the terms of this License, in the form shown in
+          the Addendum below.
+
+       G. Preserve in that license notice the full lists of Invariant
+          Sections and required Cover Texts given in the Document's
+          license notice.
+
+       H. Include an unaltered copy of this License.
+
+       I. Preserve the section Entitled "History", Preserve its Title,
+          and add to it an item stating at least the title, year, new
+          authors, and publisher of the Modified Version as given on the
+          Title Page.  If there is no section Entitled "History" in the
+          Document, create one stating the title, year, authors, and
+          publisher of the Document as given on its Title Page, then add
+          an item describing the Modified Version as stated in the
+          previous sentence.
+
+       J. Preserve the network location, if any, given in the Document
+          for public access to a Transparent copy of the Document, and
+          likewise the network locations given in the Document for
+          previous versions it was based on.  These may be placed in the
+          "History" section.  You may omit a network location for a work
+          that was published at least four years before the Document
+          itself, or if the original publisher of the version it refers
+          to gives permission.
+
+       K. For any section Entitled "Acknowledgements" or "Dedications",
+          Preserve the Title of the section, and preserve in the section
+          all the substance and tone of each of the contributor
+          acknowledgements and/or dedications given therein.
+
+       L. Preserve all the Invariant Sections of the Document, unaltered
+          in their text and in their titles.  Section numbers or the
+          equivalent are not considered part of the section titles.
+
+       M. Delete any section Entitled "Endorsements".  Such a section
+          may not be included in the Modified Version.
+
+       N. Do not retitle any existing section to be Entitled
+          "Endorsements" or to conflict in title with any Invariant
+          Section.
+
+       O. Preserve any Warranty Disclaimers.
+
+     If the Modified Version includes new front-matter sections or
+     appendices that qualify as Secondary Sections and contain no
+     material copied from the Document, you may at your option designate
+     some or all of these sections as invariant.  To do this, add their
+     titles to the list of Invariant Sections in the Modified Version's
+     license notice.  These titles must be distinct from any other
+     section titles.
+
+     You may add a section Entitled "Endorsements", provided it contains
+     nothing but endorsements of your Modified Version by various
+     parties--for example, statements of peer review or that the text
+     has been approved by an organization as the authoritative
+     definition of a standard.
+
+     You may add a passage of up to five words as a Front-Cover Text,
+     and a passage of up to 25 words as a Back-Cover Text, to the end of
+     the list of Cover Texts in the Modified Version.  Only one passage
+     of Front-Cover Text and one of Back-Cover Text may be added by (or
+     through arrangements made by) any one entity.  If the Document
+     already includes a cover text for the same cover, previously added
+     by you or by arrangement made by the same entity you are acting on
+     behalf of, you may not add another; but you may replace the old
+     one, on explicit permission from the previous publisher that added
+     the old one.
+
+     The author(s) and publisher(s) of the Document do not by this
+     License give permission to use their names for publicity for or to
+     assert or imply endorsement of any Modified Version.
+
+  5. COMBINING DOCUMENTS
+
+     You may combine the Document with other documents released under
+     this License, under the terms defined in section 4 above for
+     modified versions, provided that you include in the combination all
+     of the Invariant Sections of all of the original documents,
+     unmodified, and list them all as Invariant Sections of your
+     combined work in its license notice, and that you preserve all
+     their Warranty Disclaimers.
+
+     The combined work need only contain one copy of this License, and
+     multiple identical Invariant Sections may be replaced with a single
+     copy.  If there are multiple Invariant Sections with the same name
+     but different contents, make the title of each such section unique
+     by adding at the end of it, in parentheses, the name of the
+     original author or publisher of that section if known, or else a
+     unique number.  Make the same adjustment to the section titles in
+     the list of Invariant Sections in the license notice of the
+     combined work.
+
+     In the combination, you must combine any sections Entitled
+     "History" in the various original documents, forming one section
+     Entitled "History"; likewise combine any sections Entitled
+     "Acknowledgements", and any sections Entitled "Dedications".  You
+     must delete all sections Entitled "Endorsements."
+
+  6. COLLECTIONS OF DOCUMENTS
+
+     You may make a collection consisting of the Document and other
+     documents released under this License, and replace the individual
+     copies of this License in the various documents with a single copy
+     that is included in the collection, provided that you follow the
+     rules of this License for verbatim copying of each of the documents
+     in all other respects.
+
+     You may extract a single document from such a collection, and
+     distribute it individually under this License, provided you insert
+     a copy of this License into the extracted document, and follow this
+     License in all other respects regarding verbatim copying of that
+     document.
+
+  7. AGGREGATION WITH INDEPENDENT WORKS
+
+     A compilation of the Document or its derivatives with other
+     separate and independent documents or works, in or on a volume of a
+     storage or distribution medium, is called an "aggregate" if the
+     copyright resulting from the compilation is not used to limit the
+     legal rights of the compilation's users beyond what the individual
+     works permit.  When the Document is included in an aggregate, this
+     License does not apply to the other works in the aggregate which
+     are not themselves derivative works of the Document.
+
+     If the Cover Text requirement of section 3 is applicable to these
+     copies of the Document, then if the Document is less than one half
+     of the entire aggregate, the Document's Cover Texts may be placed
+     on covers that bracket the Document within the aggregate, or the
+     electronic equivalent of covers if the Document is in electronic
+     form.  Otherwise they must appear on printed covers that bracket
+     the whole aggregate.
+
+  8. TRANSLATION
+
+     Translation is considered a kind of modification, so you may
+     distribute translations of the Document under the terms of section
+     4.  Replacing Invariant Sections with translations requires special
+     permission from their copyright holders, but you may include
+     translations of some or all Invariant Sections in addition to the
+     original versions of these Invariant Sections.  You may include a
+     translation of this License, and all the license notices in the
+     Document, and any Warranty Disclaimers, provided that you also
+     include the original English version of this License and the
+     original versions of those notices and disclaimers.  In case of a
+     disagreement between the translation and the original version of
+     this License or a notice or disclaimer, the original version will
+     prevail.
+
+     If a section in the Document is Entitled "Acknowledgements",
+     "Dedications", or "History", the requirement (section 4) to
+     Preserve its Title (section 1) will typically require changing the
+     actual title.
+
+  9. TERMINATION
+
+     You may not copy, modify, sublicense, or distribute the Document
+     except as expressly provided under this License.  Any attempt
+     otherwise to copy, modify, sublicense, or distribute it is void,
+     and will automatically terminate your rights under this License.
+
+     However, if you cease all violation of this License, then your
+     license from a particular copyright holder is reinstated (a)
+     provisionally, unless and until the copyright holder explicitly and
+     finally terminates your license, and (b) permanently, if the
+     copyright holder fails to notify you of the violation by some
+     reasonable means prior to 60 days after the cessation.
+
+     Moreover, your license from a particular copyright holder is
+     reinstated permanently if the copyright holder notifies you of the
+     violation by some reasonable means, this is the first time you have
+     received notice of violation of this License (for any work) from
+     that copyright holder, and you cure the violation prior to 30 days
+     after your receipt of the notice.
+
+     Termination of your rights under this section does not terminate
+     the licenses of parties who have received copies or rights from you
+     under this License.  If your rights have been terminated and not
+     permanently reinstated, receipt of a copy of some or all of the
+     same material does not give you any rights to use it.
+
+  10. FUTURE REVISIONS OF THIS LICENSE
+
+     The Free Software Foundation may publish new, revised versions of
+     the GNU Free Documentation License from time to time.  Such new
+     versions will be similar in spirit to the present version, but may
+     differ in detail to address new problems or concerns.  See
+     <https://www.gnu.org/licenses/>.
+
+     Each version of the License is given a distinguishing version
+     number.  If the Document specifies that a particular numbered
+     version of this License "or any later version" applies to it, you
+     have the option of following the terms and conditions either of
+     that specified version or of any later version that has been
+     published (not as a draft) by the Free Software Foundation.  If the
+     Document does not specify a version number of this License, you may
+     choose any version ever published (not as a draft) by the Free
+     Software Foundation.  If the Document specifies that a proxy can
+     decide which future versions of this License can be used, that
+     proxy's public statement of acceptance of a version permanently
+     authorizes you to choose that version for the Document.
+
+  11. RELICENSING
+
+     "Massive Multiauthor Collaboration Site" (or "MMC Site") means any
+     World Wide Web server that publishes copyrightable works and also
+     provides prominent facilities for anybody to edit those works.  A
+     public wiki that anybody can edit is an example of such a server.
+     A "Massive Multiauthor Collaboration" (or "MMC") contained in the
+     site means any set of copyrightable works thus published on the MMC
+     site.
+
+     "CC-BY-SA" means the Creative Commons Attribution-Share Alike 3.0
+     license published by Creative Commons Corporation, a not-for-profit
+     corporation with a principal place of business in San Francisco,
+     California, as well as future copyleft versions of that license
+     published by that same organization.
+
+     "Incorporate" means to publish or republish a Document, in whole or
+     in part, as part of another Document.
+
+     An MMC is "eligible for relicensing" if it is licensed under this
+     License, and if all works that were first published under this
+     License somewhere other than this MMC, and subsequently
+     incorporated in whole or in part into the MMC, (1) had no cover
+     texts or invariant sections, and (2) were thus incorporated prior
+     to November 1, 2008.
+
+     The operator of an MMC Site may republish an MMC contained in the
+     site under CC-BY-SA on the same site at any time before August 1,
+     2009, provided the MMC is eligible for relicensing.
+
+ADDENDUM: How to use this License for your documents
+====================================================
+
+To use this License in a document you have written, include a copy of
+the License in the document and put the following copyright and license
+notices just after the title page:
+
+       Copyright (C)  YEAR  YOUR NAME.
+       Permission is granted to copy, distribute and/or modify this document
+       under the terms of the GNU Free Documentation License, Version 1.3
+       or any later version published by the Free Software Foundation;
+       with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+       Texts.  A copy of the license is included in the section entitled ``GNU
+       Free Documentation License''.
+
+   If you have Invariant Sections, Front-Cover Texts and Back-Cover
+Texts, replace the "with...Texts." line with this:
+
+         with the Invariant Sections being LIST THEIR TITLES, with
+         the Front-Cover Texts being LIST, and with the Back-Cover Texts
+         being LIST.
+
+   If you have Invariant Sections without Cover Texts, or some other
+combination of the three, merge those two alternatives to suit the
+situation.
+
+   If your document contains nontrivial examples of program code, we
+recommend releasing these examples in parallel under your choice of free
+software license, such as the GNU General Public License, to permit
+their use in free software.
+
+
+Tag Table:
+Node: Top907
+Node: Sales Pitch2646
+Node: Quick Tutorial3753
+Node: The Basics9127
+Node: Formulas11459
+Node: Resizing13421
+Node: Printer functions14957
+Node: Various kinds of printer functions15667
+Node: Configuring what printer function applies17312
+Node: Standard printer functions18946
+Node: Local printer functions20089
+Node: Writing a lambda printer function21922
+Node: Clearing cells25641
+Node: Copy/cut/paste26088
+Node: Customizing SES29008
+Node: Advanced Features32612
+Node: The print area34537
+Node: Ranges in formulas35444
+Node: Sorting by column39633
+Node: Standard formula functions40773
+Node: More on cell printing41855
+Node: Import and export45456
+Node: Virus protection46268
+Node: Spreadsheets with details and summary48127
+Node: For Gurus49654
+Node: Deferred updates50090
+Node: Nonrelocatable references52021
+Node: The data area53917
+Node: Buffer-local variables in spreadsheets55734
+Node: Uses of advice-add in SES57623
+Node: Index58407
+Node: Acknowledgments70017
+Node: GNU Free Documentation License70654
+
+End Tag Table
+
+
+Local Variables:
+coding: utf-8
+Info-documentlanguage: fr
+End:

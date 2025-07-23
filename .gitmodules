@@ -10,3 +10,9 @@
 [submodule "custom/dired-preview"]
 	path = custom/dired-preview
 	url = https://github.com/protesilaos/dired-preview
+[submodule "custom/taxy"]
+	path = custom/taxy
+	url = https://github.com/alphapapa/taxy.el
+[submodule "custom/google-maps"]
+	path = custom/google-maps
+	url = https://github.com/jd/google-maps.el

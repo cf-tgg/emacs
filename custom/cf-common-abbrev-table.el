@@ -1,6 +1,6 @@
 ;;; cf-common-abbrev-table.el --- Common Abbrevs -*- lexical-binding: t; -*-
 
-;; Time-stamp: <2025-07-19 00:04:21 cf>
+;; Time-stamp: <2025-07-22 20:38:33 cf>
 ;; Box: [Linux 6.15.6-zen1-1-zen x86_64 GNU/Linux]
 
 ;; Copyright (C) 2025 cf dot gg
@@ -169,11 +169,13 @@ making an abbreviation to a function."
     (insert (format "#+date: %s\n" (format-time-string "<%F %H:%M>")))
     (insert "\n")
     (save-buffer)))
-(define-abbrev org-mode-abbrev-table "elhd" "" #'abrv/insert-org-header)
 
 (defun abrv/insert-end-src-block ()
   (insert "#+end_src\n\n#+begin_src "))
-(define-abbrev org-mode-abbrev-table  "jj" "" #'abrv/insert-end-src-block)
+
+(with-eval-after-load 'org
+  (define-abbrev org-mode-abbrev-table "elhd" "" #'abrv/insert-org-header)
+  (define-abbrev org-mode-abbrev-table  "jj" "" #'abrv/insert-end-src-block))
 
 ;;; emacs-lisp-mode
 
@@ -231,12 +233,10 @@ If at end of buffer, inserts a newline before moving to next line."
 (defun abrv/insert-shebang ()
   "Insert standard sh-mode header."
   (insert "#!/bin/sh\n# -*- mode: sh; -*- vim: ft=sh:ts=2:sw=2:norl:et:\n# Time-stamp: <>\n# Box: \n"))
-(define-abbrev sh-mode-abbrev-table "shb" "" #'abrv/insert-shebang)
 
 (defun abrv/insert-sh-pkg ()
   "Insert standard sh-mode package header."
   (insert "#  Copyright (C) 2025 cf dot gg\n\n#  Author: cf <cf.gg.tty@protonmail.com>\n#  Github: <https://github.com/cf-tgg/>\n#  Gitlab: <https://gitlab.com/cf-gg/>\n#  Codeberg: <https://codeberg.org/cfggtty/>\n#  Version: 0.1.0\n\n"))
-(define-abbrev sh-mode-abbrev-table "shpkg" "" #'abrv/insert-sh-pkg)
 
 (defun abrv/insert-usage ()
   "Insert a standard POSIX shell usage() function with heredoc formatting."
@@ -267,7 +267,6 @@ If at end of buffer, inserts a newline before moving to next line."
       "")
     "\n"))
 (delete-char))
-(define-abbrev sh-mode-abbrev-table "helpfn" "" #'abrv/insert-usage)
 
 (defun abrv/insert-getopts ()
   "Insert a standard POSIX shell usage() function with heredoc formatting."
@@ -284,7 +283,12 @@ If at end of buffer, inserts a newline before moving to next line."
       "shift $((OPTIND-1))"
       "")
     "\n")))
-(define-abbrev sh-mode-abbrev-table "gopts" "" #'abrv/insert-getopts)
+
+(with-eval-after-load 'sh-mode
+  (define-abbrev sh-mode-abbrev-table "shb" "" #'abrv/insert-shebang)
+  (define-abbrev sh-mode-abbrev-table "shpkg" "" #'abrv/insert-sh-pkg)
+  (define-abbrev sh-mode-abbrev-table "helpfn" "" #'abrv/insert-usage)
+  (define-abbrev sh-mode-abbrev-table "gopts" "" #'abrv/insert-getopts))
 
 (defun cf/simple-get-word ()
   (car-safe (save-excursion (ispell-get-word nil))))

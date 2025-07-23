@@ -1,7 +1,8 @@
-This is doc42NEVp.info, produced by makeinfo version 6.8 from
+This is company.info, produced by makeinfo version 7.2 from
 company.texi.
 
-This user manual is for Company version 1.0.0 (21 September 2024).
+This user manual is for Company version 1.0.3-snapshot
+(7 December 2024).
 
 Copyright © 2021-2024 Free Software Foundation, Inc.
 
@@ -15,7 +16,7 @@ START-INFO-DIR-ENTRY
 END-INFO-DIR-ENTRY
 
 
-File: doc42NEVp.info,  Node: Top,  Next: Overview,  Up: (dir)
+File: company.info,  Node: Top,  Next: Overview,  Up: (dir)
 
 Company
 *******
@@ -26,7 +27,8 @@ The goal of this document is to lay out the foundational knowledge of
 the package, so that the readers of the manual could competently start
 adapting Company to their needs and preferences.
 
-This user manual is for Company version 1.0.0 (21 September 2024).
+This user manual is for Company version 1.0.3-snapshot
+(7 December 2024).
 
 Copyright © 2021-2024 Free Software Foundation, Inc.
 
@@ -45,7 +47,7 @@ Copyright © 2021-2024 Free Software Foundation, Inc.
 * Troubleshooting:: When Something Goes Wrong
 * Index::
 
-— The Detailed Node Listing —
+-- The Detailed Node Listing --
 
 Overview
 
@@ -80,9 +82,8 @@ Backends
 * Package Backends::
 * Candidates Post-Processing::
 
-
 
-File: doc42NEVp.info,  Node: Overview,  Next: Getting Started,  Prev: Top,  Up: Top
+File: company.info,  Node: Overview,  Next: Getting Started,  Prev: Top,  Up: Top
 
 1 Overview
 **********
@@ -99,7 +100,7 @@ writers, and scientists during code and text writing.
 * Structure::
 
 
-File: doc42NEVp.info,  Node: Terminology,  Next: Structure,  Up: Overview
+File: company.info,  Node: Terminology,  Next: Structure,  Up: Overview
 
 1.1 Terminology
 ===============
@@ -120,13 +121,13 @@ configurable through the user option ‘completion-styles’, which see.
 For illustrations on how Company visualizes the matches, *note
 Frontends::.
 
-The package’s name ‘Company’ is based on the combination of the two
-words: ‘Complete’ and ‘Anything’.  These words reflect the package’s
+The package's name ‘Company’ is based on the combination of the two
+words: ‘Complete’ and ‘Anything’.  These words reflect the package's
 commitment to handling completion candidates and its extensible nature
 allowing it to cover a wide range of usage scenarios.
 
 
-File: doc42NEVp.info,  Node: Structure,  Prev: Terminology,  Up: Overview
+File: company.info,  Node: Structure,  Prev: Terminology,  Up: Overview
 
 1.2 Structure
 =============
@@ -152,15 +153,15 @@ commands for the user to operate with.  For more details, *note
 Customization:: and *note Commands::.
 
 Also, Company is bundled with an alternative workflow configuration
-“company-tng” — defining ‘company-tng-frontend’, ‘company-tng-mode’, and
-‘company-tng-map’ — that allows performing completion with just <TAB>.
-To enable this configuration, add the following line to the Emacs
-initialization file (*note (emacs)Init File::):
+“company-tng” -- defining ‘company-tng-frontend’, ‘company-tng-mode’,
+and ‘company-tng-map’ -- that allows performing completion with just
+<TAB>.  To enable this configuration, add the following line to the
+Emacs initialization file (*note (emacs)Init File::):
 
      (add-hook 'after-init-hook 'company-tng-mode)
 
 
-File: doc42NEVp.info,  Node: Getting Started,  Next: Customization,  Prev: Overview,  Up: Top
+File: company.info,  Node: Getting Started,  Next: Customization,  Prev: Overview,  Up: Top
 
 2 Getting Started
 *****************
@@ -175,7 +176,7 @@ This chapter provides basic instructions for Company setup and usage.
 * Commands::
 
 
-File: doc42NEVp.info,  Node: Installation,  Next: Initial Setup,  Up: Getting Started
+File: company.info,  Node: Installation,  Next: Initial Setup,  Up: Getting Started
 
 2.1 Installation
 ================
@@ -187,7 +188,7 @@ form of both stable and development releases.  To install Company, type
 For more details on Emacs package archives, *note (emacs)Packages::.
 
 
-File: doc42NEVp.info,  Node: Initial Setup,  Next: Usage Basics,  Prev: Installation,  Up: Getting Started
+File: company.info,  Node: Initial Setup,  Next: Usage Basics,  Prev: Installation,  Up: Getting Started
 
 2.2 Initial Setup
 =================
@@ -209,12 +210,12 @@ To have Company always enabled for the following sessions, add the line
 (emacs)Init File::).
 
 
-File: doc42NEVp.info,  Node: Usage Basics,  Next: Commands,  Prev: Initial Setup,  Up: Getting Started
+File: company.info,  Node: Usage Basics,  Next: Commands,  Prev: Initial Setup,  Up: Getting Started
 
 2.3 Usage Basics
 ================
 
-By default — having _company-mode_ enabled (*note Initial Setup::) — a
+By default -- having _company-mode_ enabled (*note Initial Setup::) -- a
 tooltip with completion candidates is shown when the user types a few
 characters.
 
@@ -226,7 +227,7 @@ respectively key bindings ‘C-n’ and ‘C-p’, then do one of the following:
    • Hit <RET> to choose a selected candidate for completion.
 
    • Hit <TAB> to expand the “common part” of all completions.  Exactly
-     what that means, can vary by backend.  In the simplest case it’s
+     what that means, can vary by backend.  In the simplest case it's
      the longest string that all completion start with, but when a
      backend returns _non-prefix matches_, it can implement the same
      kind of expansion logic for the input string.
@@ -234,7 +235,7 @@ respectively key bindings ‘C-n’ and ‘C-p’, then do one of the following:
    • Hit ‘C-g’ to stop activity of Company.
 
 
-File: doc42NEVp.info,  Node: Commands,  Prev: Usage Basics,  Up: Getting Started
+File: company.info,  Node: Commands,  Prev: Usage Basics,  Up: Getting Started
 
 2.4 Commands
 ============
@@ -255,11 +256,15 @@ commands of the out-of-the-box Company.
 ‘RET’
 ‘<return>’
      Insert the selected candidate (‘company-complete-selection’).
+     Restart completion if a new field is entered.
 
 ‘TAB’
 ‘<tab>’
-     Insert the _common part_ of all completion candidates
-     (‘company-complete-common’).
+     Insert the _common part_ of all completion candidates or -- if no
+     _common part_ is present -- select the next candidate
+     (‘company-complete-common-or-cycle’).  In the latter case,
+     wraparound is implicitly enabled (*note
+     company-selection-wrap-around::).
 
 ‘C-g’
 ‘<ESC ESC ESC>’
@@ -287,17 +292,8 @@ illustrate how to assign key bindings to such commands.
      (global-set-key (kbd "<tab>") #'company-indent-or-complete-common)
 
      (with-eval-after-load 'company
-       (define-key company-active-map (kbd "M-/") #'company-complete))
-
-     (with-eval-after-load 'company
-       (define-key company-active-map
-                   (kbd "TAB")
-                   #'company-complete-common-or-cycle)
-       (define-key company-active-map
-                   (kbd "<backtab>")
-                   (lambda ()
-                     (interactive)
-                     (company-complete-common-or-cycle -1))))
+       (define-key company-active-map (kbd "M-/") #'company-complete)
+       (define-key company-active-map (kbd "C-M-/") #'company-complete-common))
 
 In the same manner, an additional key can be assigned to a command or a
 command can be unbound from a key.  For instance:
@@ -313,7 +309,7 @@ utilize ‘M-x describe-keymap <RET> company-active-map’ or
 ‘C-h f <RET> company-mode’.
 
 
-File: doc42NEVp.info,  Node: Customization,  Next: Frontends,  Prev: Getting Started,  Up: Top
+File: company.info,  Node: Customization,  Next: Frontends,  Prev: Getting Started,  Up: Top
 
 3 Customization
 ***************
@@ -330,7 +326,7 @@ approaches.
 * Configuration File::
 
 
-File: doc42NEVp.info,  Node: Customization Interface,  Next: Configuration File,  Up: Customization
+File: company.info,  Node: Customization Interface,  Next: Configuration File,  Up: Customization
 
 3.1 Customization Interface
 ===========================
@@ -346,7 +342,7 @@ For instructions on how to change the settings, *note (emacs)Changing a
 Variable::.
 
 
-File: doc42NEVp.info,  Node: Configuration File,  Prev: Customization Interface,  Up: Customization
+File: company.info,  Node: Configuration File,  Prev: Customization Interface,  Up: Customization
 
 3.2 Configuration File
 ======================
@@ -363,7 +359,7 @@ core settings that influence its overall behavior.
      than the default value of ‘3’.
 
  -- User Option: company-idle-delay
-     This is the second of the options that configure Company’s
+     This is the second of the options that configure Company's
      auto-start behavior (together with
      ‘company-minimum-prefix-length’).  The value of this option defines
      how fast Company is going to react to the typed input, such that
@@ -393,7 +389,7 @@ core settings that influence its overall behavior.
           (setq company-global-modes '(not erc-mode message-mode eshell-mode))
 
  -- User Option: company-selection-wrap-around
-     Enable this option to loop (cycle) the candidates’ selection: after
+     Enable this option to loop (cycle) the candidates' selection: after
      selecting the last candidate on the list, a command to select the
      next candidate does so with the first candidate.  By default, this
      option is disabled, which means the selection of the next candidate
@@ -401,7 +397,7 @@ core settings that influence its overall behavior.
      influenced by this option similarly.
 
  -- User Option: company-require-match
-     To allow typing in characters that don’t match the candidates, set
+     To allow typing in characters that don't match the candidates, set
      the value of this option to ‘nil’.  For an opposite behavior (that
      is, to disallow non-matching input), set it to ‘t’.  By default,
      Company is configured to require a matching input only if the user
@@ -446,7 +442,7 @@ Company exposes the following life-cycle hooks:
  -- User Option: company-after-completion-hook
 
 
-File: doc42NEVp.info,  Node: Frontends,  Next: Backends,  Prev: Customization,  Up: Top
+File: company.info,  Node: Frontends,  Next: Backends,  Prev: Customization,  Up: Top
 
 4 Frontends
 ***********
@@ -475,7 +471,7 @@ displayed candidates can be searched, filtered, and quick-accessed.
 * Quick Access a Candidate::
 
 
-File: doc42NEVp.info,  Node: Tooltip Frontends,  Next: Preview Frontends,  Up: Frontends
+File: company.info,  Node: Tooltip Frontends,  Next: Preview Frontends,  Up: Frontends
 
 4.1 Tooltip Frontends
 =====================
@@ -487,7 +483,7 @@ listed below.
  -- Function: company-pseudo-tooltip-unless-just-one-frontend
      This is one of the default frontends.  It starts displaying a
      tooltip only if more than one completion candidate is available,
-     which nicely combines — and it is done so by default — with
+     which nicely combines -- and it is done so by default -- with
      ‘company-preview-if-just-one-frontend’, *note Preview Frontends::.
 
  -- Function: company-pseudo-tooltip-frontend
@@ -535,10 +531,10 @@ user options.
 
           (setq company-tooltip-align-annotations t)
 
-          [image src="./images/small/tooltip-annotations.png" ]
+                 [./images/small/tooltip-annotations]
 
  -- User Option: company-tooltip-annotation-padding
-     Adds left padding to the candidates’ annotations.  It is disabled
+     Adds left padding to the candidates' annotations.  It is disabled
      by default.  If ‘company-tooltip-align-annotations’ is enabled,
      ‘company-tooltip-annotation-padding’ defines the minimum spacing
      between a candidate and annotation, with the default value of 1.
@@ -548,12 +544,12 @@ user options.
  -- User Option: company-tooltip-limit
      Controls the maximum number of the candidates shown simultaneously
      in the tooltip (the default value is ‘10’).  When the number of the
-     available candidates is larger than this option’s value, Company
+     available candidates is larger than this option's value, Company
      paginates the results.
 
           (setq company-tooltip-limit 4)
 
-             [image src="./images/small/tooltip-limit.png" ]
+                    [./images/small/tooltip-limit]
 
  -- User Option: company-tooltip-offset-display
      Use this option to choose in which way to output paginated results.
@@ -563,7 +559,7 @@ user options.
 
           (setq company-tooltip-offset-display 'lines)
 
-         [image src="./images/small/tooltip-offset-display.png" ]
+                [./images/small/tooltip-offset-display]
 
  -- User Option: company-tooltip-minimum
      This user option acts only when a tooltip is shown close to the
@@ -575,10 +571,10 @@ user options.
 
           (setq company-tooltip-minimum 4)
 
-         [image src="./images/small/tooltip-minimum-below.png" ]
+                [./images/small/tooltip-minimum-below]
 
 
-         [image src="./images/small/tooltip-minimum-above.png" ]
+                [./images/small/tooltip-minimum-above]
 
  -- User Option: company-tooltip-flip-when-above
      When this setting is enabled, no matter if a tooltip is shown above
@@ -589,7 +585,7 @@ user options.
 
           (setq company-tooltip-flip-when-above t)
 
-              [image src="./images/small/tooltip-flip.png" ]
+                     [./images/small/tooltip-flip]
 
  -- User Option: company-tooltip-minimum-width
      Sets the minimum width of a tooltip, excluding the margins and the
@@ -620,12 +616,12 @@ user options.
 
           (setq company-tooltip-margin 3)
 
-             [image src="./images/small/tooltip-margin.png" ]
+                    [./images/small/tooltip-margin]
 
 Candidates Icons
 ----------------
 
-An “icon” is an image or a text that represents a candidate’s kind; it
+An “icon” is an image or a text that represents a candidate's kind; it
 is displayed in front of a candidate.  The term “kind” here stands for a
 high-level category a candidate fits into.  (Such as ‘array’,
 ‘function’, ‘file’, ‘string’, ‘color’, etc.  For an extended list of the
@@ -634,7 +630,7 @@ the variable ‘company-vscode-icons-mapping’.)
 
  -- User Option: company-format-margin-function
      Allows setting a function to format the left margin of a tooltip
-     inner area; namely, to output candidate’s _icons_.  The predefined
+     inner area; namely, to output candidate's _icons_.  The predefined
      formatting functions are listed below.  The user may also set this
      option to a custom function.  To disable left margin formatting,
      set the value of the option to ‘nil’ (this way control over the
@@ -647,27 +643,27 @@ the variable ‘company-vscode-icons-mapping’.)
      The related two user options are ‘company-icon-size’ and
      ‘company-icon-margin’.
 
-          [image src="./images/small/tooltip-icons-vscode.png" ]
+                 [./images/small/tooltip-icons-vscode]
 
  -- Function: company-text-icons-margin
      This function produces letters and symbols formatted according to
      the ‘company-text-icons-format’.  The rest of the user options
      affecting this function behavior are listed below.
 
-           [image src="./images/small/tooltip-icons-text.png" ]
+                  [./images/small/tooltip-icons-text]
 
  -- Function: company-dot-icons-margin
      This function produces a colored Unicode symbol of a circle
      formatted according to the ‘company-dot-icons-format’.  Other user
      options that affect the resulting output are listed below.
 
-           [image src="./images/small/tooltip-icons-dot.png" ]
+                  [./images/small/tooltip-icons-dot]
 
 The following user options influence appearance of the _text_ and _dot_
 _icons_.
 
  -- User Option: company-text-icons-mapping
-     Lists candidates’ _kinds_ with their corresponding _icons_
+     Lists candidates' _kinds_ with their corresponding _icons_
      configurations.
 
  -- User Option: company-text-face-extra-attributes
@@ -676,16 +672,16 @@ _icons_.
           (setq company-text-face-extra-attributes
                 '(:weight bold :slant italic))
 
-           [image src="./images/small/tooltip-icon-face.png" ]
+                  [./images/small/tooltip-icon-face]
 
  -- User Option: company-text-icons-add-background
-     If this option is enabled, when an _icon_ doesn’t have a background
+     If this option is enabled, when an _icon_ doesn't have a background
      configured by ‘company-text-icons-mapping’, then a generated
      background is applied.
 
           (setq company-text-icons-add-background t)
 
-            [image src="./images/small/tooltip-icon-bg.png" ]
+                   [./images/small/tooltip-icon-bg]
 
  -- Function: company-detect-icons-margin
      This is the default margin formatting function, that applies one of
@@ -699,8 +695,8 @@ Faces
 Out-of-the-box Company defines and configures distinguished faces (*note
 (emacs)Faces::) for light and dark themes.  Moreover, some of the
 built-in and third-party themes fine-tune Company to fit their palettes.
-That is why there’s often no real need to make such adjustments on the
-user’s side.  However, this chapter presents some hints on where to
+That is why there's often no real need to make such adjustments on the
+user's side.  However, this chapter presents some hints on where to
 start customizing Company interface.
 
 Namely, the look of a tooltip is controlled by the ‘company-tooltip*’
@@ -719,7 +715,7 @@ customization:
       '(company-scrollbar-bg ((t (:background "ivory2"))))
       '(company-tooltip-annotation ((t (:foreground "MistyRose2")))))
 
-          [image src="./images/small/tooltip-faces-light.png" ]
+                 [./images/small/tooltip-faces-light]
 
    ---------- Footnotes ----------
 
@@ -729,7 +725,7 @@ image-types’.  Before compiling Emacs, make sure ‘librsvg’ is installed
 on your system.
 
 
-File: doc42NEVp.info,  Node: Preview Frontends,  Next: Echo Frontends,  Prev: Tooltip Frontends,  Up: Frontends
+File: company.info,  Node: Preview Frontends,  Next: Echo Frontends,  Prev: Tooltip Frontends,  Up: Frontends
 
 4.2 Preview Frontends
 =====================
@@ -757,10 +753,10 @@ The look of the preview is controlled by the following faces:
 ‘company-preview’, ‘company-preview-common’, and
 ‘company-preview-search’.
 
-             [image src="./images/small/preview-light.png" ]
+                    [./images/small/preview-light]
 
 
-              [image src="./images/small/preview-dark.png" ]
+                     [./images/small/preview-dark]
 
    ---------- Footnotes ----------
 
@@ -768,12 +764,12 @@ The look of the preview is controlled by the following faces:
 Terminology::) may be shown in full after point.
 
 
-File: doc42NEVp.info,  Node: Echo Frontends,  Next: Candidates Search,  Prev: Preview Frontends,  Up: Frontends
+File: company.info,  Node: Echo Frontends,  Next: Candidates Search,  Prev: Preview Frontends,  Up: Frontends
 
 4.3 Echo Frontends
 ==================
 
-The frontends listed in this section display information in the Emacs’s
+The frontends listed in this section display information in the Emacs's
 echo area, *note (emacs)Echo Area::.
 
  -- Function: company-echo-metadata-frontend
@@ -781,10 +777,10 @@ echo area, *note (emacs)Echo Area::.
      responsibility is to output a short documentation string for a
      completion candidate in the echo area.
 
-               [image src="./images/small/echo-meta.png" ]
+                      [./images/small/echo-meta]
 
 
-The last pair of the built-in frontends isn’t that commonly used and not
+The last pair of the built-in frontends isn't that commonly used and not
 as full-featured as the previously reviewed _tooltip-_ and _preview-_
 frontends, but still, feel free to play with them and have some fun!
 
@@ -792,13 +788,13 @@ frontends, but still, feel free to play with them and have some fun!
      This frontend outputs all the available completion candidates in
      the echo area.
 
-                  [image src="./images/small/echo.png" ]
+                         [./images/small/echo]
 
  -- Function: company-echo-strip-common-frontend
      It acts similarly to the previous frontend but outputs a common
      part of the candidates once for all of them.
 
-               [image src="./images/small/echo-strip.png" ]
+                      [./images/small/echo-strip]
 
  -- User Option: company-echo-truncate-lines
      This is the only _echo frontends_ targeted setting.  When enabled,
@@ -809,7 +805,7 @@ To apply visual changes to the output of these frontends, configure the
 faces ‘company-echo’ and ‘company-echo-common’.
 
 
-File: doc42NEVp.info,  Node: Candidates Search,  Next: Filter Candidates,  Prev: Echo Frontends,  Up: Frontends
+File: company.info,  Node: Candidates Search,  Next: Filter Candidates,  Prev: Echo Frontends,  Up: Frontends
 
 4.4 Candidates Search
 =====================
@@ -817,7 +813,7 @@ File: doc42NEVp.info,  Node: Candidates Search,  Next: Filter Candidates,  Prev:
 By default, when _company-mode_ is in action, a key binding ‘C-s’ starts
 looking for matches to additionally typed characters among the displayed
 candidates.  When a search is initiated, an indicator
-‘Search: CHARACTERS’ is shown in the Emacs’s mode line.
+‘Search: CHARACTERS’ is shown in the Emacs's mode line.
 
 To quit the search mode, hit ‘C-g’.
 
@@ -841,10 +837,10 @@ To quit the search mode, hit ‘C-g’.
 Search matches are distinguished by the ‘company-tooltip-search’ and
 ‘company-tooltip-search-selection’ faces.
 
-             [image src="./images/small/tooltip-search.png" ]
+                    [./images/small/tooltip-search]
 
 
-File: doc42NEVp.info,  Node: Filter Candidates,  Next: Quick Access a Candidate,  Prev: Candidates Search,  Up: Frontends
+File: company.info,  Node: Filter Candidates,  Next: Quick Access a Candidate,  Prev: Candidates Search,  Up: Frontends
 
 4.5 Filter Candidates
 =====================
@@ -860,10 +856,10 @@ face).
 To quit the filtering, hit ‘C-g’.  To toggle between search and filter
 states, use key binding ‘C-o’.
 
-             [image src="./images/small/tooltip-filter.png" ]
+                    [./images/small/tooltip-filter]
 
 
-File: doc42NEVp.info,  Node: Quick Access a Candidate,  Prev: Filter Candidates,  Up: Frontends
+File: company.info,  Node: Quick Access a Candidate,  Prev: Filter Candidates,  Up: Frontends
 
 4.6 Quick Access a Candidate
 ============================
@@ -879,13 +875,13 @@ frontends show quick-access hints.
 
      (setq company-show-quick-access 'left)
 
-          [image src="./images/small/tooltip-quick-access.png" ]
+                 [./images/small/tooltip-quick-access]
 
 
-                [image src="./images/small/echo-qa.png" ]
+                       [./images/small/echo-qa]
 
 
-             [image src="./images/small/echo-strip-qa.png" ]
+                    [./images/small/echo-strip-qa]
 
 To customize the key bindings, either do it via Customization Interface
 (*note Customization Interface::) or use the following approach:
@@ -906,10 +902,10 @@ how to change quick-access hints faces.
       '(company-tooltip-quick-access-selection
         ((t (:foreground "pink1" :slant italic)))))
 
-         [image src="./images/small/tooltip-qa-faces-light.png" ]
+                [./images/small/tooltip-qa-faces-light]
 
 
-File: doc42NEVp.info,  Node: Backends,  Next: Troubleshooting,  Prev: Frontends,  Up: Top
+File: company.info,  Node: Backends,  Next: Troubleshooting,  Prev: Frontends,  Up: Top
 
 5 Backends
 **********
@@ -936,7 +932,7 @@ concepts are described in this user manual too.
 * Candidates Post-Processing::
 
 
-File: doc42NEVp.info,  Node: Backends Usage Basics,  Next: Grouped Backends,  Up: Backends
+File: company.info,  Node: Backends Usage Basics,  Next: Grouped Backends,  Up: Backends
 
 5.1 Backends Usage Basics
 =========================
@@ -972,7 +968,7 @@ can be assigned to key bindings, for example:
 Backends::.
 
 
-File: doc42NEVp.info,  Node: Grouped Backends,  Next: Package Backends,  Prev: Backends Usage Basics,  Up: Backends
+File: company.info,  Node: Grouped Backends,  Next: Package Backends,  Prev: Backends Usage Basics,  Up: Backends
 
 5.2 Grouped Backends
 ====================
@@ -1008,7 +1004,7 @@ example:
      (setq company-backends '((company-capf :with company-yasnippet)))
 
 
-File: doc42NEVp.info,  Node: Package Backends,  Next: Candidates Post-Processing,  Prev: Grouped Backends,  Up: Backends
+File: company.info,  Node: Package Backends,  Next: Candidates Post-Processing,  Prev: Grouped Backends,  Up: Backends
 
 5.3 Package Backends
 ====================
@@ -1019,7 +1015,7 @@ roughly outlined groups of the backends.
 
 Some of the backends expose user options for customization; a few of
 these options are introduced below.  For those who would like to fetch
-the full list of a backend’s user options, we suggest doing one of the
+the full list of a backend's user options, we suggest doing one of the
 following:
 
    • Execute command ‘M-x customize-group <RET> <backend-name>’.
@@ -1038,13 +1034,13 @@ following:
 * Template Expansion::
 
 
-File: doc42NEVp.info,  Node: Code Completion,  Next: Text Completion,  Up: Package Backends
+File: company.info,  Node: Code Completion,  Next: Text Completion,  Up: Package Backends
 
 5.3.1 Code Completion
 ---------------------
 
  -- Function: company-capf
-     The current trend in the Emacs’s world is to delegate completion
+     The current trend in the Emacs's world is to delegate completion
      logic to the hook ‘completion-at-point-functions’ (CAPF) assigned
      to by the major or minor modes.  It supports a common subset of
      features which is well-supported across different completion UIs.
@@ -1066,8 +1062,8 @@ File: doc42NEVp.info,  Node: Code Completion,  Next: Text Completion,  Up: Packa
  -- User Option: company-capf-disabled-functions
      List of completion functions which should be ignored by this
      backend.  By default it contains the functions that duplicate the
-     built-in backends but don’t support the corresponding configuration
-     options and/or alter the intended priority of the default backends’
+     built-in backends but don't support the corresponding configuration
+     options and/or alter the intended priority of the default backends'
      configuration.
 
  -- Function: company-dabbrev-code
@@ -1116,7 +1112,7 @@ File: doc42NEVp.info,  Node: Code Completion,  Next: Text Completion,  Up: Packa
      interface of the program ‘clang’, but without any advanced caching
      across calls, or automatic detection of the project structure.
      Which makes it more suitable for small to medium projects,
-     especially if you’re willing to customize
+     especially if you're willing to customize
      ‘company-clang-arguments’.  Otherwise we recommend using one of the
      LSP clients available for Emacs, together with the backend
      ‘company-capf’.
@@ -1140,7 +1136,7 @@ File: doc42NEVp.info,  Node: Code Completion,  Next: Text Completion,  Up: Packa
      program _etags_, *note (emacs)Tags Tables::.
 
  -- User Option: company-etags-ignore-case
-     Non-nil to ignore case in this backend’s completions.
+     Non-nil to ignore case in this backend's completions.
 
  -- User Option: company-etags-everywhere
      Non-nil to offer completions in comments and strings.  It can also
@@ -1153,7 +1149,7 @@ File: doc42NEVp.info,  Node: Code Completion,  Next: Text Completion,  Up: Packa
      completion styles with this backend.  The default value is nil.
 
 
-File: doc42NEVp.info,  Node: Text Completion,  Next: File Name Completion,  Prev: Code Completion,  Up: Package Backends
+File: company.info,  Node: Text Completion,  Next: File Name Completion,  Prev: Code Completion,  Up: Package Backends
 
 5.3.2 Text Completion
 ---------------------
@@ -1162,7 +1158,7 @@ File: doc42NEVp.info,  Node: Text Completion,  Next: File Name Completion,  Prev
      This backend works similarly to the built-in Emacs package
      _dabbrev_, searching for completion candidates inside the contents
      of the open buffer(s).  It is one of the often used backends, and
-     it has several interesting options for configuration.  Let’s review
+     it has several interesting options for configuration.  Let's review
      a few of them.
 
       -- User Option: company-dabbrev-minimum-length
@@ -1205,7 +1201,7 @@ File: doc42NEVp.info,  Node: Text Completion,  Next: File Name Completion,  Prev
           ‘nil’, ‘Enjoy’ is suggested as a completion candidate for the
           typed ‘Enj’ letters, but not for ‘enj’.  When the option is
           set to ‘t’, ‘Enjoy’ is suggested as a candidate for both ‘Enj’
-          and ‘enj’ input; note that ‘enj’ prefix is “overwritten” by
+          and ‘enj’ input; note that ‘enj’ prefix is "overwritten" by
           completing with the ‘Enjoy’ candidate.  The third, default,
           type of behavior solves this issue, keeping the case of the
           typed prefix (and still collecting candidates
@@ -1224,7 +1220,7 @@ File: doc42NEVp.info,  Node: Text Completion,  Next: File Name Completion,  Prev
           being suggested.  When the option is set to ‘t’, the
           down-cased candidate ‘enjoy’ is suggested.  By default, this
           option is set to ‘case-replace’, meaning taking a value of the
-          Emacs’s variable ‘case-replace’ (‘t’ is the current default).
+          Emacs's variable ‘case-replace’ (‘t’ is the current default).
 
 
  -- Function: company-ispell
@@ -1234,14 +1230,14 @@ File: doc42NEVp.info,  Node: Text Completion,  Next: File Name Completion,  Prev
      _Ispell_ uses only one dictionary at a time (combining several
      dictionaries into one file is an accepted practice).  By default,
      _company-ispell_ suggests candidates from a dictionary specified by
-     the Emacs’s setting ‘ispell-complete-word-dict’.
+     the Emacs's setting ‘ispell-complete-word-dict’.
 
       -- User Option: company-ispell-dictionary
           Optionally, set a file path for _company-ispell_ to use
           another dictionary.
 
 
-File: doc42NEVp.info,  Node: File Name Completion,  Next: Template Expansion,  Prev: Text Completion,  Up: Package Backends
+File: company.info,  Node: File Name Completion,  Next: Template Expansion,  Prev: Text Completion,  Up: Package Backends
 
 5.3.3 File Name Completion
 --------------------------
@@ -1255,7 +1251,7 @@ File: doc42NEVp.info,  Node: File Name Completion,  Next: Template Expansion,  P
       -- User Option: company-files-exclusions
           It may be desirable to exclude directories or files from the
           list of suggested completion candidates.  For example,
-          someone’s setup might look this way:
+          someone's setup might look this way:
 
                (setq company-files-exclusions '(".git/" ".DS_Store"))
 
@@ -1274,7 +1270,7 @@ File: doc42NEVp.info,  Node: File Name Completion,  Next: Template Expansion,  P
           directory.
 
 
-File: doc42NEVp.info,  Node: Template Expansion,  Prev: File Name Completion,  Up: Package Backends
+File: company.info,  Node: Template Expansion,  Prev: File Name Completion,  Up: Package Backends
 
 5.3.4 Template Expansion
 ------------------------
@@ -1294,21 +1290,47 @@ File: doc42NEVp.info,  Node: Template Expansion,  Prev: File Name Completion,  U
      system YASnippet (https://github.com/joaotavora/yasnippet).
 
 
-File: doc42NEVp.info,  Node: Candidates Post-Processing,  Prev: Package Backends,  Up: Backends
+File: company.info,  Node: Candidates Post-Processing,  Prev: Package Backends,  Up: Backends
 
 5.4 Candidates Post-Processing
 ==============================
 
-A list of completion candidates, supplied by a backend, can be
-additionally manipulated (reorganized, reduced, sorted, etc) before its
-output.  This is done by adding a processing function name to the user
-option ‘company-transformers’ list, for example:
+A list of completion candidates supplied by backends can be manipulated
+before output: reorganized, reduced, sorted, etc.  To apply adjustments,
+add a processing function name to the user option ‘company-transformers’
+list.
 
+The transformer functions are called in a sequence, each with the return
+value of the previous one.  The first function receives a sorted list of
+distinct completion candidates.  Note that the default sorting behavior
+may be overridden by backends and influenced by the use of the keyword
+‘:separate’ in the grouped backends list (*note Grouped Backends::).
+
+Since Company does not treat candidates with differing annotations as
+duplicates, it may sometimes be desirable to condense completion lists
+containing such entries.  In the example below, post-processing begins
+with their removal.  Then, the weighted ordering of the candidates is
+performed.
+
+     ;; Set grouped backends.
+     (setq company-backends '((company-capf company-dabbrev-code)))
+
+     ;; Apply post-processing.
      (setq company-transformers '(delete-consecutive-dups
                                   company-sort-by-occurrence))
 
-Company is bundled with several such transformer functions.  They are
-listed below.
+If a grouped backend contains the keyword ‘:separate’, you can use the
+‘delete-dups’ function instead.
+
+     ;; Set grouped backends.
+     (setq company-backends
+           '((:separate company-capf company-dabbrev-code)))
+
+     ;; Apply post-processing.
+     (setq company-transformers '(delete-dups
+                                  company-sort-by-occurrence))
+
+Company is bundled with several transformer functions.
 
  -- Function: company-sort-by-occurrence
      Sorts candidates using ‘company-occurrence-weight-function’
@@ -1331,7 +1353,7 @@ listed below.
      case-insensitively.
 
 
-File: doc42NEVp.info,  Node: Troubleshooting,  Next: Index,  Prev: Backends,  Up: Top
+File: company.info,  Node: Troubleshooting,  Next: Index,  Prev: Backends,  Up: Top
 
 6 Troubleshooting
 *****************
@@ -1355,7 +1377,7 @@ Based on the value of the ‘Used backend’ in the output of the command
      caused by a function listed there.  To identify to which package it
      belongs, type ‘M-x find-function <RET> <function-name> <RET>’.
 
-If the aforementioned steps didn’t help to find the cause of the issue,
+If the aforementioned steps didn't help to find the cause of the issue,
 then file a bug report to
 the Company Issue Tracker (https://github.com/company-mode/company-mode/issues),
 attaching the following information:
@@ -1372,7 +1394,7 @@ attaching the following information:
      command: ‘M-x toggle-debug-on-error’ before reproducing the error.
 
 
-File: doc42NEVp.info,  Node: Index,  Prev: Troubleshooting,  Up: Top
+File: company.info,  Node: Index,  Prev: Troubleshooting,  Up: Top
 
 Index
 *****
@@ -1385,7 +1407,7 @@ Index
 * Concept Index::
 
 
-File: doc42NEVp.info,  Node: Key Index,  Next: Variable Index,  Up: Index
+File: company.info,  Node: Key Index,  Next: Variable Index,  Up: Index
 
 Key Index
 =========
@@ -1394,10 +1416,10 @@ Key Index
 * Menu:
 
 * C-g:                                   Usage Basics.         (line 23)
-* C-g <1>:                               Commands.             (line 30)
+* C-g <1>:                               Commands.             (line 34)
 * C-g <2>:                               Candidates Search.    (line 11)
 * C-g <3>:                               Filter Candidates.    (line 14)
-* C-h:                                   Commands.             (line 34)
+* C-h:                                   Commands.             (line 38)
 * C-M-s:                                 Filter Candidates.    (line  6)
 * C-n:                                   Usage Basics.         (line 12)
 * C-n <1>:                               Commands.             (line 11)
@@ -1405,16 +1427,16 @@ Key Index
 * C-p:                                   Usage Basics.         (line 12)
 * C-p <1>:                               Commands.             (line 16)
 * C-s:                                   Candidates Search.    (line  6)
-* C-w:                                   Commands.             (line 41)
+* C-w:                                   Commands.             (line 45)
 * M-<digit>:                             Quick Access a Candidate.
                                                                (line  6)
 * RET:                                   Usage Basics.         (line 15)
 * RET <1>:                               Commands.             (line 21)
 * TAB:                                   Usage Basics.         (line 17)
-* TAB <1>:                               Commands.             (line 25)
+* TAB <1>:                               Commands.             (line 26)
 
 
-File: doc42NEVp.info,  Node: Variable Index,  Next: Function Index,  Prev: Key Index,  Up: Index
+File: company.info,  Node: Variable Index,  Next: Function Index,  Prev: Key Index,  Up: Index
 
 Variable Index
 ==============
@@ -1464,7 +1486,7 @@ Variable Index
 * company-minimum-prefix-length:         Configuration File.  (line   9)
 * company-mode:                          Initial Setup.       (line   6)
 * company-occurrence-weight-function:    Candidates Post-Processing.
-                                                              (line  21)
+                                                              (line  47)
 * company-require-match:                 Configuration File.  (line  55)
 * company-search-regexp-function:        Candidates Search.   (line  13)
 * company-selection-wrap-around:         Configuration File.  (line  47)
@@ -1489,7 +1511,7 @@ Variable Index
                                                               (line   6)
 
 
-File: doc42NEVp.info,  Node: Function Index,  Next: Concept Index,  Prev: Variable Index,  Up: Index
+File: company.info,  Node: Function Index,  Next: Concept Index,  Prev: Variable Index,  Up: Index
 
 Function Index
 ==============
@@ -1498,13 +1520,15 @@ Function Index
 * Menu:
 
 * company-abbrev:                        Template Expansion.  (line   6)
-* company-abort:                         Commands.            (line  30)
+* company-abort:                         Commands.            (line  34)
 * company-begin-backend:                 Backends Usage Basics.
                                                               (line  24)
 * company-capf:                          Code Completion.     (line   6)
 * company-clang:                         Code Completion.     (line  72)
 * company-complete:                      Usage Basics.        (line  10)
-* company-complete-common:               Commands.            (line  25)
+* company-complete <1>:                  Commands.            (line  51)
+* company-complete-common:               Commands.            (line  51)
+* company-complete-common-or-cycle:      Commands.            (line  26)
 * company-complete-selection:            Commands.            (line  21)
 * company-dabbrev:                       Text Completion.     (line   6)
 * company-dabbrev-code:                  Code Completion.     (line  33)
@@ -1519,6 +1543,7 @@ Function Index
 * company-etags:                         Code Completion.     (line  98)
 * company-files:                         File Name Completion.
                                                               (line   6)
+* company-indent-or-complete-common:     Commands.            (line  51)
 * company-ispell:                        Text Completion.     (line  75)
 * company-keywords:                      Code Completion.     (line  67)
 * company-mode:                          Initial Setup.       (line   6)
@@ -1541,14 +1566,14 @@ Function Index
 * company-select-previous:               Commands.            (line  16)
 * company-select-previous-or-abort:      Commands.            (line  16)
 * company-semantic:                      Code Completion.     (line  90)
-* company-show-doc-buffer:               Commands.            (line  34)
-* company-show-location:                 Commands.            (line  41)
+* company-show-doc-buffer:               Commands.            (line  38)
+* company-show-location:                 Commands.            (line  45)
 * company-sort-by-backend-importance:    Candidates Post-Processing.
-                                                              (line  27)
+                                                              (line  53)
 * company-sort-by-occurrence:            Candidates Post-Processing.
-                                                              (line  17)
+                                                              (line  43)
 * company-sort-prefer-same-case-prefix:  Candidates Post-Processing.
-                                                              (line  33)
+                                                              (line  59)
 * company-tempo:                         Template Expansion.  (line  11)
 * company-text-icons-margin:             Tooltip Frontends.   (line 175)
 * company-tng-frontend:                  Structure.           (line  26)
@@ -1559,7 +1584,7 @@ Function Index
 * global-company-mode:                   Initial Setup.       (line  18)
 
 
-File: doc42NEVp.info,  Node: Concept Index,  Prev: Function Index,  Up: Index
+File: company.info,  Node: Concept Index,  Prev: Function Index,  Up: Index
 
 Concept Index
 =============
@@ -1567,14 +1592,22 @@ Concept Index
  [index ]
 * Menu:
 
+* :separate:                             Grouped Backends.    (line  14)
+* :separate <1>:                         Candidates Post-Processing.
+                                                              (line  11)
+* :separate <2>:                         Candidates Post-Processing.
+                                                              (line  30)
+* :with:                                 Grouped Backends.    (line  25)
 * abbrev:                                Template Expansion.  (line   6)
 * abort:                                 Usage Basics.        (line  23)
-* abort <1>:                             Commands.            (line  30)
+* abort <1>:                             Commands.            (line  34)
 * activate:                              Initial Setup.       (line   8)
 * active backend:                        Backends Usage Basics.
                                                               (line  13)
 * active backend <1>:                    Troubleshooting.     (line  14)
 * annotation:                            Tooltip Frontends.   (line  52)
+* annotation <1>:                        Candidates Post-Processing.
+                                                              (line  17)
 * auto-start:                            Initial Setup.       (line  13)
 * backend:                               Structure.           (line   6)
 * backend <1>:                           Structure.           (line  10)
@@ -1588,12 +1621,14 @@ Concept Index
                                                               (line   6)
 * backends <2>:                          Grouped Backends.    (line   6)
 * backends <3>:                          Package Backends.    (line   6)
+* backends <4>:                          Candidates Post-Processing.
+                                                              (line  11)
 * basics:                                Usage Basics.        (line   6)
 * bug:                                   Troubleshooting.     (line   6)
 * bug <1>:                               Troubleshooting.     (line  25)
 * bundled backends:                      Package Backends.    (line   6)
 * cancel:                                Usage Basics.        (line  23)
-* cancel <1>:                            Commands.            (line  30)
+* cancel <1>:                            Commands.            (line  34)
 * candidate:                             Terminology.         (line  10)
 * candidate <1>:                         Usage Basics.        (line  12)
 * candidate <2>:                         Usage Basics.        (line  15)
@@ -1602,7 +1637,7 @@ Concept Index
 * color <1>:                             Quick Access a Candidate.
                                                               (line  34)
 * common part:                           Usage Basics.        (line  17)
-* common part <1>:                       Commands.            (line  25)
+* common part <1>:                       Commands.            (line  26)
 * common part <2>:                       Preview Frontends.   (line   6)
 * company-echo:                          Echo Frontends.      (line   6)
 * company-preview:                       Preview Frontends.   (line   6)
@@ -1645,11 +1680,13 @@ Concept Index
                                                               (line  25)
 * custom <9>:                            Quick Access a Candidate.
                                                               (line  34)
-* definition:                            Commands.            (line  41)
+* definition:                            Commands.            (line  45)
 * distribution:                          Installation.        (line   6)
-* doc:                                   Commands.            (line  34)
-* duplicate:                             Candidates Post-Processing.
-                                                              (line   6)
+* doc:                                   Commands.            (line  38)
+* duplicates:                            Candidates Post-Processing.
+                                                              (line  17)
+* duplicates <1>:                        Candidates Post-Processing.
+                                                              (line  30)
 * echo:                                  Echo Frontends.      (line   6)
 * enable:                                Initial Setup.       (line   8)
 * error:                                 Troubleshooting.     (line   6)
@@ -1668,7 +1705,7 @@ Concept Index
                                                               (line  34)
 * filter:                                Filter Candidates.   (line   6)
 * finish:                                Usage Basics.        (line  23)
-* finish <1>:                            Commands.            (line  30)
+* finish <1>:                            Commands.            (line  34)
 * font:                                  Tooltip Frontends.   (line 222)
 * font <1>:                              Quick Access a Candidate.
                                                               (line  34)
@@ -1676,6 +1713,8 @@ Concept Index
 * frontend <1>:                          Structure.           (line  10)
 * frontends:                             Frontends.           (line   6)
 * grouped backends:                      Grouped Backends.    (line   6)
+* grouped backends <1>:                  Candidates Post-Processing.
+                                                              (line  11)
 * icon:                                  Tooltip Frontends.   (line 151)
 * install:                               Installation.        (line   6)
 * interface:                             Tooltip Frontends.   (line  48)
@@ -1689,7 +1728,7 @@ Concept Index
 * issue:                                 Troubleshooting.     (line   6)
 * issue tracker:                         Troubleshooting.     (line  25)
 * kind:                                  Tooltip Frontends.   (line 151)
-* location:                              Commands.            (line  41)
+* location:                              Commands.            (line  45)
 * manual:                                Initial Setup.       (line   8)
 * manual <1>:                            Usage Basics.        (line  10)
 * margin:                                Tooltip Frontends.   (line 140)
@@ -1705,13 +1744,15 @@ Concept Index
 * package backends:                      Package Backends.    (line   6)
 * pluggable:                             Structure.           (line   6)
 * pop-up:                                Tooltip Frontends.   (line   6)
+* post-processing:                       Candidates Post-Processing.
+                                                              (line   6)
 * prefix matches:                        Terminology.         (line  10)
 * preview:                               Preview Frontends.   (line   6)
 * quick start:                           Initial Setup.       (line   6)
 * quick-access:                          Quick Access a Candidate.
                                                               (line   6)
 * quit:                                  Usage Basics.        (line  23)
-* quit <1>:                              Commands.            (line  30)
+* quit <1>:                              Commands.            (line  34)
 * search:                                Candidates Search.   (line   6)
 * select:                                Usage Basics.        (line  12)
 * select <1>:                            Commands.            (line  11)
@@ -1720,7 +1761,7 @@ Concept Index
 * sort:                                  Candidates Post-Processing.
                                                               (line   6)
 * stop:                                  Usage Basics.        (line  23)
-* stop <1>:                              Commands.            (line  30)
+* stop <1>:                              Commands.            (line  34)
 * TAB:                                   Structure.           (line  26)
 * Tab and Go:                            Structure.           (line  26)
 * template:                              Template Expansion.  (line   6)
@@ -1730,51 +1771,52 @@ Concept Index
 * troubleshoot:                          Troubleshooting.     (line   6)
 * usage:                                 Usage Basics.        (line   6)
 
-
 
 Tag Table:
-Node: Top568
-Node: Overview1992
-Node: Terminology2402
-Node: Structure3711
-Node: Getting Started5204
-Node: Installation5484
-Node: Initial Setup5869
-Node: Usage Basics6719
-Node: Commands7699
-Ref: Commands-Footnote-110145
-Node: Customization10312
-Node: Customization Interface10786
-Node: Configuration File11321
-Node: Frontends16130
-Node: Tooltip Frontends17101
-Ref: Tooltip Frontends-Footnote-127817
-Node: Preview Frontends28054
-Ref: Preview Frontends-Footnote-129314
-Node: Echo Frontends29441
-Node: Candidates Search30976
-Node: Filter Candidates32312
-Node: Quick Access a Candidate33094
-Node: Backends34714
-Node: Backends Usage Basics35746
-Ref: Backends Usage Basics-Footnote-137180
-Node: Grouped Backends37264
-Node: Package Backends38777
-Node: Code Completion39708
-Node: Text Completion45237
-Node: File Name Completion49673
-Node: Template Expansion51223
-Node: Candidates Post-Processing51944
-Node: Troubleshooting53423
-Node: Index55098
-Node: Key Index55263
-Node: Variable Index56764
-Node: Function Index61619
-Node: Concept Index66102
+Node: Top573
+Node: Overview1999
+Node: Terminology2407
+Node: Structure3710
+Node: Getting Started5200
+Node: Installation5478
+Node: Initial Setup5861
+Node: Usage Basics6709
+Node: Commands7683
+Ref: Commands-Footnote-110079
+Node: Customization10246
+Node: Customization Interface10718
+Node: Configuration File11251
+Ref: company-selection-wrap-around13563
+Node: Frontends16052
+Node: Tooltip Frontends17021
+Ref: Tooltip Frontends-Footnote-127561
+Node: Preview Frontends27798
+Ref: Preview Frontends-Footnote-129032
+Node: Echo Frontends29159
+Node: Candidates Search30652
+Node: Filter Candidates31972
+Node: Quick Access a Candidate32740
+Node: Backends34310
+Node: Backends Usage Basics35340
+Ref: Backends Usage Basics-Footnote-136772
+Node: Grouped Backends36856
+Node: Package Backends38367
+Node: Code Completion39294
+Node: Text Completion44811
+Node: File Name Completion49235
+Node: Template Expansion50781
+Node: Candidates Post-Processing51500
+Node: Troubleshooting54077
+Node: Index55748
+Node: Key Index55911
+Node: Variable Index57410
+Node: Function Index62263
+Node: Concept Index66963
 
 End Tag Table
 
 
 Local Variables:
 coding: utf-8
+Info-documentlanguage: en
 End:

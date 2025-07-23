@@ -1,4 +1,4 @@
-This is docuGPDVz.info, produced by makeinfo version 6.8 from ivy.texi.
+This is ivy.info, produced by makeinfo version 7.2 from ivy.texi.
 
 Ivy manual, version 0.15.1
 
@@ -11,7 +11,7 @@ available choices while previewing in the minibuffer.  Selecting the
 final candidate is either through simple keyboard character inputs or
 through powerful regular expressions.
 
-   Copyright (C) 2015–2025 Free Software Foundation, Inc.
+   Copyright (C) 2015-2025 Free Software Foundation, Inc.
 
      Permission is granted to copy, distribute and/or modify this
      document under the terms of the GNU Free Documentation License,
@@ -26,7 +26,7 @@ START-INFO-DIR-ENTRY
 END-INFO-DIR-ENTRY
 
 
-File: docuGPDVz.info,  Node: Top,  Next: Introduction,  Up: (dir)
+File: ivy.info,  Node: Top,  Next: Introduction,  Up: (dir)
 
 Ivy User Manual
 ***************
@@ -44,7 +44,7 @@ Ivy User Manual
 * Variable Index::
 * Keystroke Index::
 
-— The Detailed Node Listing —
+-- The Detailed Node Listing --
 
 Installation
 
@@ -118,9 +118,8 @@ API
 * Example - counsel-locate::
 * Example - ivy-read-with-extra-properties::
 
-
 
-File: docuGPDVz.info,  Node: Introduction,  Next: Installation,  Prev: Top,  Up: Top
+File: ivy.info,  Node: Introduction,  Next: Installation,  Prev: Top,  Up: Top
 
 1 Introduction
 **************
@@ -144,11 +143,11 @@ Minimalism
 Simplicity
 ..........
 
-     Simplicity is about Ivy’s behavior in the minibuffer.  It is also
-     about the code interface to extend Ivy’s functionality.  The
+     Simplicity is about Ivy's behavior in the minibuffer.  It is also
+     about the code interface to extend Ivy's functionality.  The
      minibuffer area behaves as close to ‘fundamental-mode’ as possible.
      ‘SPC’ inserts a space, for example, instead of being bound to the
-     more complex ‘minibuffer-complete-word’.  Ivy’s code uses
+     more complex ‘minibuffer-complete-word’.  Ivy's code uses
      easy-to-examine global variables; avoids needless complications
      with branch-introducing custom macros.
 
@@ -163,7 +162,7 @@ Customizability
      ‘ivy-format-functions-alist’).  Or take the customization of
      actions, say after the candidate function is selected.  ‘RET’ uses
      ‘counsel-describe-function’ to describe the function, whereas ‘M-o
-     d’ jumps to that function’s definition in the code.  The ‘M-o’
+     d’ jumps to that function's definition in the code.  The ‘M-o’
      prefix can be uniformly used with characters like ‘d’ to group
      similar actions.
 
@@ -180,13 +179,13 @@ Discoverability
      look-ups.
 
 
-File: docuGPDVz.info,  Node: Installation,  Next: Getting started,  Prev: Introduction,  Up: Top
+File: ivy.info,  Node: Installation,  Next: Getting started,  Prev: Introduction,  Up: Top
 
 2 Installation
 **************
 
-Install Ivy automatically through Emacs’s package manager, or manually
-from Ivy’s development repository.
+Install Ivy automatically through Emacs's package manager, or manually
+from Ivy's development repository.
 
    Emacs 24.5 is the oldest version to run Ivy.
 
@@ -196,7 +195,7 @@ from Ivy’s development repository.
 * Installing from the Git repository::
 
 
-File: docuGPDVz.info,  Node: Installing from Emacs Package Manager,  Next: Installing from the Git repository,  Up: Installation
+File: ivy.info,  Node: Installing from Emacs Package Manager,  Next: Installing from the Git repository,  Up: Installation
 
 2.1 Installing from Emacs Package Manager
 =========================================
@@ -226,7 +225,7 @@ archives:
    For package manager details, see *note (emacs)Packages::.
 
 
-File: docuGPDVz.info,  Node: Installing from the Git repository,  Prev: Installing from Emacs Package Manager,  Up: Installation
+File: ivy.info,  Node: Installing from the Git repository,  Prev: Installing from Emacs Package Manager,  Up: Installation
 
 2.2 Installing from the Git repository
 ======================================
@@ -236,7 +235,7 @@ Why install from Git?
 
         • No need to wait for GNU ELPA / MELPA builds.
         • Easy to revert to previous versions.
-        • Contribute to Ivy’s development; send patches; pull requests.
+        • Contribute to Ivy's development; send patches; pull requests.
 
 Configuration steps
 ...................
@@ -257,7 +256,7 @@ Configuration steps
           make
 
 
-File: docuGPDVz.info,  Node: Getting started,  Next: Key bindings,  Prev: Installation,  Up: Top
+File: ivy.info,  Node: Getting started,  Next: Key bindings,  Prev: Installation,  Up: Top
 
 3 Getting started
 *****************
@@ -273,7 +272,7 @@ First enable Ivy completion everywhere:
 * Basic customization::
 
 
-File: docuGPDVz.info,  Node: Basic customization,  Up: Getting started
+File: ivy.info,  Node: Basic customization,  Up: Getting started
 
 3.1 Basic customization
 =======================
@@ -285,14 +284,14 @@ Here are some basic settings particularly useful for new Ivy users:
 
    If you want, you can go without any customizations at all.  The
 settings above give the most bang for the buck in terms of
-customization.  So users that typically don’t like customizing a lot are
+customization.  So users that typically don't like customizing a lot are
 advised to look at these settings first.
 
    For more advanced customizations, refer to ‘M-x describe-variable’
 documentation.
 
 
-File: docuGPDVz.info,  Node: Key bindings,  Next: Completion Styles,  Prev: Getting started,  Up: Top
+File: ivy.info,  Node: Key bindings,  Next: Completion Styles,  Prev: Getting started,  Up: Top
 
 4 Key bindings
 **************
@@ -303,7 +302,7 @@ File: docuGPDVz.info,  Node: Key bindings,  Next: Completion Styles,  Prev: Gett
 * Minibuffer key bindings::
 
 
-File: docuGPDVz.info,  Node: Global key bindings,  Next: Minibuffer key bindings,  Up: Key bindings
+File: ivy.info,  Node: Global key bindings,  Next: Minibuffer key bindings,  Up: Key bindings
 
 4.1 Global key bindings
 =======================
@@ -360,7 +359,7 @@ Ivy-resume and other commands
 remapping for you.
 
 
-File: docuGPDVz.info,  Node: Minibuffer key bindings,  Prev: Global key bindings,  Up: Key bindings
+File: ivy.info,  Node: Minibuffer key bindings,  Prev: Global key bindings,  Up: Key bindings
 
 4.2 Minibuffer key bindings
 ===========================
@@ -388,7 +387,7 @@ where the familiar ‘C-a’, ‘C-f’, ‘M-d’, ‘M-DEL’, ‘M-b’, ‘M
 * Saving the current completion session to a buffer::
 
 
-File: docuGPDVz.info,  Node: Key bindings for navigation,  Next: Key bindings for single selection action then exit minibuffer,  Up: Minibuffer key bindings
+File: ivy.info,  Node: Key bindings for navigation,  Next: Key bindings for single selection action then exit minibuffer,  Up: Minibuffer key bindings
 
 4.2.1 Key bindings for navigation
 ---------------------------------
@@ -415,7 +414,7 @@ File: docuGPDVz.info,  Node: Key bindings for navigation,  Next: Key bindings fo
      ‘ivy-height’ is 10 lines by default.
 
 
-File: docuGPDVz.info,  Node: Key bindings for single selection action then exit minibuffer,  Next: Key bindings for multiple selections and actions keep minibuffer open,  Prev: Key bindings for navigation,  Up: Minibuffer key bindings
+File: ivy.info,  Node: Key bindings for single selection action then exit minibuffer,  Next: Key bindings for multiple selections and actions keep minibuffer open,  Prev: Key bindings for navigation,  Up: Minibuffer key bindings
 
 4.2.2 Key bindings for single selection, action, then exit minibuffer
 ---------------------------------------------------------------------
@@ -472,8 +471,8 @@ extends usability of lists in Emacs.
 
      This is useful e.g.  when you call ‘find-file’ to create a new
      file, but the desired name matches an existing file.  In that case,
-     using ‘C-j’ would select that existing file, which isn’t what you
-     want — use this command instead.
+     using ‘C-j’ would select that existing file, which isn't what you
+     want -- use this command instead.
 
 ‘C-'’ (‘ivy-avy’)
 .................
@@ -483,7 +482,7 @@ extends usability of lists in Emacs.
      keystrokes followed by ‘C-m’.
 
 
-File: docuGPDVz.info,  Node: Key bindings for multiple selections and actions keep minibuffer open,  Next: Key bindings that alter the minibuffer input,  Prev: Key bindings for single selection action then exit minibuffer,  Up: Minibuffer key bindings
+File: ivy.info,  Node: Key bindings for multiple selections and actions keep minibuffer open,  Next: Key bindings that alter the minibuffer input,  Prev: Key bindings for single selection action then exit minibuffer,  Up: Minibuffer key bindings
 
 4.2.3 Key bindings for multiple selections and actions, keep minibuffer open
 ----------------------------------------------------------------------------
@@ -515,7 +514,7 @@ that use the ‘ivy-read’ API, rather than the built-in ‘completing-read’.
 
      For example, during the ‘counsel-rhythmbox’ completion, press
      ‘C-M-o e’ to en-queue the selected candidate, followed by ‘C-n C-m’
-     to play the next candidate — the current action reverts to the
+     to play the next candidate -- the current action reverts to the
      default one after ‘C-M-o’.
 
 ‘C-M-n’ (‘ivy-next-line-and-call’)
@@ -547,7 +546,7 @@ that use the ‘ivy-read’ API, rather than the built-in ‘completing-read’.
      ‘universal-argument’ to resume any previous session.
 
 
-File: docuGPDVz.info,  Node: Key bindings that alter the minibuffer input,  Next: Other key bindings,  Prev: Key bindings for multiple selections and actions keep minibuffer open,  Up: Minibuffer key bindings
+File: ivy.info,  Node: Key bindings that alter the minibuffer input,  Next: Other key bindings,  Prev: Key bindings for multiple selections and actions keep minibuffer open,  Up: Minibuffer key bindings
 
 4.2.4 Key bindings that alter the minibuffer input
 --------------------------------------------------
@@ -594,7 +593,7 @@ File: docuGPDVz.info,  Node: Key bindings that alter the minibuffer input,  Next
 ‘C-r’ (‘ivy-reverse-i-search’)
 ..............................
 
-     Starts a recursive completion session through the command’s
+     Starts a recursive completion session through the command's
      history.
 
      This works just like ‘C-r’ at the bash command prompt, where the
@@ -602,7 +601,7 @@ File: docuGPDVz.info,  Node: Key bindings that alter the minibuffer input,  Next
      selected candidate string is inserted into the minibuffer.
 
 
-File: docuGPDVz.info,  Node: Other key bindings,  Next: Hydra in the minibuffer,  Prev: Key bindings that alter the minibuffer input,  Up: Minibuffer key bindings
+File: ivy.info,  Node: Other key bindings,  Next: Hydra in the minibuffer,  Prev: Key bindings that alter the minibuffer input,  Up: Minibuffer key bindings
 
 4.2.5 Other key bindings
 ------------------------
@@ -615,7 +614,7 @@ File: docuGPDVz.info,  Node: Other key bindings,  Next: Hydra in the minibuffer,
      Copies the region if the region is active.
 
 
-File: docuGPDVz.info,  Node: Hydra in the minibuffer,  Next: Saving the current completion session to a buffer,  Prev: Other key bindings,  Up: Minibuffer key bindings
+File: ivy.info,  Node: Hydra in the minibuffer,  Next: Saving the current completion session to a buffer,  Prev: Other key bindings,  Up: Minibuffer key bindings
 
 4.2.6 Hydra in the minibuffer
 -----------------------------
@@ -699,7 +698,7 @@ Key     Command name
    The action is called on each marked candidate one by one.
 
 
-File: docuGPDVz.info,  Node: Saving the current completion session to a buffer,  Prev: Hydra in the minibuffer,  Up: Minibuffer key bindings
+File: ivy.info,  Node: Saving the current completion session to a buffer,  Prev: Hydra in the minibuffer,  Up: Minibuffer key bindings
 
 4.2.7 Saving the current completion session to a buffer
 -------------------------------------------------------
@@ -752,12 +751,12 @@ File: docuGPDVz.info,  Node: Saving the current completion session to a buffer, 
 names.  For example: ‘*ivy-occur counsel-describe-variable "function$*’.
 
 
-File: docuGPDVz.info,  Node: Completion Styles,  Next: Customization,  Prev: Key bindings,  Up: Top
+File: ivy.info,  Node: Completion Styles,  Next: Customization,  Prev: Key bindings,  Up: Top
 
 5 Completion Styles
 *******************
 
-Ivy’s completion functions rely on a regexp builder — a function that
+Ivy's completion functions rely on a regexp builder -- a function that
 transforms a string input into a string regexp.  All current candidates
 simply have to match this regexp.  Each collection can be assigned its
 own regexp builder by customizing ‘ivy-re-builders-alist’.
@@ -770,7 +769,7 @@ of the following:
    • ‘ivy--regex-fuzzy’
    • ‘regexp-quote’
 
-   A catch-all key, ‘t’, applies to all collections that don’t have
+   A catch-all key, ‘t’, applies to all collections that don't have
 their own key.
 
    The default is:
@@ -805,17 +804,17 @@ second argument to ‘completing-read’ for file name completion.
 * ivy--regex-fuzzy::
 
 
-File: docuGPDVz.info,  Node: ivy--regex-plus,  Next: ivy--regex-ignore-order,  Up: Completion Styles
+File: ivy.info,  Node: ivy--regex-plus,  Next: ivy--regex-ignore-order,  Up: Completion Styles
 
-5.1 ivy–regex-plus
+5.1 ivy-regex-plus
 ==================
 
-‘ivy--regex-plus’ is Ivy’s default completion method.
+‘ivy--regex-plus’ is Ivy's default completion method.
 
    ‘ivy--regex-plus’ matches by splitting the input by spaces and
 rebuilding it into a regexp.
 
-   As the search string is typed in Ivy’s minibuffer, it is transformed
+   As the search string is typed in Ivy's minibuffer, it is transformed
 into valid regexp syntax.  If the string is ‘"for example"’, it is
 transformed into:
 
@@ -842,9 +841,9 @@ spaces, which translate to ‘".*"’, and ‘"!"’, that signals the beginning
 of a negation group.
 
 
-File: docuGPDVz.info,  Node: ivy--regex-ignore-order,  Next: ivy--regex-fuzzy,  Prev: ivy--regex-plus,  Up: Completion Styles
+File: ivy.info,  Node: ivy--regex-ignore-order,  Next: ivy--regex-fuzzy,  Prev: ivy--regex-plus,  Up: Completion Styles
 
-5.2 ivy–regex-ignore-order
+5.2 ivy-regex-ignore-order
 ==========================
 
 ‘ivy--regex-ignore-order’ ignores the order of regexp tokens when
@@ -852,20 +851,20 @@ searching for matching candidates.  For instance, the input ‘"for
 example"’ will match ‘"example test for"’.
 
 
-File: docuGPDVz.info,  Node: ivy--regex-fuzzy,  Prev: ivy--regex-ignore-order,  Up: Completion Styles
+File: ivy.info,  Node: ivy--regex-fuzzy,  Prev: ivy--regex-ignore-order,  Up: Completion Styles
 
-5.3 ivy–regex-fuzzy
+5.3 ivy-regex-fuzzy
 ===================
 
 ‘ivy--regex-fuzzy’ splits each character with a wild card.  Searching
 for ‘"for"’ returns all ‘"f.*o.*r"’ matches, resulting in a large number
 of hits.  Yet some searches need these extra hits.  Ivy sorts such large
-lists using ‘flx’ package’s scoring mechanism, if it’s installed.
+lists using ‘flx’ package's scoring mechanism, if it's installed.
 
    ‘C-o m’ toggles the current regexp builder.
 
 
-File: docuGPDVz.info,  Node: Customization,  Next: Commands,  Prev: Completion Styles,  Up: Top
+File: ivy.info,  Node: Customization,  Next: Commands,  Prev: Completion Styles,  Up: Top
 
 6 Customization
 ***************
@@ -878,7 +877,7 @@ File: docuGPDVz.info,  Node: Customization,  Next: Commands,  Prev: Completion S
 * Packages::
 
 
-File: docuGPDVz.info,  Node: Faces,  Next: Defcustoms,  Up: Customization
+File: ivy.info,  Node: Faces,  Next: Defcustoms,  Up: Customization
 
 6.1 Faces
 =========
@@ -922,7 +921,7 @@ File: docuGPDVz.info,  Node: Faces,  Next: Defcustoms,  Up: Customization
 
           (setopt confirm-nonexistent-file-or-buffer t)
 
-     Then call ‘find-file’, enter "eldorado" and press ‘RET’ — the
+     Then call ‘find-file’, enter "eldorado" and press ‘RET’ -- the
      prompt will have "(confirm)" appended.  Press ‘RET’ once more to
      confirm, or any key to continue the completion.
 
@@ -936,7 +935,7 @@ File: docuGPDVz.info,  Node: Faces,  Next: Defcustoms,  Up: Customization
      constraint.
 
      For example, call ‘describe-variable’, enter "waldo" and press
-     ‘RET’ — "(match required)" is indicated.  Press any key for the
+     ‘RET’ -- "(match required)" is indicated.  Press any key for the
      indication to disappear.
 
 ‘ivy-subdir’
@@ -974,7 +973,7 @@ File: docuGPDVz.info,  Node: Faces,  Next: Defcustoms,  Up: Customization
      This takes precedence over ‘ivy-modified-buffer’.
 
 
-File: docuGPDVz.info,  Node: Defcustoms,  Next: Actions,  Prev: Faces,  Up: Customization
+File: ivy.info,  Node: Defcustoms,  Next: Actions,  Prev: Faces,  Up: Customization
 
 6.2 Defcustoms
 ==============
@@ -1010,13 +1009,13 @@ File: docuGPDVz.info,  Node: Defcustoms,  Next: Actions,  Prev: Faces,  Up: Cust
      This is usually the case when there is no text left to delete,
      i.e., when ‘DEL’ is typed at the beginning of the minibuffer.
 
-     The default behavior is to quit the completion after ‘DEL’ — a
+     The default behavior is to quit the completion after ‘DEL’ -- a
      handy key to invoke after mistakenly triggering a completion.
 
      Another common option is ‘ignore’, which does nothing.
 
 
-File: docuGPDVz.info,  Node: Actions,  Next: Packages,  Prev: Defcustoms,  Up: Customization
+File: ivy.info,  Node: Actions,  Next: Packages,  Prev: Defcustoms,  Up: Customization
 
 6.3 Actions
 ===========
@@ -1030,7 +1029,7 @@ File: docuGPDVz.info,  Node: Actions,  Next: Packages,  Prev: Defcustoms,  Up: C
 * Example - define a new command with several actions::
 
 
-File: docuGPDVz.info,  Node: What are actions?,  Next: How can different actions be called?,  Up: Actions
+File: ivy.info,  Node: What are actions?,  Next: How can different actions be called?,  Up: Actions
 
 6.3.1 What are actions?
 -----------------------
@@ -1054,7 +1053,7 @@ Window context when calling an action
               (insert x)))
 
 
-File: docuGPDVz.info,  Node: How can different actions be called?,  Next: How to modify the actions list?,  Prev: What are actions?,  Up: Actions
+File: ivy.info,  Node: How can different actions be called?,  Next: How to modify the actions list?,  Prev: What are actions?,  Up: Actions
 
 6.3.2 How can different actions be called?
 ------------------------------------------
@@ -1066,7 +1065,7 @@ File: docuGPDVz.info,  Node: How can different actions be called?,  Next: How to
      selection, calls the selected one, and then does not exit.
 
 
-File: docuGPDVz.info,  Node: How to modify the actions list?,  Next: Example - add two actions to each command,  Prev: How can different actions be called?,  Up: Actions
+File: ivy.info,  Node: How to modify the actions list?,  Next: Example - add two actions to each command,  Prev: How can different actions be called?,  Up: Actions
 
 6.3.3 How to modify the actions list?
 -------------------------------------
@@ -1081,13 +1080,13 @@ designated for the default command.  This way, ‘M-o o’ should always be
 equivalent to ‘C-m’.
 
 
-File: docuGPDVz.info,  Node: Example - add two actions to each command,  Next: Example - define a new command with several actions,  Prev: How to modify the actions list?,  Up: Actions
+File: ivy.info,  Node: Example - add two actions to each command,  Next: Example - define a new command with several actions,  Prev: How to modify the actions list?,  Up: Actions
 
 6.3.4 Example - add two actions to each command
 -----------------------------------------------
 
-The first action inserts the current candidate into the Ivy window — the
-window from which ‘ivy-read’ was called.
+The first action inserts the current candidate into the Ivy window --
+the window from which ‘ivy-read’ was called.
 
    The second action copies the current candidate to the kill ring.
 
@@ -1112,7 +1111,7 @@ and ‘M-o i’ invokes ‘ivy-copy-to-buffer-action’.
 * How to add actions to a specific command::
 
 
-File: docuGPDVz.info,  Node: How to undo adding the two actions,  Next: How to add actions to a specific command,  Up: Example - add two actions to each command
+File: ivy.info,  Node: How to undo adding the two actions,  Next: How to add actions to a specific command,  Up: Example - add two actions to each command
 
 6.3.4.1 How to undo adding the two actions
 ..........................................
@@ -1124,7 +1123,7 @@ set the extra actions list to ‘nil’ by assigning a ‘nil’ value to the
      (ivy-set-actions t nil)
 
 
-File: docuGPDVz.info,  Node: How to add actions to a specific command,  Prev: How to undo adding the two actions,  Up: Example - add two actions to each command
+File: ivy.info,  Node: How to add actions to a specific command,  Prev: How to undo adding the two actions,  Up: Example - add two actions to each command
 
 6.3.4.2 How to add actions to a specific command
 ................................................
@@ -1137,7 +1136,7 @@ Use the command name as the key:
         ("y" ivy-yank-action "yank")))
 
 
-File: docuGPDVz.info,  Node: Example - define a new command with several actions,  Prev: Example - add two actions to each command,  Up: Actions
+File: ivy.info,  Node: Example - define a new command with several actions,  Prev: Example - add two actions to each command,  Up: Actions
 
 6.3.5 Example - define a new command with several actions
 ---------------------------------------------------------
@@ -1167,7 +1166,7 @@ has its own string description for easy selection.
 * Test the above function with ivy-occur::
 
 
-File: docuGPDVz.info,  Node: Test the above function with ivy-occur,  Up: Example - define a new command with several actions
+File: ivy.info,  Node: Test the above function with ivy-occur,  Up: Example - define a new command with several actions
 
 6.3.5.1 Test the above function with ‘ivy-occur’
 ................................................
@@ -1187,7 +1186,7 @@ To examine each action with each candidate in a key-efficient way, try:
    • and so on...
 
 
-File: docuGPDVz.info,  Node: Packages,  Prev: Actions,  Up: Customization
+File: ivy.info,  Node: Packages,  Prev: Actions,  Up: Customization
 
 6.4 Packages
 ============
@@ -1230,7 +1229,7 @@ automatically integrated packages
      ‘amx’ or ‘smex’, ‘flx’, and ‘wgrep’.
 
 
-File: docuGPDVz.info,  Node: Commands,  Next: API,  Prev: Customization,  Up: Top
+File: ivy.info,  Node: Commands,  Next: API,  Prev: Customization,  Up: Top
 
 7 Commands
 **********
@@ -1242,7 +1241,7 @@ File: docuGPDVz.info,  Node: Commands,  Next: API,  Prev: Customization,  Up: To
 * Counsel commands::
 
 
-File: docuGPDVz.info,  Node: File Name Completion,  Next: Buffer Name Completion,  Up: Commands
+File: ivy.info,  Node: File Name Completion,  Next: Buffer Name Completion,  Up: Commands
 
 7.1 File Name Completion
 ========================
@@ -1316,7 +1315,7 @@ History
 * Using TRAMP::
 
 
-File: docuGPDVz.info,  Node: Using TRAMP,  Up: File Name Completion
+File: ivy.info,  Node: Using TRAMP,  Up: File Name Completion
 
 7.1.1 Using TRAMP
 -----------------
@@ -1366,7 +1365,7 @@ Example : connect to a remote host ‘cloud’ and open a file with ‘sudo’ t
         • ‘C-x C-f’ ‘/ssh:cloud|sudo:root:/’.
 
 
-File: docuGPDVz.info,  Node: Buffer Name Completion,  Next: Counsel commands,  Prev: File Name Completion,  Up: Commands
+File: ivy.info,  Node: Buffer Name Completion,  Next: Counsel commands,  Prev: File Name Completion,  Up: Commands
 
 7.2 Buffer Name Completion
 ==========================
@@ -1383,7 +1382,7 @@ File: docuGPDVz.info,  Node: Buffer Name Completion,  Next: Counsel commands,  P
      ‘ivy-virtual’ face, will visit the corresponding file.
 
 
-File: docuGPDVz.info,  Node: Counsel commands,  Prev: Buffer Name Completion,  Up: Commands
+File: ivy.info,  Node: Counsel commands,  Prev: Buffer Name Completion,  Up: Commands
 
 7.3 Counsel commands
 ====================
@@ -1400,7 +1399,7 @@ in ‘ivy-mode’ are:
      sessions.
 
 
-File: docuGPDVz.info,  Node: API,  Next: Variable Index,  Prev: Commands,  Up: Top
+File: ivy.info,  Node: API,  Next: Variable Index,  Prev: Commands,  Up: Top
 
 8 API
 *****
@@ -1419,7 +1418,7 @@ multi-actions, non-exiting actions, ‘ivy-occur’ and ‘ivy-resume’.
 * Example - ivy-read-with-extra-properties::
 
 
-File: docuGPDVz.info,  Node: Required arguments for ivy-read,  Next: Optional arguments for ivy-read,  Up: API
+File: ivy.info,  Node: Required arguments for ivy-read,  Next: Optional arguments for ivy-read,  Up: API
 
 8.1 Required arguments for ‘ivy-read’
 =====================================
@@ -1438,7 +1437,7 @@ File: docuGPDVz.info,  Node: Required arguments for ivy-read,  Next: Optional ar
      If a function, then it has to be compatible with ‘all-completions’.
 
 
-File: docuGPDVz.info,  Node: Optional arguments for ivy-read,  Next: Example - counsel-describe-function,  Prev: Required arguments for ivy-read,  Up: API
+File: ivy.info,  Node: Optional arguments for ivy-read,  Next: Example - counsel-describe-function,  Prev: Required arguments for ivy-read,  Up: API
 
 8.2 Optional arguments for ‘ivy-read’
 =====================================
@@ -1463,7 +1462,7 @@ File: docuGPDVz.info,  Node: Optional arguments for ivy-read,  Next: Example - c
      This string argument is included for compatibility with
      ‘completing-read’, which inserts it into the minibuffer.
 
-     It’s recommended to use the ‘preselect’ argument instead of this.
+     It's recommended to use the ‘preselect’ argument instead of this.
 
 ‘history’
 .........
@@ -1497,7 +1496,7 @@ File: docuGPDVz.info,  Node: Optional arguments for ivy-read,  Next: Example - c
 ...........
 
      Is the function called each time the current candidate changes.
-     This function takes no arguments and is called in the minibuffer’s
+     This function takes no arguments and is called in the minibuffer's
      ‘post-command-hook’.  See ‘swiper’ for an example usage.
 
 ‘sort’
@@ -1549,7 +1548,7 @@ File: docuGPDVz.info,  Node: Optional arguments for ivy-read,  Next: Example - c
      ‘ivy-read’, which may be useful for further customizations.
 
 
-File: docuGPDVz.info,  Node: Example - counsel-describe-function,  Next: Example - counsel-locate,  Prev: Optional arguments for ivy-read,  Up: API
+File: ivy.info,  Node: Example - counsel-describe-function,  Next: Example - counsel-locate,  Prev: Optional arguments for ivy-read,  Up: API
 
 8.3 Example - ‘counsel-describe-function’
 =========================================
@@ -1558,12 +1557,12 @@ This is a typical example of a function with a non-async collection,
 which is a collection where all the strings in the collection are known
 prior to any input from the user.
 
-   Only the first two arguments (along with ‘action’) are essential —
+   Only the first two arguments (along with ‘action’) are essential --
 the rest of the arguments are for fine-tuning, and could be omitted.
 
-   The ‘action’ argument could also be omitted — but then ‘ivy-read’
+   The ‘action’ argument could also be omitted -- but then ‘ivy-read’
 would do nothing except return the string result, which you could later
-use yourself.  However, it’s recommended that you use the ‘action’
+use yourself.  However, it's recommended that you use the ‘action’
 argument.
 
      (defun counsel-describe-function ()
@@ -1598,19 +1597,19 @@ that they appear:
      necessary.
    • The ‘history’ argument is for keeping the history of this command
      separate from the common history in ‘ivy-history’.
-   • The ‘require-match’ is set to ‘t’ since it doesn’t make sense to
+   • The ‘require-match’ is set to ‘t’ since it doesn't make sense to
      call ‘describe-function’ on an uninterned symbol.
    • The ‘action’ argument calls ‘describe-function’ on the interned
      selected candidate.
    • The ‘caller’ argument identifies this completion session.  This is
      important because, with the collection being a list of strings and
      not a function name, the only other way for ‘ivy-read’ to identify
-     "who’s calling" and to apply the appropriate customizations is to
+     "who's calling" and to apply the appropriate customizations is to
      examine ‘this-command’.  But ‘this-command’ would be modified if
      another command called ‘counsel-describe-function’.
 
 
-File: docuGPDVz.info,  Node: Example - counsel-locate,  Next: Example - ivy-read-with-extra-properties,  Prev: Example - counsel-describe-function,  Up: API
+File: ivy.info,  Node: Example - counsel-locate,  Next: Example - ivy-read-with-extra-properties,  Prev: Example - counsel-describe-function,  Up: API
 
 8.4 Example - ‘counsel-locate’
 ==============================
@@ -1664,7 +1663,7 @@ order that they appear:
 
    • ‘counsel-locate-function’ takes a string argument and returns a
      list of strings.  Note that this is incompatible with
-     ‘all-completions’, but since we’re not using that here, we might as
+     ‘all-completions’, but since we're not using that here, we might as
      well use one argument instead of three.
    • ‘ivy-more-chars’ is a simple function that returns, e.g., ‘'("2
      chars more")’ asking the user for more input.
@@ -1688,7 +1687,7 @@ order that they appear:
    • ‘caller’ argument identifies this command for easier customization.
 
 
-File: docuGPDVz.info,  Node: Example - ivy-read-with-extra-properties,  Prev: Example - counsel-locate,  Up: API
+File: ivy.info,  Node: Example - ivy-read-with-extra-properties,  Prev: Example - counsel-locate,  Up: API
 
 8.5 Example - ‘ivy-read-with-extra-properties’
 ==============================================
@@ -1721,7 +1720,7 @@ displayed candidate strings.
      It then retrieves that value and displays it.
 
 
-File: docuGPDVz.info,  Node: Variable Index,  Next: Keystroke Index,  Prev: API,  Up: Top
+File: ivy.info,  Node: Variable Index,  Next: Keystroke Index,  Prev: API,  Up: Top
 
 9 Variable Index
 ****************
@@ -1820,7 +1819,7 @@ File: docuGPDVz.info,  Node: Variable Index,  Next: Keystroke Index,  Prev: API,
                                                                (line 32)
 
 
-File: docuGPDVz.info,  Node: Keystroke Index,  Prev: Variable Index,  Up: Top
+File: ivy.info,  Node: Keystroke Index,  Prev: Variable Index,  Up: Top
 
 10 Keystroke Index
 ******************
@@ -1911,60 +1910,60 @@ File: docuGPDVz.info,  Node: Keystroke Index,  Prev: Variable Index,  Up: Top
 * w:                                     Hydra in the minibuffer.
                                                                (line 55)
 
-
 
 Tag Table:
-Node: Top1198
-Node: Introduction3115
-Node: Installation5644
-Node: Installing from Emacs Package Manager6026
-Node: Installing from the Git repository7279
-Node: Getting started8114
-Node: Basic customization8427
-Node: Key bindings9035
-Node: Global key bindings9233
-Node: Minibuffer key bindings11660
-Node: Key bindings for navigation12898
-Node: Key bindings for single selection action then exit minibuffer14111
-Node: Key bindings for multiple selections and actions keep minibuffer open16803
-Node: Key bindings that alter the minibuffer input19432
-Node: Other key bindings21389
-Node: Hydra in the minibuffer21773
-Node: Saving the current completion session to a buffer24197
-Node: Completion Styles25615
-Node: ivy--regex-plus27389
-Node: ivy--regex-ignore-order28888
-Node: ivy--regex-fuzzy29262
-Node: Customization29765
-Node: Faces29957
-Node: Defcustoms32403
-Node: Actions33750
-Node: What are actions?34082
-Node: How can different actions be called?34906
-Node: How to modify the actions list?35479
-Node: Example - add two actions to each command36145
-Node: How to undo adding the two actions37112
-Node: How to add actions to a specific command37572
-Node: Example - define a new command with several actions37994
-Node: Test the above function with ivy-occur38937
-Node: Packages39787
-Node: Commands40761
-Node: File Name Completion40952
-Node: Using TRAMP42967
-Node: Buffer Name Completion44470
-Node: Counsel commands45104
-Node: API45757
-Node: Required arguments for ivy-read46341
-Node: Optional arguments for ivy-read46866
-Node: Example - counsel-describe-function50324
-Node: Example - counsel-locate53283
-Node: Example - ivy-read-with-extra-properties57136
-Node: Variable Index58428
-Node: Keystroke Index65558
+Node: Top1190
+Node: Introduction3098
+Node: Installation5613
+Node: Installing from Emacs Package Manager5985
+Node: Installing from the Git repository7232
+Node: Getting started8059
+Node: Basic customization8366
+Node: Key bindings8966
+Node: Global key bindings9158
+Node: Minibuffer key bindings11579
+Node: Key bindings for navigation12811
+Node: Key bindings for single selection action then exit minibuffer14018
+Node: Key bindings for multiple selections and actions keep minibuffer open16701
+Node: Key bindings that alter the minibuffer input19323
+Node: Other key bindings21272
+Node: Hydra in the minibuffer21650
+Node: Saving the current completion session to a buffer24068
+Node: Completion Styles25480
+Node: ivy--regex-plus27243
+Node: ivy--regex-ignore-order28730
+Node: ivy--regex-fuzzy29096
+Node: Customization29587
+Node: Faces29773
+Node: Defcustoms32211
+Node: Actions33551
+Node: What are actions?33877
+Node: How can different actions be called?34695
+Node: How to modify the actions list?35262
+Node: Example - add two actions to each command35922
+Node: How to undo adding the two actions36882
+Node: How to add actions to a specific command37336
+Node: Example - define a new command with several actions37752
+Node: Test the above function with ivy-occur38689
+Node: Packages39533
+Node: Commands40501
+Node: File Name Completion40686
+Node: Using TRAMP42695
+Node: Buffer Name Completion44192
+Node: Counsel commands44820
+Node: API45467
+Node: Required arguments for ivy-read46045
+Node: Optional arguments for ivy-read46564
+Node: Example - counsel-describe-function50012
+Node: Example - counsel-locate52957
+Node: Example - ivy-read-with-extra-properties56802
+Node: Variable Index58088
+Node: Keystroke Index65212
 
 End Tag Table
 
 
 Local Variables:
 coding: utf-8
+Info-documentlanguage: en
 End:

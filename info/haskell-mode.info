@@ -1,4 +1,4 @@
-This is docuOwVOT.info, produced by makeinfo version 6.8 from
+This is haskell-mode.info, produced by makeinfo version 7.2 from
 haskell-mode.texi.
 
 This manual is for Haskell mode, version 17.5
@@ -16,7 +16,7 @@ START-INFO-DIR-ENTRY
 END-INFO-DIR-ENTRY
 
 
-File: docuOwVOT.info,  Node: Top,  Next: Introduction,  Up: (dir)
+File: haskell-mode.info,  Node: Top,  Next: Introduction,  Up: (dir)
 
 Haskell Mode
 ************
@@ -54,7 +54,7 @@ interpreter (e.g.  GHCi).
 * Variable index::                       Index of options and types
 
 
-File: docuOwVOT.info,  Node: Introduction,  Next: Installation,  Prev: Top,  Up: Top
+File: haskell-mode.info,  Node: Introduction,  Next: Installation,  Prev: Top,  Up: Top
 
 1 Introduction
 **************
@@ -85,8 +85,8 @@ Since then, it has received many contributions in many forms.  Some
 design choices that remain in haskell-mode today are historical.  Some
 modules are outdated or no longer used, or are used by a few people.
 
-   Historically there hasn’t been a single individual or set of
-individuals directing the package’s architecture for a long period of
+   Historically there hasn't been a single individual or set of
+individuals directing the package's architecture for a long period of
 time, rather, patches and new modules were accepted in liberally and we
 are left with a box full of interesting toys that may or may not work.
 
@@ -94,7 +94,7 @@ are left with a box full of interesting toys that may or may not work.
 <https://github.com/haskell/haskell-mode>.
 
 
-File: docuOwVOT.info,  Node: Installation,  Next: Editing Haskell Code,  Prev: Introduction,  Up: Top
+File: haskell-mode.info,  Node: Installation,  Next: Editing Haskell Code,  Prev: Introduction,  Up: Top
 
 2 Installation
 **************
@@ -141,7 +141,7 @@ Haskell source code in color now.
 2.1 Customizing
 ===============
 
-Most of Haskell Mode’s settings are configurable via customizable
+Most of Haskell Mode's settings are configurable via customizable
 variables (*note (emacs)Easy Customization::, for details).  You can use
 ‘M-x customize-group <RET> haskell’ to browse the ‘haskell’
 customization sub-tree.
@@ -157,7 +157,7 @@ can customize ‘haskell-mode-hook’ by
 any function to the list.
 
 
-File: docuOwVOT.info,  Node: Editing Haskell Code,  Next: Syntax highlighting,  Prev: Installation,  Up: Top
+File: haskell-mode.info,  Node: Editing Haskell Code,  Next: Syntax highlighting,  Prev: Installation,  Up: Top
 
 3 Editing Haskell Code
 **********************
@@ -202,7 +202,7 @@ To jump to your import list, run
 
    ‘M-x’ ‘haskell-navigate-imports’
 
-   It’s nicer to have a keybinding to do this, for example:
+   It's nicer to have a keybinding to do this, for example:
 
      (define-key haskell-mode-map (kbd "<f8>") 'haskell-navigate-imports)
 
@@ -267,12 +267,12 @@ if one is present, or add one if point is over whitespace.  By default
 it is bound to ‘C-c C-s’.
 
 
-File: docuOwVOT.info,  Node: Syntax highlighting,  Next: Completion support,  Prev: Editing Haskell Code,  Up: Top
+File: haskell-mode.info,  Node: Syntax highlighting,  Next: Completion support,  Prev: Editing Haskell Code,  Up: Top
 
 4 Syntax highlighting
 *********************
 
-‘haskell-mode’ supports “syntax highlighting” via Emacs’ Font Lock minor
+‘haskell-mode’ supports “syntax highlighting” via Emacs' Font Lock minor
 mode which should be enabled by default in current Emacsen.  *Note
 (emacs)Font Lock::, for more information on how to control
 ‘font-lock-mode’.
@@ -321,18 +321,18 @@ unambiguous.  Any of the following will work:
      result = [ html| html <- htmlList]
      result = [html | html <- htmlList]
 
-   GHC’s ambiguity is an accident of the past but it is unlikely to be
+   GHC's ambiguity is an accident of the past but it is unlikely to be
 fixed due to backward compatibility baggage.
 
 
-File: docuOwVOT.info,  Node: Completion support,  Next: Unicode support,  Prev: Syntax highlighting,  Up: Top
+File: haskell-mode.info,  Node: Completion support,  Next: Unicode support,  Prev: Syntax highlighting,  Up: Top
 
 5 Completion support
 ********************
 
 ‘haskell-mode’ can complete symbols, pragma directives, language
 extensions, and language keywords out-of-box.  ‘haskell-mode’ completes
-identifiers (symbols) using tags (see “Tags”), however you can get more
+identifiers (symbols) using tags (see "Tags"), however you can get more
 precise completions with ‘haskell-interactive-mode’.  In interactive
 mode completion candidates are produced by querying GHCi REPL.
 
@@ -344,7 +344,7 @@ symbols from imported modules.
 
    Unfortunately, it is not possible to provide candidates for
 identifiers defined locally in ‘let’ and ‘where’ blocks even in
-interactive mode.  But if you’re using company-mode
+interactive mode.  But if you're using company-mode
 (http://company-mode.github.io/) you can override ‘company-backends’
 variable for Haskell buffers to combine completion candidates from
 completion-at-point function (‘company-capf’ backend) and dynamic
@@ -365,12 +365,12 @@ major slowdown while trying to complete after an Haskell operator (See
 GHC-Bug 10576 (https://ghc.haskell.org/trac/ghc/ticket/10576)).
 
 
-File: docuOwVOT.info,  Node: Unicode support,  Next: Indentation,  Prev: Completion support,  Up: Top
+File: haskell-mode.info,  Node: Unicode support,  Next: Indentation,  Prev: Completion support,  Up: Top
 
 6 Unicode support
 *****************
 
-See the Haskell Wiki’s entry on Unicode Symbols
+See the Haskell Wiki's entry on Unicode Symbols
 (http://www.haskell.org/haskellwiki/Unicode-symbols) for general
 information about Unicode support in Haskell.
 
@@ -440,12 +440,12 @@ _8     ₈           _9     ₉           ^0     ⁰           ^1     ¹
 ^2     ²           ^3     ³           ^4     ⁴           ^5     ⁵
 ^6     ⁶           ^7     ⁷           ^8     ⁸           ^9     ⁹
 
-   If you don’t like the highlighting of partially matching tokens you
+   If you don't like the highlighting of partially matching tokens you
 can turn it off by setting ‘input-method-highlight-flag’ to ‘nil’ via
 ‘M-x customize-variable’.
 
 
-File: docuOwVOT.info,  Node: Indentation,  Next: External indentation,  Prev: Unicode support,  Up: Top
+File: haskell-mode.info,  Node: Indentation,  Next: External indentation,  Prev: Unicode support,  Up: Top
 
 7 Indentation
 *************
@@ -501,7 +501,7 @@ more about rectangle commands.
    Moreover, CUA mode (*note (emacs)CUA Bindings::) provides enhanced
 rectangle support with visible rectangle highlighting.  When CUA mode is
 active, you can initiate a rectangle selection by ‘C-RET’ and extend it
-simply by movement commands.  You don’t have to enable full CUA mode to
+simply by movement commands.  You don't have to enable full CUA mode to
 benefit from these enhanced rectangle commands; you can activate CUA
 selection mode (without redefining ‘C-x’,‘C-c’,‘C-v’, and ‘C-z’) by
 calling ‘M-x cua-selection-mode’ (or adding ‘(cua-selection-mode nil)’
@@ -525,7 +525,7 @@ require time travel.
 in ‘haskell-mode’.
 
 
-File: docuOwVOT.info,  Node: External indentation,  Next: Autoformatting,  Prev: Indentation,  Up: Top
+File: haskell-mode.info,  Node: External indentation,  Next: Autoformatting,  Prev: Indentation,  Up: Top
 
 8 Other ways to indent code
 ***************************
@@ -547,7 +547,7 @@ code by parsing the code with a full Haskell parser and deciding where
 to indent based on that.
 
 
-File: docuOwVOT.info,  Node: Autoformatting,  Next: Module templates,  Prev: External indentation,  Up: Top
+File: haskell-mode.info,  Node: Autoformatting,  Next: Module templates,  Prev: External indentation,  Up: Top
 
 9 Using external formatters
 ***************************
@@ -569,7 +569,7 @@ automatically formatted.
 ‘haskell-mode-stylish-buffer’.
 
 
-File: docuOwVOT.info,  Node: Module templates,  Next: Declaration scanning,  Prev: Autoformatting,  Up: Top
+File: haskell-mode.info,  Node: Module templates,  Next: Declaration scanning,  Prev: Autoformatting,  Up: Top
 
 10 Module templates
 *******************
@@ -587,7 +587,7 @@ To enable auto-insertion of module templates, enable:
    And put your cursor in the comment section.
 
 
-File: docuOwVOT.info,  Node: Declaration scanning,  Next: Compilation,  Prev: Module templates,  Up: Top
+File: haskell-mode.info,  Node: Declaration scanning,  Next: Compilation,  Prev: Module templates,  Up: Top
 
 11 Declaration scannning
 ************************
@@ -617,11 +617,11 @@ enabled to operate on Haskell declarations:
      Select whole current or following declaration (‘mark-defun’).
 
    Moreover, if enabled via the option
-‘haskell-decl-scan-add-to-menubar’, a menu item “Declarations” is added
+‘haskell-decl-scan-add-to-menubar’, a menu item "Declarations" is added
 to the menu bar listing the scanned declarations and allowing to jump to
 declarations in the source buffer.
 
-   It’s recommended to have font lock mode enabled (*note (emacs)Font
+   It's recommended to have font lock mode enabled (*note (emacs)Font
 Lock::) as ‘haskell-decl-scan-mode’ ignores text highlighted with
 ‘font-lock-comment-face’.
 
@@ -633,7 +633,7 @@ for Haskell buffers, add ‘haskell-decl-scan-mode’ to
 
    ‘haskell-decl-scan-mode’ enables the use of features that build upon
 ‘imenu’ support such as Speedbar Frames (*note (emacs)Speedbar::) or the
-global “Which Function” minor mode (*note (emacs)Which Function::).
+global "Which Function" minor mode (*note (emacs)Which Function::).
 
    In order to enable ‘which-function-mode’ for Haskell buffers you need
 to add the following to your Emacs initialization:
@@ -696,27 +696,27 @@ if you enable Haskell support for speedbar:
 the line in the right file when clicked/selected.
 
 
-File: docuOwVOT.info,  Node: Compilation,  Next: Interactive Haskell,  Prev: Declaration scanning,  Up: Top
+File: haskell-mode.info,  Node: Compilation,  Next: Interactive Haskell,  Prev: Declaration scanning,  Up: Top
 
 12 Compilation
 **************
 
 Haskell mode comes equipped with a specialized “Compilation mode”
-tailored to GHC’s compiler messages with optional support for Cabal
+tailored to GHC's compiler messages with optional support for Cabal
 projects.  *Note (emacs)Compilation Mode::, for more information about
 the basic commands provided by the Compilation mode which are available
 in the Haskell compilation sub-mode as well.  The additional features
-provided compared to Emacs’ basic Compilation mode are:
+provided compared to Emacs' basic Compilation mode are:
 
    • DWIM-style auto-detection of compile command (including support for
      stack and cabal projects)
-   • Support for GHC’s compile messages and recognizing error, warning
+   • Support for GHC's compile messages and recognizing error, warning
      and info source locations (including ‘-ferror-spans’ syntax)
-   • Support for filtering out GHC’s uninteresting ‘Loading package...’
+   • Support for filtering out GHC's uninteresting ‘Loading package...’
      linker messages
 
    In order to use it, invoke the ‘haskell-compile’ command instead of
-‘compile’ as you would for the ordinary Compilation mode.  It’s
+‘compile’ as you would for the ordinary Compilation mode.  It's
 recommended to bind ‘haskell-compile’ to a convenient key binding.  For
 instance, you can add the following to your Emacs initialization to bind
 ‘haskell-compile’ to ‘C-c C-c’.
@@ -770,64 +770,85 @@ customized compile command, invoke ‘recompile’ (bound to ‘g’) inside the
 12.1 Keybindings
 ================
 
-Key   Function
-binding
-------------
-TAB   compilation-next-error
-      
-RET   compile-goto-error
-      
-C-o   compilation-display-error
-      
-SPC   scroll-up-command
-      
--     negative-argument
-      
-0     digit-argument
-..    
-9
-<     beginning-of-buffer
-      
->     end-of-buffer
-      
-?     describe-mode
-      
-g     recompile
-      
-h     describe-mode
-      
-q     quit-window
-      
-DEL   scroll-down-command
-      
-S-SPC scroll-down-command
-      
-<backtab>compilation-previous-error
-      
-<follow-link>mouse-face
-      
-<mouse-2>compile-goto-error
-      
-<remap>Prefix
-      Command
-      
-M-n   compilation-next-error
-      
-M-p   compilation-previous-error
-      
-M-{   compilation-previous-file
-      
-M-}   compilation-next-file
-      
-C-c   compile-goto-error
-C-c   
-C-c   next-error-follow-minor-mode
-C-f   
-C-c   kill-compilation
-C-k   
+Key binding
+Function
+TAB
+compilation-next-error
+
+RET
+compile-goto-error
+
+C-o
+compilation-display-error
+
+SPC
+scroll-up-command
+
+-
+negative-argument
+
+0 ..  9
+digit-argument
+
+<
+beginning-of-buffer
+
+>
+end-of-buffer
+
+?
+describe-mode
+
+g
+recompile
+
+h
+describe-mode
+
+q
+quit-window
+
+DEL
+scroll-down-command
+
+S-SPC
+scroll-down-command
+
+<backtab>
+compilation-previous-error
+
+<follow-link>
+mouse-face
+
+<mouse-2>
+compile-goto-error
+
+<remap>
+Prefix Command
+
+M-n
+compilation-next-error
+
+M-p
+compilation-previous-error
+
+M-{
+compilation-previous-file
+
+M-}
+compilation-next-file
+
+C-c C-c
+compile-goto-error
+
+C-c C-f
+next-error-follow-minor-mode
+
+C-c C-k
+kill-compilation
 
 
-File: docuOwVOT.info,  Node: Interactive Haskell,  Next: Editing Cabal files,  Prev: Compilation,  Up: Top
+File: haskell-mode.info,  Node: Interactive Haskell,  Next: Editing Cabal files,  Prev: Compilation,  Up: Top
 
 13 Interactive Haskell
 **********************
@@ -848,7 +869,7 @@ just the REPL, it comes with the standard key bindings(like ‘ielm’ or
    With ‘haskell-interactive-mode’, each Haskell source buffer is
 associated with at most one GHCi session, so when you call
 ‘haskell-process-load-file’ for a Haskell source buffer which has no
-session associated yet, you’re asked which GHCi session to create or
+session associated yet, you're asked which GHCi session to create or
 associate with.
 
 13.1 Goto Error
@@ -883,17 +904,17 @@ symbols ‘auto’, ‘ghci’, ‘stack-ghci’, ‘cabal-repl’, or ‘cabal-
 ‘new-build’ that it selected.  Emacs actually runs the equivalent cabal
 command ‘build’.)
 
-   If it’s ‘auto’, the directory contents and available programs will be
+   If it's ‘auto’, the directory contents and available programs will be
 used to make a best guess at the process type.  The actual process type
 will then determine which variables ‘haskell-interactive-mode’ will
 access to determine the program to start and its arguments:
 
-   • If it’s ‘ghci’, ‘haskell-process-path-ghci’ and
+   • If it's ‘ghci’, ‘haskell-process-path-ghci’ and
      ‘haskell-process-args-ghci’ will be used.
-   • If it’s ‘cabal-repl’ or ‘cabal-new-repl’,
+   • If it's ‘cabal-repl’ or ‘cabal-new-repl’,
      ‘haskell-process-path-cabal’ and ‘haskell-process-args-cabal-repl’
      are used.
-   • If it’s ‘stack-ghci’, ‘haskell-process-path-stack’ and
+   • If it's ‘stack-ghci’, ‘haskell-process-path-stack’ and
      ‘haskell-process-args-stack-ghci’ will be used.
 
    With each of these pairs, the the ‘haskell-process-path-...’ variable
@@ -936,7 +957,7 @@ This gives the basic ways to start a session.  In a Haskell buffer:
    • Or: run ‘C-c C-l’ to load the file.  This will first try to start a
      session as the previous command does.
    • Or: run any command which requires a running session.  It will
-     always prompt to create one if there isn’t one already for the
+     always prompt to create one if there isn't one already for the
      current project.
 
      (define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-or-reload)
@@ -979,14 +1000,14 @@ setting by running ‘M-x’ ‘customize-variable’ ‘RET’
    • stack-ghci
 
    Please, check the documentation for ‘haskell-process-type’ to see how
-the real type is guessed, when it’s set to ‘auto’.
+the real type is guessed, when it's set to ‘auto’.
 
 13.4.5 Troubleshooting
 ----------------------
 
-Launching your GHCi process can fail when you’re first getting setup,
+Launching your GHCi process can fail when you're first getting setup,
 depending on the type you choose.  If it does fail to launch, switch to
-the buffer ‘*haskell-process-log*’ and see what’s up.  The buffer
+the buffer ‘*haskell-process-log*’ and see what's up.  The buffer
 contains a log of incoming/outgoing messages to the GHCi process.
 
 13.5 Haskell Interactive Mode Tags Using GHCi
@@ -996,17 +1017,17 @@ You can bind the following to use GHCi to find definitions of things:
 
      (define-key haskell-mode-map (kbd "M-.") 'haskell-mode-jump-to-def)
 
-   The one problem with this approach is that if your code doesn’t
-compile, GHCi doesn’t give any location info.  So you need to make sure
+   The one problem with this approach is that if your code doesn't
+compile, GHCi doesn't give any location info.  So you need to make sure
 your code compiles and the modules you want to jump to are loaded
 byte-compiled.
 
    Note: I think that when you restart GHCi you lose location
 information, even if you have the ‘.o’ and ‘.hi’ files lying around.
-I’m not sure.  But sometimes ‘:i foo’ will give ‘foo is defined in Bar’
+I'm not sure.  But sometimes ‘:i foo’ will give ‘foo is defined in Bar’
 rather than ‘foo is defined in /foo/Bar.hs:123:23’.
 
-   Alternatively, you can use tags generation, which doesn’t require a
+   Alternatively, you can use tags generation, which doesn't require a
 valid compile.
 
 13.5.1 Tags Setup
@@ -1031,7 +1052,7 @@ Now, every time you run ‘save-buffer’ (‘C-x C-s’), there is a hook that
 will run and generate Emacs *Note (emacs)Tags::, for the whole project
 directory.  The resulting file will be called ‘TAGS’.
 
-   WARNING: You should be careful that your project root isn’t your home
+   WARNING: You should be careful that your project root isn't your home
 directory or something, otherwise it will traverse all the way down and
 take an impossibly long time.
 
@@ -1057,7 +1078,7 @@ jumping, use:
 ---------------------------
 
 Sometimes a ‘TAGS’ file is deleted (by you or some other process).
-Emacs will complain that it doesn’t exist anymore.  To resolve this
+Emacs will complain that it doesn't exist anymore.  To resolve this
 simply do ‘M-x’ ‘tags-reset-tags-tables’.
 
 13.6 Sessions
@@ -1078,7 +1099,7 @@ To start a session run the following steps:
    • Or: run ‘C-c C-l’ to load the file.  This will first try to start a
      session as the previous command does.
    • Or: run any command which requires a running session.  It will
-     always prompt to create one if there isn’t one already for the
+     always prompt to create one if there isn't one already for the
      current project.
 
    It will prompt for a Cabal directory and a current directory.  It
@@ -1093,7 +1114,7 @@ You can run
 
          M-x haskell-session-change
 
-   If it prompts you to make a new session, tell it no (that’s a bug).
+   If it prompts you to make a new session, tell it no (that's a bug).
 It will ask you to choose from a list of sessions.
 
 13.6.3 Killing a session
@@ -1142,7 +1163,7 @@ To compile and load a Haskell module into GHCi, run the following
 
          M-x haskell-process-load
 
-   Or ‘C-c C-l’.  You’ll see any compile errors in the REPL window.
+   Or ‘C-c C-l’.  You'll see any compile errors in the REPL window.
 
 13.7.2 Build the Cabal project
 ------------------------------
@@ -1151,15 +1172,15 @@ To compile the whole Cabal project, run the following
 
          M-x haskell-process-cabal-build
 
-   Or ‘C-c C-c’.  You’ll see any compile errors in the REPL window.
+   Or ‘C-c C-c’.  You'll see any compile errors in the REPL window.
 
 13.7.3 Reloading modules
 ------------------------
 
-To reload the current module, even when you’re in other modules, you can
+To reload the current module, even when you're in other modules, you can
 run ‘C-u M-x’ ‘haskell-process-load-or-reload’ or ‘C-u C-c C-l’.  It
 will now reload that module whenever you run ‘C-c C-l’ in the future
-from whatever module you’re in.  To disable this mode, just run ‘C-u C-c
+from whatever module you're in.  To disable this mode, just run ‘C-u C-c
 C-l’ again.
 
 13.7.4 Jumping to compile errors
@@ -1210,9 +1231,9 @@ Enable the customization variable
 
    Whenever GHC says something is not in scope, it will hoogle that
 symbol.  If there are results, it will prompt to add one of the modules
-from Hoogle’s results.
+from Hoogle's results.
 
-   You need to make sure you’ve generated your Hoogle database properly.
+   You need to make sure you've generated your Hoogle database properly.
 
 13.7.7 Auto-adding of extensions
 --------------------------------
@@ -1223,7 +1244,7 @@ For example, if you write:
      newtype X a = X (IO a)
        deriving (Monad)
 
-   Then you’ll see a message like:
+   Then you'll see a message like:
 
          x.hs:13:13: Can't make a derived instance of `Monad X': …
                `Monad' is not a derivable class
@@ -1235,7 +1256,7 @@ For example, if you write:
      > Add `{-# LANGUAGE GeneralizedNewtypeDeriving #-}` to the top of the
      > file? (y or n)
 
-   If you answer ‘y‘, it will temporarily jump to the buffer and it to
+   If you answer 'y', it will temporarily jump to the buffer and it to
 the top of the file.
 
 13.7.8 Orphan instances
@@ -1302,7 +1323,7 @@ targets for
 
    - Library
 
-   Answer “yes” to restart the session and run your tests, benchmarks,
+   Answer "yes" to restart the session and run your tests, benchmarks,
 executables.
 
    TODO/WRITEME
@@ -1310,7 +1331,7 @@ executables.
 13.8.2 Bringing the REPL
 ------------------------
 
-If you don’t know where the REPL buffer is, you can always bring it
+If you don't know where the REPL buffer is, you can always bring it
 with:
 
          M-x haskell-interactive-bring
@@ -1320,7 +1341,7 @@ with:
 13.8.3 Evaluating expressions
 -----------------------------
 
-To evaluate expressions, simply type one out and hit ‘RET‘.
+To evaluate expressions, simply type one out and hit 'RET'.
 
          λ> 123
          123
@@ -1334,7 +1355,7 @@ GHCi features two ways to evaluate multiline expressions.  You can use
 for all expressions, or you can wrap your expression in ‘:{’ and ‘:}’
 (they have to be on their own lines).
 
-   The prompt will change to indicate that you’re inputting a multiline
+   The prompt will change to indicate that you're inputting a multiline
 expression:
 
      λ> :{
@@ -1370,7 +1391,7 @@ something:
          λ> id
          id :: a -> a
 
-   and because there’s no ‘Show’ instance for ‘(a -> a)’.  This would
+   and because there's no ‘Show’ instance for ‘(a -> a)’.  This would
 normally yield a compile error:
 
          No instance for (Show (a0 -> a0))
@@ -1432,7 +1453,7 @@ expressions.  To do that, configure the variable
      (define-key haskell-interactive-mode-map (kbd "C-c C-v")
                  'haskell-interactive-toggle-print-mode)
 
-   There you can choose ‘haskell-mode‘, for example, to pretty print the
+   There you can choose 'haskell-mode', for example, to pretty print the
 output as Haskell.
 
 13.8.7 SVG images rendering
@@ -1526,7 +1547,6 @@ layout of windows in Emacs.
        (create-unfocused-frame)
        (delete-window))
 
-
 13.8.13 Troubleshooting
 -----------------------
 
@@ -1540,7 +1560,7 @@ If the REPL ever goes funny, you can clear the command queue via:
 
    You can also switch to the buffer ‘*haskell-process-log*’, which can
 be enabled and disabled with the customization variable
-‘haskell-process-log‘, to see what the cause of your troubles are.
+'haskell-process-log', to see what the cause of your troubles are.
 
    If the process fails and nothing unusual is in the process log, the
 following command can dump the ‘haskell-process’ state:
@@ -1564,7 +1584,7 @@ in the message buffer, run the following command:
 
    or ‘C-c C-t’.
 
-13.9.2 Insert identifier’s type as type signature
+13.9.2 Insert identifier's type as type signature
 -------------------------------------------------
 
 To print the type of the top-level identifier at point, run the
@@ -1616,9 +1636,9 @@ cursor to ‘Ordering’ and hit ‘C-c C-i’ again to get another popup:
      instance Read Ordering -- Defined in `GHC.Read'
      instance Show Ordering -- Defined in `GHC.Show'
 
-   And so on.  It’s a very good way of exploring a new codebase.
+   And so on.  It's a very good way of exploring a new codebase.
 
-13.9.5 Browse import’s module
+13.9.5 Browse import's module
 -----------------------------
 
 To print all exported identifiers of the module imported by the import
@@ -1632,8 +1652,8 @@ The.Module’ in the GHCi process.
 13.10 Haskell Interactive Mode Cabal integration
 ================================================
 
-There’s some integration with Cabal in Haskell Interactive Mode.  Once
-you’ve started a session, the features below are available.
+There's some integration with Cabal in Haskell Interactive Mode.  Once
+you've started a session, the features below are available.
 
 13.10.1 Cabal building
 ----------------------
@@ -1645,7 +1665,7 @@ command:
 
    Or ‘C-c C-c’.  When building, it will hide unnecessary output.
 
-   For example, to build the ‘ace‘ package, the output is simply:
+   For example, to build the 'ace' package, the output is simply:
 
          Compiling: ACE.Types.Tokens
          Compiling: ACE.Combinators
@@ -1727,7 +1747,7 @@ normal file, for example:
                putStrLn "World"
 
    and load it into GHCi (‘C-c C-l’).  Now when you hit ‘g’ (to refresh)
-in the debugging buffer, you’ll see something like:
+in the debugging buffer, you'll see something like:
 
 
          Debugging haskell
@@ -1863,10 +1883,10 @@ to:
 
          Main - hello.hs
 
-   And you’re done debugging.
+   And you're done debugging.
 
 
-File: docuOwVOT.info,  Node: Editing Cabal files,  Next: Browsing Haddocks,  Prev: Interactive Haskell,  Up: Top
+File: haskell-mode.info,  Node: Editing Cabal files,  Next: Browsing Haddocks,  Prev: Interactive Haskell,  Up: Top
 
 14 Editing Cabal files
 **********************
@@ -1885,7 +1905,7 @@ sequence ‘C-c v c’.
    TODO/WRITEME
 
 
-File: docuOwVOT.info,  Node: Browsing Haddocks,  Next: Spell checking strings and comments,  Prev: Editing Cabal files,  Up: Top
+File: haskell-mode.info,  Node: Browsing Haddocks,  Next: Spell checking strings and comments,  Prev: Editing Cabal files,  Up: Top
 
 15 Browsing Haddocks using ‘w3m’
 ********************************
@@ -1908,7 +1928,7 @@ Most Linux distributions will have a package for the binary:
    Confirm installation by trying ‘M-x’ ‘w3m-browse-url’ ‘RET’
 ‘haskell.org’ ‘RET’.
 
-   If this works, you’re good to go.
+   If this works, you're good to go.
 
 15.2 Configure w3m
 ==================
@@ -1936,7 +1956,7 @@ passive viewer than a full-fledged browser.  For example:
 15.3 Import w3m-haddock
 =======================
 
-It’s not enabled by default in haskell-mode at present, so you need to
+It's not enabled by default in haskell-mode at present, so you need to
 import it manually:
 
      (require 'w3m-haddock)
@@ -1949,7 +1969,7 @@ highlighting to source view), you can add this hook:
 
      (add-hook 'w3m-display-hook 'w3m-haddock-display)
 
-   It’s a little rough around the edges, but it’s a start.
+   It's a little rough around the edges, but it's a start.
 
 15.5 Configure your package locations
 =====================================
@@ -1966,7 +1986,7 @@ custom-set-variables code for it.
 15.6 Finally
 ============
 
-You did all that!  Now you’re ready to bind a useful key:
+You did all that!  Now you're ready to bind a useful key:
 
      (define-key haskell-mode-map (kbd "C-c C-d") 'haskell-w3m-open-haddock)
 
@@ -1976,7 +1996,7 @@ to.
    This feature will be improved gradually as time goes on.
 
 
-File: docuOwVOT.info,  Node: Spell checking strings and comments,  Next: Aligning code,  Prev: Browsing Haddocks,  Up: Top
+File: haskell-mode.info,  Node: Spell checking strings and comments,  Next: Aligning code,  Prev: Browsing Haddocks,  Up: Top
 
 16 Using with ‘flyspell-prog-mode’
 **********************************
@@ -2005,7 +2025,7 @@ your ‘~/.emacs’ file:
    ‘(add-hook 'haskell-mode-hook 'flyspell-prog-mode)’
 
 
-File: docuOwVOT.info,  Node: Aligning code,  Next: Rectangular commands,  Prev: Spell checking strings and comments,  Up: Top
+File: haskell-mode.info,  Node: Aligning code,  Next: Rectangular commands,  Prev: Spell checking strings and comments,  Up: Top
 
 17 Aligning code
 ****************
@@ -2025,7 +2045,7 @@ type a regexp representing the alignment delimiter.
        -> Foo b -- ^ and b
        -> c     -- ^ to c
 
-   Of course, this works for just about anything.  Personally, I’ve
+   Of course, this works for just about anything.  Personally, I've
 globally bound it to ‘C-x a r’:
 
      (global-set-key (kbd "C-x a r") 'align-regexp)
@@ -2052,7 +2072,7 @@ aligner about Haskell.  Once you evaluate this, you can just use ‘M-x’
                     (modes quote (haskell-mode haskell-literate-mode))))
 
 
-File: docuOwVOT.info,  Node: Rectangular commands,  Next: REPL,  Prev: Aligning code,  Up: Top
+File: haskell-mode.info,  Node: Rectangular commands,  Next: REPL,  Prev: Aligning code,  Up: Top
 
 18 Using rectangular region commands
 ************************************
@@ -2069,7 +2089,7 @@ whitespace sensitive languages.
    • ‘C-x r t’ is "String Rectangle".
 
      It will replace any text within the rectangle with the given string
-     on all the lines in the region.  If comment-region didn’t already
+     on all the lines in the region.  If comment-region didn't already
      exist, you could use this instead, for example.
 
    • ‘C-x r d’ is "Delete Rectangle".
@@ -2099,7 +2119,7 @@ whitespace sensitive languages.
 out what keys are bound beginning with the ‘C-x r’ prefix.
 
 
-File: docuOwVOT.info,  Node: REPL,  Next: Collapsing Haskell code,  Prev: Rectangular commands,  Up: Top
+File: haskell-mode.info,  Node: REPL,  Next: Collapsing Haskell code,  Prev: Rectangular commands,  Up: Top
 
 19 Using GHCi REPL within Emacs
 *******************************
@@ -2208,7 +2228,7 @@ Interpreter (defcustom)       Default        Possible Values
 
 The Haskell interpreter used by ‘Inf-Haskell’ is auto-detected by
 default, but is customizable with defcustom ‘haskell-process-type’.  The
-values recognized by it are (default is ’auto):
+values recognized by it are (default is 'auto):
 
    • ‘'stack-ghci’
    • ‘'cabal-repl’
@@ -2229,7 +2249,7 @@ following preference is followed: ‘cabal.project’ > ‘stack.yaml’ >
 ‘*.cabal’
 
 
-File: docuOwVOT.info,  Node: Collapsing Haskell code,  Next: Getting Help and Reporting Bugs,  Prev: REPL,  Up: Top
+File: haskell-mode.info,  Node: Collapsing Haskell code,  Next: Getting Help and Reporting Bugs,  Prev: REPL,  Up: Top
 
 20 Collapsing Haskell code
 **************************
@@ -2317,7 +2337,7 @@ for indentation and it collapses all toplevel functions.
      dp money a @ (coin:coins)...
 
 
-File: docuOwVOT.info,  Node: Getting Help and Reporting Bugs,  Next: Concept index,  Prev: Collapsing Haskell code,  Up: Top
+File: haskell-mode.info,  Node: Getting Help and Reporting Bugs,  Next: Concept index,  Prev: Collapsing Haskell code,  Up: Top
 
 21 Getting Help and Reporting Bugs
 **********************************
@@ -2326,8 +2346,8 @@ Work on Haskell Mode is organized with Github ‘haskell-mode’ project.
 To understand how the project is run please read the information in the
 project wiki pages (https://github.com/haskell/haskell-mode/wiki).
 
-   To report any issues please use the Github’s issue mechanism
-available from Haskell Mode’s GitHub Home
+   To report any issues please use the Github's issue mechanism
+available from Haskell Mode's GitHub Home
 (https://github.com/haskell/haskell-mode).
 
    For a quick question visit ‘#haskell-emacs’ channel on IRC
@@ -2343,7 +2363,7 @@ gmane.comp.lang.haskell.emacs
 coding Haskell even more.
 
 
-File: docuOwVOT.info,  Node: Concept index,  Next: Function index,  Prev: Getting Help and Reporting Bugs,  Up: Top
+File: haskell-mode.info,  Node: Concept index,  Next: Function index,  Prev: Getting Help and Reporting Bugs,  Up: Top
 
 Concept index
 *************
@@ -2368,7 +2388,7 @@ Concept index
 * Unicode:                               Unicode support.     (line   6)
 
 
-File: docuOwVOT.info,  Node: Function index,  Next: Variable index,  Prev: Concept index,  Up: Top
+File: haskell-mode.info,  Node: Function index,  Next: Variable index,  Prev: Concept index,  Up: Top
 
 Function index
 **************
@@ -2387,7 +2407,7 @@ Function index
 * haskell-svg-toggle-render-images:      Interactive Haskell. (line 628)
 
 
-File: docuOwVOT.info,  Node: Variable index,  Prev: Function index,  Up: Top
+File: haskell-mode.info,  Node: Variable index,  Prev: Function index,  Up: Top
 
 Variable index
 **************
@@ -2425,35 +2445,34 @@ Variable index
 * haskell-svg-render-images:             Interactive Haskell. (line 633)
 * haskell-type-face:                     Syntax highlighting. (line  29)
 
-
 
 Tag Table:
-Node: Top676
-Node: Introduction2578
-Node: Installation4160
-Node: Editing Haskell Code6520
-Node: Syntax highlighting10277
-Node: Completion support12534
-Node: Unicode support14575
-Node: Indentation19244
-Node: External indentation22717
-Node: Autoformatting23443
-Node: Module templates24069
-Node: Declaration scanning24497
-Node: Compilation27782
-Node: Interactive Haskell32085
-Ref: printing mode51506
-Node: Editing Cabal files64270
-Node: Browsing Haddocks65014
-Node: Spell checking strings and comments67836
-Node: Aligning code68939
-Node: Rectangular commands70681
-Node: REPL72198
-Node: Collapsing Haskell code76944
-Node: Getting Help and Reporting Bugs79549
-Node: Concept index80590
-Node: Function index81845
-Node: Variable index82637
+Node: Top679
+Node: Introduction2584
+Node: Installation4165
+Node: Editing Haskell Code6526
+Node: Syntax highlighting10284
+Node: Completion support12540
+Node: Unicode support14578
+Node: Indentation19246
+Node: External indentation22720
+Node: Autoformatting23449
+Node: Module templates24078
+Node: Declaration scanning24509
+Node: Compilation27787
+Node: Interactive Haskell31875
+Ref: printing mode51233
+Node: Editing Cabal files63970
+Node: Browsing Haddocks64717
+Node: Spell checking strings and comments67532
+Node: Aligning code68638
+Node: Rectangular commands70381
+Node: REPL71899
+Node: Collapsing Haskell code76646
+Node: Getting Help and Reporting Bugs79254
+Node: Concept index80294
+Node: Function index81552
+Node: Variable index82347
 
 End Tag Table
 
